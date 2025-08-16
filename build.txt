@@ -1,0 +1,3 @@
+displayName = [c/f00000:Mario Warpworld]
+author = Lacroix + Ray
+version = 0.1

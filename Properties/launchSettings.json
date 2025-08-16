@@ -1,0 +1,20 @@
+{
+	"profiles": {
+		"Terraria": {
+			"commandName": "Executable",
+			"executablePath": "dotnet",
+			"commandLineArgs": "$(tMLPath)",
+			"workingDirectory": "$(tMLSteamPath)"
+		},
+		"TerrariaServer": {
+			"commandName": "Executable",
+			"executablePath": "dotnet",
+			"commandLineArgs": "$(tMLServerPath)",
+			"workingDirectory": "$(tMLSteamPath)"
+		},
+		"Terraria (hot reload+ watcher)": {
+			"commandName": "Project",
+			"commandLineArgs": "\"$(TerrariaSteamPath)$(tMLPath)\" -skipselect"
+		}
+	}
+}
