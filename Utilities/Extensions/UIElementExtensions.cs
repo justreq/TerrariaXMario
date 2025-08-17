@@ -3,7 +3,7 @@ using Terraria.ModLoader.UI.Elements;
 using Terraria.UI;
 
 namespace TerrariaXMario.Utilities.Extensions;
-public static class UIElementExtensions
+internal static class UIElementExtensions
 {
     // Thank the great Mirsario for this simple yet surprisingly comfortable method of dealing with UI element initialization
     public static T With<T>(this T element, Action<T> action) where T : UIElement

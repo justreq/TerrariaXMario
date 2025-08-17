@@ -1,4 +1,4 @@
 using Terraria.ModLoader;
 
 namespace TerrariaXMario;
-public class TerrariaXMario : Mod { }
+internal class TerrariaXMario : Mod { }

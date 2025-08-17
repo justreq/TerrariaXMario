@@ -5,13 +5,11 @@
 
 	<!-- General -->
 	<PropertyGroup>
-
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<!-- References -->
 	<ItemGroup>
-		<Folder Include="Core\" />
-		<Folder Include="Common\" />
 		<Folder Include="Content\" />
 	</ItemGroup>
 
