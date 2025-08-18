@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 
 namespace TerrariaXMario.Common.GearSlots;
-[GearContextAttribute(GearContext.Socks)]
+[GearTypeAttribute(GearType.Socks)]
 internal class SocksSlot : GearSlot
 {
     public override Vector2? CustomLocation => GetCustomLocation(-1, 2);

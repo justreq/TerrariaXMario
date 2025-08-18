@@ -1,1 +1,11 @@
+Items: {
+	LuigisCap: {
+		DisplayName: Luigi's Cap
+		Tooltip: Transforms its wearer into Super Luigi
+	}
 
+	MariosCap: {
+		DisplayName: Mario's Cap
+		Tooltip: Transforms its wearer into Super Mario
+	}
+}

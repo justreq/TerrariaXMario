@@ -8,7 +8,7 @@ using TerrariaXMario.Utilities.Extensions;
 namespace TerrariaXMario.Common.GearSlots;
 internal sealed class DrawAccSlotsPatch : BasePatch
 {
-    private static bool ShowGearSlots => Main.LocalPlayer.GetModPlayerOrNull<GearSlotPlayer>()?.showGearSlots ?? false;
+    private static bool ShowGearSlots => Main.LocalPlayer.GetModPlayerOrNull<GearSlotPlayer>()?.ShowGearSlots ?? false;
 
     internal override void Patch(Mod mod)
     {

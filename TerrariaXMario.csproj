@@ -9,9 +9,6 @@
 	</PropertyGroup>
 
 	<!-- References -->
-	<ItemGroup>
-		<Folder Include="Content\" />
-	</ItemGroup>
 
 	<PropertyGroup>
 		<DefineConstants>$(DefineConstants);BUILDINGFROMCSPROJ_MOD</DefineConstants>

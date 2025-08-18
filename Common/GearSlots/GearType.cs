@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace TerrariaXMario.Common.GearSlots;
-internal enum GearContext
+internal enum GearType
 {
     None,
     Cap,
@@ -13,7 +13,7 @@ internal enum GearContext
 }
 
 [AttributeUsage(AttributeTargets.Class)]
-internal class GearContextAttribute(GearContext value) : Attribute
+internal class GearTypeAttribute(GearType value) : Attribute
 {
-    internal GearContext value = value;
+    internal GearType value = value;
 }

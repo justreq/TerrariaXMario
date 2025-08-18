@@ -7,7 +7,7 @@ using TerrariaXMario.Utilities.Extensions;
 namespace TerrariaXMario.Common.GearSlots;
 internal sealed class ArmorSwapPatch : BasePatch
 {
-    private static bool ShowGearSlots => Main.LocalPlayer.GetModPlayerOrNull<GearSlotPlayer>()?.showGearSlots ?? false;
+    private static bool ShowGearSlots => Main.LocalPlayer.GetModPlayerOrNull<GearSlotPlayer>()?.ShowGearSlots ?? false;
 
     internal override void Patch(Mod mod)
     {
@@ -17,7 +17,7 @@ internal sealed class ArmorSwapPatch : BasePatch
 
     private Item On_ItemSlot_ArmorSwap(On_ItemSlot.orig_ArmorSwap orig, Item item, out bool success)
     {
-        if (ShowGearSlots)
+        if (ShowGearSlots && item.GetGlobalItemOrNull<GearSlotGlobalItem>()?.gearType == GearType.None)
         {
             success = false;
             return item;

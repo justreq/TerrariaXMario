@@ -1,23 +1,40 @@
-﻿using Terraria.ModLoader;
-using TerrariaXMario.Utilities.Extensions;
+﻿using Terraria;
+using Terraria.ModLoader;
 
 namespace TerrariaXMario.Common.GearSlots;
 internal class GearSlotPlayer : ModPlayer
 {
-    internal bool showGearSlots;
-}
+    private int lastVanillaLoadout = 0;
 
-#if DEBUG
-internal class GearSlotToggleCommand : ModCommand
-{
-    public override void Action(CommandCaller caller, string input, string[] args)
+    private EquipmentLoadout gearLoadout = new();
+
+    private bool showGearSlots;
+    internal bool ShowGearSlots
     {
-        GearSlotPlayer? player = caller.Player.GetModPlayerOrNull<GearSlotPlayer>();
-        if (player != null) player.showGearSlots ^= true;
+        get => showGearSlots;
+        set
+        {
+            showGearSlots = value;
+
+            if (Player.whoAmI != Main.myPlayer || (!(Player.itemTime > 0 || Player.itemAnimation > 0) && !Player.CCed && !Player.dead))
+            {
+                if (value)
+                {
+                    lastVanillaLoadout = Player.CurrentLoadoutIndex;
+                    Player.Loadouts[lastVanillaLoadout].Swap(Player);
+                    gearLoadout.Swap(Player);
+                }
+                else
+                {
+                    gearLoadout.Swap(Player);
+                    Player.Loadouts[lastVanillaLoadout].Swap(Player);
+                }
+            }
+        }
     }
 
-    public override string Command => "gay";
-
-    public override CommandType Type => CommandType.Chat;
+    public override void Initialize()
+    {
+        lastVanillaLoadout = Player.CurrentLoadoutIndex;
+    }
 }
-#endif
