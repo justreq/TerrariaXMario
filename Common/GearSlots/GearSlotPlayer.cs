@@ -8,7 +8,7 @@ using Terraria.UI;
 namespace TerrariaXMario.Common.GearSlots;
 internal class GearSlotPlayer : ModPlayer
 {
-    private EquipmentLoadout gearLoadout = new();
+    private readonly EquipmentLoadout gearLoadout = new();
     private int lastUsedVanillaLoadout;
 
     private bool showGearSlots;

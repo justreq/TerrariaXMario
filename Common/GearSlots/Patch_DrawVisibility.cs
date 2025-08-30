@@ -9,7 +9,7 @@ using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.GearSlots;
-internal sealed class DrawVisibilityPatch : BasePatch
+internal sealed class Patch_DrawVisibility : BasePatch
 {
     private static bool ShowGearSlots => Main.LocalPlayer.GetModPlayerOrNull<GearSlotPlayer>()?.ShowGearSlots ?? false;
 

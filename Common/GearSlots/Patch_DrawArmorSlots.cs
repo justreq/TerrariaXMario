@@ -5,7 +5,7 @@ using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.GearSlots;
-internal sealed class DrawInventoryPatch : BasePatch
+internal sealed class Patch_DrawArmorSlots : BasePatch
 {
     private static bool ShowGearSlots => Main.LocalPlayer.GetModPlayerOrNull<GearSlotPlayer>()?.ShowGearSlots ?? false;
 

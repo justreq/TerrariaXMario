@@ -1,0 +1,72 @@
+﻿using Microsoft.Xna.Framework;
+using System;
+using Terraria;
+using Terraria.ID;
+using Terraria.ModLoader;
+using TerrariaXMario.Content.Caps;
+using TerrariaXMario.Utilities.Extensions;
+
+namespace TerrariaXMario.Content.Powerups;
+internal abstract class PowerupProjectile : ModProjectile
+{
+    internal virtual string[] Caps => [];
+
+    public override void Load()
+    {
+        if (Main.netMode == NetmodeID.Server) return;
+
+        for (int i = 0; i < Caps.Length; i++)
+        {
+            EquipLoader.AddEquipTexture(Mod, $"{Texture}{Caps[i]}_{EquipType.Head}", EquipType.Head, name: $"{Name}{Caps[i]}");
+            EquipLoader.AddEquipTexture(Mod, $"{Texture}{Caps[i]}_{EquipType.Body}", EquipType.Body, name: $"{Name}{Caps[i]}");
+            EquipLoader.AddEquipTexture(Mod, $"{Texture}{Caps[i]}_{EquipType.Legs}", EquipType.Legs, name: $"{Name}{Caps[i]}");
+            Console.WriteLine(Name);
+            Console.WriteLine(Caps[i]);
+        }
+    }
+
+    public override void SetStaticDefaults()
+    {
+        if (Main.netMode == NetmodeID.Server) return;
+
+        for (int i = 0; i < Caps.Length; i++)
+        {
+            int equipSlotHead = EquipLoader.GetEquipSlot(Mod, $"{Name}{Caps[i]}", EquipType.Head);
+            int equipSlotBody = EquipLoader.GetEquipSlot(Mod, $"{Name}{Caps[i]}", EquipType.Body);
+            int equipSlotLegs = EquipLoader.GetEquipSlot(Mod, $"{Name}{Caps[i]}", EquipType.Legs);
+
+            if (equipSlotHead != -1) ArmorIDs.Head.Sets.DrawHead[equipSlotHead] = false;
+            if (equipSlotBody != -1)
+            {
+                ArmorIDs.Body.Sets.HidesTopSkin[equipSlotBody] = true;
+                ArmorIDs.Body.Sets.HidesArms[equipSlotBody] = true;
+            }
+            if (equipSlotLegs != -1) ArmorIDs.Legs.Sets.HidesBottomSkin[equipSlotLegs] = true;
+        }
+    }
+
+    public override void SetDefaults()
+    {
+        Projectile.width = 32;
+        Projectile.height = 32;
+        Projectile.hostile = true;
+    }
+
+    public override bool OnTileCollide(Vector2 oldVelocity) => false;
+
+    public override void PostAI()
+    {
+        for (int i = 0; i < Main.player.Length; i++)
+        {
+            if (!Projectile.Hitbox.Intersects(Main.player[i].Hitbox)) continue;
+
+            CapPlayer? capPlayer = Main.player[i].GetModPlayerOrNull<CapPlayer>();
+
+            if (capPlayer?.Cap != null)
+            {
+                capPlayer.powerup = Name;
+                Projectile.Kill();
+            }
+        }
+    }
+}

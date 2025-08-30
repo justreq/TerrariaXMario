@@ -1,9 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Reflection;
 using Terraria;
-using Terraria.GameContent;
 using Terraria.ModLoader;
-using Terraria.UI;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.GearSlots;
@@ -39,4 +37,40 @@ internal abstract class GearSlot : ModAccessorySlot
     {
         color = (context == AccessorySlotType.FunctionalSlot ? new Color(122, 63, 83) : new Color(84, 37, 87)) * 0.7f;
     }
+}
+
+[GearType(GearType.Cap)]
+internal class GearSlot_Cap : GearSlot
+{
+    public override Vector2? CustomLocation => GetCustomLocation();
+}
+
+[GearType(GearType.Overalls)]
+internal class GearSlot_Overalls : GearSlot
+{
+    public override Vector2? CustomLocation => GetCustomLocation(slotOffsetY: 1);
+}
+
+[GearType(GearType.Gloves)]
+internal class GearSlot_Gloves : GearSlot
+{
+    public override Vector2? CustomLocation => GetCustomLocation(-1, 1);
+}
+
+[GearType(GearType.Boots)]
+internal class GearSlot_Boots : GearSlot
+{
+    public override Vector2? CustomLocation => GetCustomLocation(slotOffsetY: 2);
+}
+
+[GearType(GearType.Socks)]
+internal class GearSlot_Socks : GearSlot
+{
+    public override Vector2? CustomLocation => GetCustomLocation(-1, 2);
+}
+
+[GearType(GearType.Badge)]
+internal class GearSlot_Badge : GearSlot
+{
+    public override Vector2? CustomLocation => GetCustomLocation(slotOffsetY: 3);
 }
