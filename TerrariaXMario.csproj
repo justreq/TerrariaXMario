@@ -1,7 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<!-- Import tModLoader mod properties -->
 	<Import Project="..\tModLoader.targets" />
+	<Import Project=".\Core\Effects\Compiler\KBOFXCTask.props" />
+	<Import Project=".\Core\Effects\Compiler\KBOFXCTask.targets" />
 
 	<!-- General -->
 	<PropertyGroup>

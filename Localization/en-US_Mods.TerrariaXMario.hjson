@@ -3,6 +3,14 @@ Items: {
 		DisplayName: Mario's Cap
 		Tooltip: Transforms its wearer into Super Mario
 	}
+
+	Luigi: {
+		DisplayName: Luigi's Cap
+		Tooltip: Transforms its wearer into Super Luigi
+	}
 }
 
-Projectiles.FireFlower.DisplayName: Fire Flower
+Projectiles: {
+	MetaballProjectile.DisplayName: Metaball
+	FireFlower.DisplayName: Fire Flower
+}

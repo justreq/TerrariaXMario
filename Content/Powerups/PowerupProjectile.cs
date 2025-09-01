@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Content.Caps;
@@ -49,23 +50,29 @@ internal abstract class PowerupProjectile : ModProjectile
     {
         Projectile.width = 32;
         Projectile.height = 32;
-        Projectile.hostile = true;
     }
 
     public override bool OnTileCollide(Vector2 oldVelocity) => false;
 
     public override void PostAI()
     {
-        for (int i = 0; i < Main.player.Length; i++)
+        foreach (Player player in Main.ActivePlayers)
         {
-            if (!Projectile.Hitbox.Intersects(Main.player[i].Hitbox)) continue;
+            if (!Projectile.Hitbox.Intersects(player.Hitbox)) continue;
 
-            CapPlayer? capPlayer = Main.player[i].GetModPlayerOrNull<CapPlayer>();
+            CapPlayer? capPlayer = player.GetModPlayerOrNull<CapPlayer>();
 
-            if (capPlayer?.Cap != null)
+            if (capPlayer != null && capPlayer.CanDoCapEffects)
             {
-                capPlayer.powerup = Name;
+                if (!player.immune)
+                {
+                    player.immuneTime = 30;
+                    player.immune = true;
+                }
+
+                SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/PowerUp") { Volume = 0.4f });
                 Projectile.Kill();
+                capPlayer.powerup = Name;
             }
         }
     }

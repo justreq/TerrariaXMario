@@ -48,6 +48,14 @@ internal abstract class CapItem : ModItem
     public override bool? PrefixChance(int pre, UnifiedRandom rand) => !(pre == -1 || pre == -3);
 
     public override bool CanEquipAccessory(Player player, int slot, bool modded) => player.GetModPlayerOrNull<GearSlotPlayer>()?.ShowGearSlots ?? false && modded;
+
+    public override void UpdateEquip(Player player)
+    {
+        player.lifeRegen = 0;
+        player.lifeRegenTime = 0;
+        player.accFlipper = true;
+    }
 }
 
 internal class Mario : CapItem { }
+internal class Luigi : CapItem { }
