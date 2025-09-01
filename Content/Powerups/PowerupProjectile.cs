@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -21,8 +20,6 @@ internal abstract class PowerupProjectile : ModProjectile
             EquipLoader.AddEquipTexture(Mod, $"{Texture}{Caps[i]}_{EquipType.Head}", EquipType.Head, name: $"{Name}{Caps[i]}");
             EquipLoader.AddEquipTexture(Mod, $"{Texture}{Caps[i]}_{EquipType.Body}", EquipType.Body, name: $"{Name}{Caps[i]}");
             EquipLoader.AddEquipTexture(Mod, $"{Texture}{Caps[i]}_{EquipType.Legs}", EquipType.Legs, name: $"{Name}{Caps[i]}");
-            Console.WriteLine(Name);
-            Console.WriteLine(Caps[i]);
         }
     }
 

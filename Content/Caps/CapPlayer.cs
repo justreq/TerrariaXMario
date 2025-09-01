@@ -9,14 +9,14 @@ namespace TerrariaXMario.Content.Caps;
 internal class CapPlayer : ModPlayer
 {
     private ModAccessorySlot CapSlot => LoaderManager.Get<AccessorySlotLoader>().Get(ModContent.GetInstance<GearSlot_Cap>().Type, Player);
-    private bool ShowGearSlots => Player.GetModPlayerOrNull<GearSlotPlayer>()?.ShowGearSlots ?? false;
+    private GearSlotPlayer? GearSlotPlayer => Player.GetModPlayerOrNull<GearSlotPlayer>();
 
-    internal string? oldCap = null;
-    internal string? Cap => CapSlot.FunctionalItem.IsAir ? null : CapSlot.FunctionalItem.ModItem.Name;
+    private string? oldCap = null;
+    private string? Cap => CapSlot.FunctionalItem.IsAir ? null : CapSlot.FunctionalItem.ModItem.Name;
 
     internal string? powerup = null;
 
-    internal bool CanDoCapEffects => Cap != null && ShowGearSlots;
+    internal bool CanDoCapEffects => Cap != null && (GearSlotPlayer?.ShowGearSlots ?? false);
 
     public override void FrameEffects()
     {
@@ -58,10 +58,10 @@ internal class CapPlayer : ModPlayer
 
     public override void PostUpdate()
     {
-        if (ShowGearSlots && oldCap != Cap)
+        if ((GearSlotPlayer?.ShowGearSlots ?? false) && oldCap != Cap)
         {
-            oldCap = Cap;
             SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{Cap ?? oldCap}{(Cap == null ? "Unequip" : "Equip")}") { Volume = 0.4f });
+            oldCap = Cap;
         }
 
         if (!CanDoCapEffects) return;
