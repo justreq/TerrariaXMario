@@ -59,7 +59,7 @@ internal abstract class PowerupProjectile : ModProjectile
 
             CapPlayer? capPlayer = player.GetModPlayerOrNull<CapPlayer>();
 
-            if (capPlayer != null && capPlayer.CanDoCapEffects)
+            if (capPlayer?.CanDoCapEffects ?? false)
             {
                 if (!player.immune)
                 {

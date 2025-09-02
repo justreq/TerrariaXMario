@@ -12,7 +12,7 @@ internal class CapPlayer : ModPlayer
     private GearSlotPlayer? GearSlotPlayer => Player.GetModPlayerOrNull<GearSlotPlayer>();
 
     private string? oldCap = null;
-    private string? Cap => CapSlot.FunctionalItem.IsAir ? null : CapSlot.FunctionalItem.ModItem.Name;
+    internal string? Cap => CapSlot.FunctionalItem.IsAir ? null : CapSlot.FunctionalItem.ModItem.Name;
 
     internal string? powerup = null;
 

@@ -2,6 +2,7 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.Utilities;
+using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Common.GearSlots;
 using TerrariaXMario.Utilities.Extensions;
 
@@ -49,11 +50,14 @@ internal abstract class CapItem : ModItem
 
     public override bool CanEquipAccessory(Player player, int slot, bool modded) => player.GetModPlayerOrNull<GearSlotPlayer>()?.ShowGearSlots ?? false && modded;
 
-    public override void UpdateEquip(Player player)
+    public override void UpdateAccessory(Player player, bool hideVisual)
     {
         player.lifeRegen = 0;
         player.lifeRegenTime = 0;
         player.accFlipper = true;
+        player.noKnockback = true;
+
+        if (Name == "Luigi") player.jumpSpeedBoost = 0.5f;
     }
 }
 

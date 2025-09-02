@@ -49,7 +49,7 @@ internal class MetaballSystem : ModSystem
 
             foreach (Projectile projectile in Main.ActiveProjectiles)
             {
-                if (projectile.ModProjectile.Type != ModContent.ProjectileType<MetaballProjectile>()) continue;
+                if (projectile.ModProjectile?.Type != ModContent.ProjectileType<MetaballProjectile>()) continue;
 
                 MetaballProjectile metaball = (MetaballProjectile)projectile.ModProjectile;
 
