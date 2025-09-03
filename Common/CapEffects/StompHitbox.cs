@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
@@ -15,6 +16,10 @@ internal class StompHitbox : ModProjectile
 
     private void Stomp(Player player)
     {
+        JumpPlayer? jumpPlayer = player.GetModPlayerOrNull<JumpPlayer>();
+
+        if (jumpPlayer != null) jumpPlayer.currentJump = Jump.None;
+
         player.velocity.Y = player.controlJump ? -(7.5f + player.jumpSpeedBoost) : -5;
 
         stompCooldown = 5;
@@ -37,16 +42,19 @@ internal class StompHitbox : ModProjectile
         Projectile.height = 4;
         Projectile.friendly = true;
         Projectile.penetrate = -1;
+        Projectile.timeLeft = 1;
     }
 
     public override bool OnTileCollide(Vector2 oldVelocity) => false;
 
     public override void AI()
     {
+        Projectile.timeLeft++;
         Player player = Main.player[Projectile.owner];
 
         if (stompCooldown > 0) stompCooldown--;
         else if (targetIndex != null) targetIndex = null;
+
 
         Projectile.position = player.BottomLeft;
 
@@ -60,13 +68,21 @@ internal class StompHitbox : ModProjectile
             else
             {
                 player.creativeGodMode = true;
+                player.bodyFrame.Y = 0;
+                player.legFrame.Y = 0;
+                player.headPosition.X = 4 * player.direction;
+                player.sitting.isSitting = true;
 
-                if (player.holdDownCardinalTimer[0] < 15) player.velocity = Vector2.Zero;
+                if (player.holdDownCardinalTimer[0] < 15) player.velocity = new Vector2(0, -2);
                 else player.velocity.Y = player.maxFallSpeed;
             }
         }
 
-        if (!player.controlDown) groundPound = false;
+        if (!player.controlDown)
+        {
+            player.headPosition.X = 0;
+            groundPound = false;
+        }
     }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
@@ -77,7 +93,16 @@ internal class StompHitbox : ModProjectile
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         targetIndex ??= target.whoAmI;
-        if (!groundPound) Stomp(Main.player[Projectile.owner]);
+        if (!groundPound)
+        {
+            Stomp(Main.player[Projectile.owner]);
+
+            for (int i = -1; i < 2; i++)
+            {
+                if (i == 0) continue;
+                Dust.NewDustPerfect(target.Top, ModContent.DustType<ImpactDust>(), new Vector2(Math.Sign(i), Main.rand.NextFloat(-0.5f, 0.5f)));
+            }
+        }
     }
 
     public override bool? CanHitNPC(NPC target)
@@ -87,6 +112,16 @@ internal class StompHitbox : ModProjectile
 
     public override void OnKill(int timeLeft)
     {
-        if (groundPound) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPound") { Volume = 0.4f });
+        if (!groundPound) return;
+
+        Player player = Main.player[Projectile.owner];
+
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPound") { Volume = 0.4f });
+        for (int i = -2; i < 3; i++)
+        {
+            if (i == 0) continue;
+            Dust.NewDustPerfect(player.Bottom, ModContent.DustType<ImpactDust>(), new Vector2(1.5f * Math.Sign(i), Main.rand.NextFloat(-1f, -0.5f)));
+        }
+
     }
 }

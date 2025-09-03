@@ -5,20 +5,22 @@ using Terraria.ModLoader;
 namespace TerrariaXMario.Common.CapEffects;
 internal class ImpactDust : ModDust
 {
+    int timeLeft = 0;
     public override void OnSpawn(Dust dust)
     {
+        timeLeft = 45;
+        dust.rotation = Main.rand.NextFloat(-MathHelper.PiOver4, MathHelper.PiOver4);
         dust.noGravity = true;
         dust.frame = new Rectangle(0, Main.rand.Next(3) * 16, 16, 16);
     }
 
     public override bool Update(Dust dust)
     {
-        dust.position += dust.velocity;
-        dust.velocity -= new Vector2(0.01f);
-        dust.scale -= 0.01f;
-        dust.color.A -= (byte)0.01f;
+        if (timeLeft > 0) timeLeft--;
 
-        if (dust.scale < 0.5f) dust.active = false;
+        dust.scale -= 0.05f;
+        dust.position += dust.velocity * (timeLeft * 0.075f);
+        if (dust.scale < 0) dust.active = false;
 
         return false;
     }
