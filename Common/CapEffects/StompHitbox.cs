@@ -58,11 +58,20 @@ internal class StompHitbox : ModProjectile
 
         Projectile.position = player.BottomLeft;
 
-        if (player.controlDown && (!player.GetModPlayerOrNull<CapEffectsPlayer>()?.crouching ?? false))
+        if (!player.controlDown)
+        {
+            player.headPosition.X = 0;
+            groundPound = false;
+        }
+
+        CapEffectsPlayer? capEffectsPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
+
+        if (player.controlDown && (!capEffectsPlayer?.crouching ?? false))
         {
             if (!groundPound)
             {
                 SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPoundStart") { Volume = 0.4f });
+                player.fullRotation = 0;
                 groundPound = true;
             }
             else
@@ -73,15 +82,9 @@ internal class StompHitbox : ModProjectile
                 player.headPosition.X = 4 * player.direction;
                 player.sitting.isSitting = true;
 
-                if (player.holdDownCardinalTimer[0] < 15) player.velocity = new Vector2(0, -2);
+                if (player.holdDownCardinalTimer[0] < 15) player.velocity = Vector2.Zero;
                 else player.velocity.Y = player.maxFallSpeed;
             }
-        }
-
-        if (!player.controlDown)
-        {
-            player.headPosition.X = 0;
-            groundPound = false;
         }
     }
 
