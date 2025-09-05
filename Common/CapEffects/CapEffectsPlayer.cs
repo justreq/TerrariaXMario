@@ -51,7 +51,15 @@ internal class CapEffectsPlayer : ModPlayer
         else
         {
             if (!player.controlDown || player.IsOnGroundPrecise()) player.headPosition.X = 0;
-            player.headPosition.Y = 0;
+
+            if (CapPlayer?.Cap == "Luigi")
+            {
+                if (Player.sitting.isSitting)
+                {
+                    Player.headPosition.Y = 2;
+                }
+                else Player.bodyPosition.Y = -2;
+            }
         }
     }
 

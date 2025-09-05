@@ -10,6 +10,7 @@ namespace TerrariaXMario.Content.Powerups;
 internal abstract class PowerupProjectile : ModProjectile
 {
     internal virtual string[] Caps => [];
+    internal virtual string EquipSound => $"{TerrariaXMario.Sounds}/PowerupEffects/PowerUp";
 
     public override void Load()
     {
@@ -67,7 +68,7 @@ internal abstract class PowerupProjectile : ModProjectile
                     player.immune = true;
                 }
 
-                SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/PowerUp") { Volume = 0.4f });
+                SoundEngine.PlaySound(new(EquipSound) { Volume = 0.4f });
                 Projectile.Kill();
                 capPlayer.powerup = Name;
             }

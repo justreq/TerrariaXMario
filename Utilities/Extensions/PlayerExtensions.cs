@@ -40,7 +40,7 @@ internal static class PlayerExtensions
     /// <inheritdoc cref="IsOnGroundPrecise(in float, float, int, bool)"/>
     public static bool IsOnGroundPrecise(this Entity entity, float yOffset = 0f, bool onlySolid = false)
     {
-        return IsOnGroundPrecise(entity.BottomLeft.X, entity.BottomLeft.Y + yOffset, entity.width, onlySolid);
+        return entity.velocity.Y == 0 && IsOnGroundPrecise(entity.BottomLeft.X, entity.BottomLeft.Y + yOffset, entity.width, onlySolid);
     }
 
     public static bool SolidTile(int i, int j)
