@@ -18,13 +18,22 @@ internal class JumpPlayer : CapEffectsPlayer
 
         if (jumpInputBuffer > 0 && !Player.IsOnGroundPrecise()) jumpInputBuffer = 0;
 
-        if ((crouching && currentJump is Jump.Single or Jump.Double or Jump.Triple) || jumpInputBuffer > 20)
+        if ((crouching && currentJump is Jump.Single or Jump.Double or Jump.Triple) || jumpInputBuffer > 10 || Player.sliding)
         {
             currentJump = Jump.None;
             jumpInputBuffer = 0;
         }
 
-        if ((currentJump is Jump.Single or Jump.Double) && Player.IsOnGroundPrecise()) jumpInputBuffer++;
+        if ((currentJump is Jump.Single or Jump.Double) && Player.IsOnGroundPrecise())
+        {
+            jumpInputBuffer++;
+
+            if (!Player.controlLeft && !Player.controlRight)
+            {
+                currentJump = Jump.None;
+                jumpInputBuffer = 0;
+            }
+        }
 
         if (currentJump == Jump.Triple && Player.IsOnGroundPrecise()) currentJump = Jump.None;
 

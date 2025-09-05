@@ -12,6 +12,7 @@ internal class CapEffectsPlayer : ModPlayer
     internal CapPlayer? CapPlayer => Player.GetModPlayerOrNull<CapPlayer>();
 
     internal bool crouching;
+    internal bool groundPounding;
     internal Jump currentJump;
 
     public override void PostUpdateRunSpeeds()

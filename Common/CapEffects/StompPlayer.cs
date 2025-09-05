@@ -29,6 +29,7 @@ internal class StompPlayer : CapEffectsPlayer
         {
             Main.projectile[(int)stompHitbox].Kill();
             stompHitbox = null;
+            groundPounding = false;
         }
     }
 }

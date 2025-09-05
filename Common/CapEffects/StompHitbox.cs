@@ -29,8 +29,6 @@ internal class StompHitbox : ModProjectile
         if (stompCount > 7) player.Heal(1);
     }
 
-    public override string Texture => "Terraria/Images/Extra_176";
-
     public override bool PreDraw(ref Color lightColor)
     {
         return false;
@@ -52,9 +50,10 @@ internal class StompHitbox : ModProjectile
         Projectile.timeLeft++;
         Player player = Main.player[Projectile.owner];
 
+        if (player.IsOnGroundPrecise()) Projectile.Kill();
+
         if (stompCooldown > 0) stompCooldown--;
         else if (targetIndex != null) targetIndex = null;
-
 
         Projectile.position = player.BottomLeft;
 
@@ -86,6 +85,8 @@ internal class StompHitbox : ModProjectile
                 else player.velocity.Y = player.maxFallSpeed;
             }
         }
+
+        capEffectsPlayer!.groundPounding = groundPound;
     }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)

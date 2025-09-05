@@ -58,6 +58,12 @@ internal abstract class CapItem : ModItem
         player.noKnockback = true;
 
         if (Name == "Luigi") player.jumpSpeedBoost = 0.5f;
+
+        CapEffectsPlayer? capEffectsPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
+
+        if (capEffectsPlayer == null) return;
+
+        if (!capEffectsPlayer.crouching && !capEffectsPlayer.groundPounding) player.spikedBoots = 1;
     }
 }
 
