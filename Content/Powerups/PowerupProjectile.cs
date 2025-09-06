@@ -7,20 +7,19 @@ using TerrariaXMario.Content.Caps;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Powerups;
-internal abstract class PowerupProjectile : ModProjectile
+internal abstract class PowerupProjectile<T> : ModProjectile where T : Powerup, new()
 {
-    internal virtual string[] Caps => [];
-    internal virtual string EquipSound => $"{TerrariaXMario.Sounds}/PowerupEffects/PowerUp";
+    internal T? PowerupData = new();
 
     public override void Load()
     {
         if (Main.netMode == NetmodeID.Server) return;
 
-        for (int i = 0; i < Caps.Length; i++)
+        for (int i = 0; i < PowerupData?.Caps.Length; i++)
         {
-            EquipLoader.AddEquipTexture(Mod, $"{Texture}{Caps[i]}_{EquipType.Head}", EquipType.Head, name: $"{Name}{Caps[i]}");
-            EquipLoader.AddEquipTexture(Mod, $"{Texture}{Caps[i]}_{EquipType.Body}", EquipType.Body, name: $"{Name}{Caps[i]}");
-            EquipLoader.AddEquipTexture(Mod, $"{Texture}{Caps[i]}_{EquipType.Legs}", EquipType.Legs, name: $"{Name}{Caps[i]}");
+            EquipLoader.AddEquipTexture(Mod, $"{Texture}{PowerupData.Caps[i]}_{EquipType.Head}", EquipType.Head, name: $"{Name}{PowerupData.Caps[i]}");
+            EquipLoader.AddEquipTexture(Mod, $"{Texture}{PowerupData.Caps[i]}_{EquipType.Body}", EquipType.Body, name: $"{Name}{PowerupData.Caps[i]}");
+            EquipLoader.AddEquipTexture(Mod, $"{Texture}{PowerupData.Caps[i]}_{EquipType.Legs}", EquipType.Legs, name: $"{Name}{PowerupData.Caps[i]}");
         }
     }
 
@@ -28,11 +27,11 @@ internal abstract class PowerupProjectile : ModProjectile
     {
         if (Main.netMode == NetmodeID.Server) return;
 
-        for (int i = 0; i < Caps.Length; i++)
+        for (int i = 0; i < PowerupData?.Caps.Length; i++)
         {
-            int equipSlotHead = EquipLoader.GetEquipSlot(Mod, $"{Name}{Caps[i]}", EquipType.Head);
-            int equipSlotBody = EquipLoader.GetEquipSlot(Mod, $"{Name}{Caps[i]}", EquipType.Body);
-            int equipSlotLegs = EquipLoader.GetEquipSlot(Mod, $"{Name}{Caps[i]}", EquipType.Legs);
+            int equipSlotHead = EquipLoader.GetEquipSlot(Mod, $"{Name}{PowerupData.Caps[i]}", EquipType.Head);
+            int equipSlotBody = EquipLoader.GetEquipSlot(Mod, $"{Name}{PowerupData.Caps[i]}", EquipType.Body);
+            int equipSlotLegs = EquipLoader.GetEquipSlot(Mod, $"{Name}{PowerupData.Caps[i]}", EquipType.Legs);
 
             if (equipSlotHead != -1) ArmorIDs.Head.Sets.DrawHead[equipSlotHead] = false;
             if (equipSlotBody != -1)
@@ -52,8 +51,10 @@ internal abstract class PowerupProjectile : ModProjectile
 
     public override bool OnTileCollide(Vector2 oldVelocity) => false;
 
-    public override void PostAI()
+    public override void AI()
     {
+        PowerupData?.UpdateWorld(Projectile);
+
         foreach (Player player in Main.ActivePlayers)
         {
             if (!Projectile.Hitbox.Intersects(player.Hitbox)) continue;
@@ -68,9 +69,13 @@ internal abstract class PowerupProjectile : ModProjectile
                     player.immune = true;
                 }
 
-                SoundEngine.PlaySound(new(EquipSound) { Volume = 0.4f });
                 Projectile.Kill();
-                capPlayer.powerup = Name;
+
+                if (PowerupData == null) return;
+
+                SoundEngine.PlaySound(new(PowerupData.EquipSound) { Volume = 0.4f });
+                capPlayer.currentPowerup = PowerupData;
+                PowerupData.OnConsume(player);
             }
         }
     }

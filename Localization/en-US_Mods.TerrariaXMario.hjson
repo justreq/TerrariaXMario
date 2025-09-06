@@ -12,8 +12,7 @@ Items: {
 
 Projectiles: {
 	MetaballProjectile.DisplayName: Metaball
-	FireFlower.DisplayName: Fire Flower
 	StompHitbox.DisplayName: Stomp Hitbox
+	FireFlower.DisplayName: Fire Flower
+	IceFlower.DisplayName: Ice Flower
 }
-
-Keybinds.Crouch.DisplayName: Crouch

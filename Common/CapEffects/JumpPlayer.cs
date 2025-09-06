@@ -69,7 +69,7 @@ internal class JumpPlayer : CapEffectsPlayer
                 backflip = false;
             }
 
-            if (currentJump is not (Jump.None or Jump.Single) && (int)currentJump < Enum.GetNames(typeof(Jump)).Length) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{CapPlayer?.Cap}{currentJump}Jump") { Volume = 0.4f });
+            if (currentJump is not (Jump.None or Jump.Single) && (int)currentJump < Enum.GetNames(typeof(Jump)).Length) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{CapPlayer?.CurrentCap}{currentJump}Jump") { Volume = 0.4f });
         }
     }
 }

@@ -26,7 +26,7 @@ internal class CapEffectsPlayer : ModPlayer
             Player.runAcceleration *= 1.5f;
         }
 
-        if (CapPlayer?.Cap == "Luigi" && !crouching && Player.IsOnGroundPrecise()) Player.runSlowdown = 0.045f;
+        if (CapPlayer?.CurrentCap == "Luigi" && !crouching && Player.IsOnGroundPrecise()) Player.runSlowdown = 0.045f;
     }
 
     public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo)
@@ -52,13 +52,13 @@ internal class CapEffectsPlayer : ModPlayer
         {
             if (!player.controlDown || player.IsOnGroundPrecise()) player.headPosition.X = 0;
 
-            if (CapPlayer?.Cap == "Luigi")
+            if (CapPlayer?.CurrentCap == "Luigi")
             {
                 if (Player.sitting.isSitting)
                 {
                     Player.headPosition.Y = 2;
                 }
-                else Player.bodyPosition.Y = -2;
+                else Player.bodyPosition.Y = Player.IsOnGroundPrecise() ? -2 : 0;
             }
         }
     }
@@ -77,11 +77,15 @@ internal class CapEffectsPlayer : ModPlayer
 
     public override void PostUpdate()
     {
+        if (!CapPlayer?.CanDoCapEffects ?? true) return;
+
         if (crouching) Player.bodyFrame.Y = 56 * 2;
     }
 
     public override void PostUpdateEquips()
     {
+        if (!CapPlayer?.CanDoCapEffects ?? true) return;
+
         if (currentJump == Jump.Double) Player.jumpSpeedBoost += 1.25f;
         else if (currentJump == Jump.Triple) Player.jumpSpeedBoost += 2.5f;
     }

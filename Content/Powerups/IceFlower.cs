@@ -2,9 +2,9 @@
 using TerrariaXMario.Content.Caps;
 
 namespace TerrariaXMario.Content.Powerups;
-internal class FireFlowerData : Powerup
+internal class IceFlowerData : Powerup
 {
-    public override string Name => "FireFlower";
+    public override string Name => "IceFlower";
 
     internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
 
@@ -14,4 +14,4 @@ internal class FireFlowerData : Powerup
     }
 }
 
-internal class FireFlower : PowerupProjectile<FireFlowerData>;
+internal class IceFlower : PowerupProjectile<IceFlowerData>;
