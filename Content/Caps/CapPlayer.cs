@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using System;
+using Terraria;
 using Terraria.Audio;
 using Terraria.GameInput;
 using Terraria.ModLoader;
@@ -18,6 +19,19 @@ internal class CapPlayer : ModPlayer
     internal Powerup? currentPowerup = null;
 
     internal bool CanDoCapEffects => CurrentCap != null && (GearSlotPlayer?.ShowGearSlots ?? false);
+
+    internal int forceDirection;
+    internal int forceSwingDuration;
+    internal int forceSwingTimer;
+
+    internal void SetForceDirection(int duration, int direction)
+    {
+        if (duration <= 0 || Math.Abs(direction) != 1) return;
+
+        forceSwingTimer = duration;
+        forceDirection = direction;
+        Player.direction = direction;
+    }
 
     public override void FrameEffects()
     {
@@ -58,7 +72,11 @@ internal class CapPlayer : ModPlayer
 
         currentPowerup.UpdateConsumed(Player);
 
-        if (PlayerInput.Triggers.JustPressed.MouseLeft) currentPowerup.OnLeftClick(Player);
+        if (PlayerInput.Triggers.JustPressed.MouseLeft && !Player.mouseInterface && Main.cursorOverride != TerrariaXMario.Instance.CursorGrabIndex && Main.cursorOverride != TerrariaXMario.Instance.CursorThrowIndex)
+        {
+            SetForceDirection(10, Math.Sign(Main.MouseWorld.X - Player.position.X));
+            currentPowerup.OnLeftClick(Player);
+        }
     }
 
     public override void PostUpdate()
@@ -69,9 +87,31 @@ internal class CapPlayer : ModPlayer
             oldCap = CurrentCap;
         }
 
-        if (!CanDoCapEffects) return;
+        if (!CanDoCapEffects)
+        {
+            forceDirection = 0;
+            forceSwingDuration = 0;
+            forceSwingTimer = 0;
+            return;
+        }
 
         if ((Player.wet && PlayerInput.Triggers.JustPressed.Jump) || Player.justJumped)
             SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(Player.wet ? "Swim" : "Jump")}") { Volume = 0.4f });
+
+        if (forceSwingTimer > 0)
+        {
+            if (forceSwingDuration == 0) forceSwingDuration = forceSwingTimer;
+
+            Player.bodyFrame.Y = 56 * Math.Clamp(Math.Max(1, 4 - (int)Math.Floor((double)forceSwingTimer / forceSwingDuration * 4)), 1, 4);
+
+            forceSwingTimer--;
+
+            if (forceSwingTimer <= 0)
+            {
+                forceDirection = 0;
+                forceSwingDuration = 0;
+                forceSwingTimer = 0;
+            }
+        }
     }
 }

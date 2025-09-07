@@ -3,6 +3,7 @@ using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
+using TerrariaXMario.Content.PowerupProjectiles;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.CapEffects;
@@ -111,6 +112,8 @@ internal class StompHitbox : ModProjectile
 
     public override bool? CanHitNPC(NPC target)
     {
+        if (target.GetGlobalNPCOrNull<IceBlockNPC>()?.IsFrozen ?? true) return false;
+
         return groundPound || (targetIndex == null && stompCooldown == 0 && Projectile.Hitbox.Intersects(new Rectangle((int)target.position.X, (int)target.position.Y, target.width, 4)));
     }
 

@@ -15,4 +15,7 @@ Projectiles: {
 	StompHitbox.DisplayName: Stomp Hitbox
 	FireFlower.DisplayName: Fire Flower
 	IceFlower.DisplayName: Ice Flower
+	FireFlowerFireball.DisplayName: Fire Flower Fireball
+	IceFlowerIceball.DisplayName: Ice Flower Iceball
+	IceBlock.DisplayName: Ice Block
 }

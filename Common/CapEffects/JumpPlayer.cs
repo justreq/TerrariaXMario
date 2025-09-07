@@ -18,7 +18,7 @@ internal class JumpPlayer : CapEffectsPlayer
 
         if (jumpInputBuffer > 0 && !Player.IsOnGroundPrecise()) jumpInputBuffer = 0;
 
-        if ((crouching && currentJump is Jump.Single or Jump.Double or Jump.Triple) || jumpInputBuffer > 10 || Player.sliding)
+        if ((crouching && currentJump is Jump.Single or Jump.Double or Jump.Triple) || jumpInputBuffer > 10 || Player.sliding || Player.GetModPlayerOrNull<GrabPlayer>()?.GrabProjectile != null)
         {
             currentJump = Jump.None;
             jumpInputBuffer = 0;
