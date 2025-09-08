@@ -2,7 +2,7 @@
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
-using Terraria.ModLoader;
+using TerrariaXMario.Common.MiscEffects;
 
 namespace TerrariaXMario.Content.PowerupProjectiles;
 internal class IceFlowerIceball : FireFlowerFireball
@@ -38,12 +38,7 @@ internal class IceFlowerIceball : FireFlowerFireball
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/Freeze"));
-        IceBlock iceBlock = (IceBlock)Main.projectile[Projectile.NewProjectile(Projectile.GetSource_FromThis(), target.position, Vector2.Zero, ModContent.ProjectileType<IceBlock>(), 0, 0f, Projectile.owner)].ModProjectile;
-        target.GetGlobalNPC<IceBlockNPC>().iceBlock = iceBlock;
-        iceBlock.npc = target;
-        iceBlock.Projectile.width = target.frame.Width;
-        iceBlock.Projectile.height = target.frame.Height;
-        iceBlock.Projectile.Bottom = target.Bottom;
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/Freeze") { Volume = 0.4f });
+        target.GetGlobalNPC<IceBlockNPC>().frozen = true;
     }
 }

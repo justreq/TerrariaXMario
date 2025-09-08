@@ -7,7 +7,7 @@ using TerrariaXMario.Common.GearSlots;
 using TerrariaXMario.Content.Powerups;
 using TerrariaXMario.Utilities.Extensions;
 
-namespace TerrariaXMario.Content.Caps;
+namespace TerrariaXMario.Common.CapEffects;
 internal class CapPlayer : ModPlayer
 {
     private ModAccessorySlot CapSlot => LoaderManager.Get<AccessorySlotLoader>().Get(ModContent.GetInstance<GearSlot_Cap>().Type, Player);
@@ -95,7 +95,7 @@ internal class CapPlayer : ModPlayer
             return;
         }
 
-        if ((Player.wet && PlayerInput.Triggers.JustPressed.Jump) || Player.justJumped)
+        if (Player.wet && PlayerInput.Triggers.JustPressed.Jump || Player.justJumped)
             SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(Player.wet ? "Swim" : "Jump")}") { Volume = 0.4f });
 
         if (forceSwingTimer > 0)

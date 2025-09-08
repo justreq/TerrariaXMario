@@ -1,7 +1,6 @@
 ﻿using MonoMod.Cil;
 using Terraria;
 using Terraria.ModLoader;
-using TerrariaXMario.Content.Caps;
 using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 

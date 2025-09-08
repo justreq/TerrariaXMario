@@ -3,7 +3,7 @@ using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
-using TerrariaXMario.Content.PowerupProjectiles;
+using TerrariaXMario.Common.MiscEffects;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.CapEffects;
@@ -14,6 +14,7 @@ internal class StompHitbox : ModProjectile
     private int? targetIndex;
 
     private bool groundPound;
+    private int groundPoundCooldown;
 
     private void Stomp(Player player)
     {
@@ -58,33 +59,34 @@ internal class StompHitbox : ModProjectile
 
         Projectile.position = player.BottomLeft;
 
-        if (!player.controlDown)
+        if (groundPound && groundPoundCooldown > 15 && !player.controlDown)
         {
-            player.headPosition.X = 0;
             groundPound = false;
+            groundPoundCooldown = 0;
         }
+
+        if (groundPound) groundPoundCooldown++;
+        else player.headPosition.X = 0;
 
         CapEffectsPlayer? capEffectsPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
 
-        if (player.controlDown && (!capEffectsPlayer?.crouching ?? false))
+        if (player.controlDown && (!capEffectsPlayer?.crouching ?? false) && !groundPound)
         {
-            if (!groundPound)
-            {
-                SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPoundStart") { Volume = 0.4f });
-                player.fullRotation = 0;
-                groundPound = true;
-            }
-            else
-            {
-                player.creativeGodMode = true;
-                player.bodyFrame.Y = 0;
-                player.legFrame.Y = 0;
-                player.headPosition.X = 4 * player.direction;
-                player.sitting.isSitting = true;
+            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPoundStart") { Volume = 0.4f });
+            player.fullRotation = 0;
+            groundPound = true;
+        }
 
-                if (player.holdDownCardinalTimer[0] < 15) player.velocity = Vector2.Zero;
-                else player.velocity.Y = player.maxFallSpeed;
-            }
+        if (groundPound)
+        {
+            player.creativeGodMode = true;
+            player.bodyFrame.Y = 0;
+            player.legFrame.Y = 0;
+            player.headPosition.X = 4 * player.direction;
+            player.sitting.isSitting = true;
+
+            if (groundPoundCooldown <= 15) player.velocity = new(0, 0.1f);
+            else if (player.controlDown) player.velocity.Y = player.maxFallSpeed;
         }
 
         capEffectsPlayer!.groundPounding = groundPound;
@@ -98,6 +100,7 @@ internal class StompHitbox : ModProjectile
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         targetIndex ??= target.whoAmI;
+
         if (!groundPound)
         {
             Stomp(Main.player[Projectile.owner]);
@@ -107,12 +110,21 @@ internal class StompHitbox : ModProjectile
                 if (i == 0) continue;
                 Dust.NewDustPerfect(target.Top, ModContent.DustType<ImpactDust>(), new Vector2(Math.Sign(i), Main.rand.NextFloat(-0.5f, 0.5f)));
             }
+
+            return;
+        }
+
+        IceBlockNPC? iceBlockNPC = target.GetGlobalNPCOrNull<IceBlockNPC>();
+
+        if (iceBlockNPC?.frozen ?? false)
+        {
+            iceBlockNPC.KillIceBlock(target);
         }
     }
 
     public override bool? CanHitNPC(NPC target)
     {
-        if (target.GetGlobalNPCOrNull<IceBlockNPC>()?.IsFrozen ?? true) return false;
+        if (target.GetGlobalNPCOrNull<IceBlockNPC>()?.frozen ?? false) return groundPound;
 
         return groundPound || (targetIndex == null && stompCooldown == 0 && Projectile.Hitbox.Intersects(new Rectangle((int)target.position.X, (int)target.position.Y, target.width, 4)));
     }

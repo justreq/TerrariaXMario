@@ -3,7 +3,7 @@ using Terraria;
 using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 
-namespace TerrariaXMario.Content.Caps;
+namespace TerrariaXMario.Common.CapEffects;
 internal sealed class Patch_ForceDirection : BasePatch
 {
     internal override void Patch(Mod mod)

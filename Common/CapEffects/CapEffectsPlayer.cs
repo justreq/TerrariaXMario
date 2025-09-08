@@ -2,7 +2,6 @@
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
-using TerrariaXMario.Content.Caps;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.CapEffects;
@@ -14,6 +13,7 @@ internal class CapEffectsPlayer : ModPlayer
     internal bool crouching;
     internal bool groundPounding;
     internal Jump currentJump;
+    internal bool hasPSpeed;
 
     public override void PostUpdateRunSpeeds()
     {
@@ -26,7 +26,12 @@ internal class CapEffectsPlayer : ModPlayer
             Player.runAcceleration *= 1.5f;
         }
 
-        if (CapPlayer?.CurrentCap == "Luigi" && !crouching && Player.IsOnGroundPrecise()) Player.runSlowdown = 0.045f;
+        if (CapPlayer?.CurrentCap == "Luigi")
+        {
+            if (!crouching && Player.IsOnGroundPrecise()) Player.runSlowdown = 0.045f;
+
+            Player.maxRunSpeed *= 1.05f;
+        }
     }
 
     public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo)
@@ -54,10 +59,7 @@ internal class CapEffectsPlayer : ModPlayer
 
             if (CapPlayer?.CurrentCap == "Luigi")
             {
-                if (Player.sitting.isSitting)
-                {
-                    Player.headPosition.Y = 2;
-                }
+                if (Player.sitting.isSitting) Player.headPosition.Y = 2;
                 else Player.bodyPosition.Y = Player.IsOnGroundPrecise() ? -2 : 0;
             }
         }
