@@ -29,7 +29,7 @@ public class IceBlockNPC : GlobalNPC
         for (int i = 0; i < 4; i++)
         {
             int gore = Mod.Find<ModGore>($"IceBlockGore_{i + 1}").Type;
-            gore = Gore.NewGore(npc.GetSource_Misc("Ice Block"), npc.Center, MathHelper.ToRadians(0 - i * 60).ToRotationVector2() * 2.5f * npc.oldVelocity, gore);
+            gore = Gore.NewGore(npc.GetSource_Misc("Ice BlockTile"), npc.Center, MathHelper.ToRadians(0 - i * 60).ToRotationVector2() * 2.5f * npc.oldVelocity, gore);
             Main.gore[gore].timeLeft = 0;
         }
     }

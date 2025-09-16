@@ -8,6 +8,21 @@ Items: {
 		DisplayName: Luigi's Cap
 		Tooltip: Transforms its wearer into Super Luigi
 	}
+
+	QuestionBlock: {
+		DisplayName: Question Block
+		Tooltip: Can contain certain special objects
+	}
+
+	BrickBlock: {
+		DisplayName: Brick Block
+		Tooltip: Can contain certain special objects
+	}
+
+	Hammer: {
+		DisplayName: Hammer
+		Tooltip: Useful on certain special blocks
+	}
 }
 
 Projectiles: {

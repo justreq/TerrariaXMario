@@ -65,7 +65,7 @@ internal class PSpeedMeter : UIState
         resourceWidth = pSpeedPlayer.runTime == 0 ? resourceWidth - 1 : (int)((float)pSpeedPlayer.runTime / pSpeedPlayer.runTimeRequiredForPSpeed * 36);
         ImageResource?.SetFrame(new(0, 54, resourceWidth, 6));
 
-        if (ImageFrame != null) ImageFrame.Color = Color.Lerp(ImageFrame.Color, resourceWidth <= 18 ? Color.Transparent : Color.White, 0.1f);
+        if (ImageFrame != null) ImageFrame.Color = Color.Lerp(ImageFrame.Color, resourceWidth <= 18 ? Color.Transparent : Color.White, 0.075f);
         if (ImageResource != null) ImageResource.Color = ImageFrame?.Color ?? Color.Transparent;
 
         if (pSpeedPlayer.hasPSpeed)

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Utilities.Extensions;
 
@@ -14,6 +15,8 @@ internal class CapEffectsPlayer : ModPlayer
     internal bool groundPounding;
     internal Jump currentJump;
     internal bool hasPSpeed;
+
+    internal Vector2 currentObjectSpawnerBlockToEdit;
 
     public override void PostUpdateRunSpeeds()
     {
@@ -86,7 +89,11 @@ internal class CapEffectsPlayer : ModPlayer
 
     public override void PostUpdateEquips()
     {
-        if (!CapPlayer?.CanDoCapEffects ?? true) return;
+        if (!CapPlayer?.CanDoCapEffects ?? true)
+        {
+            if (currentObjectSpawnerBlockToEdit != Vector2.Zero) currentObjectSpawnerBlockToEdit = Vector2.Zero;
+            return;
+        }
 
         if (currentJump == Jump.Double) Player.jumpSpeedBoost += 1.25f;
         else if (currentJump == Jump.Triple) Player.jumpSpeedBoost += 2.5f;

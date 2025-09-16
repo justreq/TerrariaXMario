@@ -4,10 +4,11 @@ using Terraria.ModLoader;
 using Terraria.Utilities;
 using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Common.GearSlots;
+using TerrariaXMario.Common.ObjectSpawnerBlockUI;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Caps;
-internal abstract class CapItem : ModItem
+internal abstract class CapItem : ModItem, ISpawnableObject
 {
     private GearSlotGlobalItem? GlobalItem => Item.GetGlobalItemOrNull<GearSlotGlobalItem>();
 

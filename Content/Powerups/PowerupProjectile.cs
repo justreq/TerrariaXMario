@@ -4,10 +4,11 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.CapEffects;
+using TerrariaXMario.Common.ObjectSpawnerBlockUI;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Powerups;
-internal abstract class PowerupProjectile<T> : ModProjectile where T : Powerup, new()
+internal abstract class PowerupProjectile<T> : ModProjectile, ISpawnableObject where T : Powerup, new()
 {
     internal T? PowerupData = new();
 
