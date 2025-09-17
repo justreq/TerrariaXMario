@@ -3,7 +3,7 @@
 namespace TerrariaXMario.Content.Blocks;
 internal class BrickBlockTile : ObjectSpawnerBlockTile
 {
-    internal override Color? MapColor => new(200, 88, 0);
+    internal override Color MapColor => new(200, 88, 0);
 
     public override void AnimateIndividualTile(int type, int i, int j, ref int frameXOffset, ref int frameYOffset)
     {

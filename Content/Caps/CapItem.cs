@@ -10,8 +10,6 @@ using TerrariaXMario.Utilities.Extensions;
 namespace TerrariaXMario.Content.Caps;
 internal abstract class CapItem : ModItem, ISpawnableObject
 {
-    private GearSlotGlobalItem? GlobalItem => Item.GetGlobalItemOrNull<GearSlotGlobalItem>();
-
     public override void Load()
     {
         if (Main.netMode == NetmodeID.Server) return;
@@ -44,7 +42,7 @@ internal abstract class CapItem : ModItem, ISpawnableObject
         Item.height = 20;
         Item.accessory = true;
 
-        if (GlobalItem != null) GlobalItem.gearType = GearType.Cap;
+        Item.GetGlobalItemOrNull<GearSlotGlobalItem>()?.gearType = GearType.Cap;
     }
 
     public override bool? PrefixChance(int pre, UnifiedRandom rand) => !(pre == -1 || pre == -3);
@@ -62,9 +60,9 @@ internal abstract class CapItem : ModItem, ISpawnableObject
 
         CapEffectsPlayer? capEffectsPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
 
-        if (capEffectsPlayer == null) return;
+        capEffectsPlayer?.CapPlayer?.currentCap = Name;
 
-        if (!capEffectsPlayer.crouching && !capEffectsPlayer.groundPounding) player.spikedBoots = 1;
+        if (!capEffectsPlayer?.crouching ?? false && !capEffectsPlayer.groundPounding) player.spikedBoots = 1;
     }
 }
 

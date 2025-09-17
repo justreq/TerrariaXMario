@@ -26,7 +26,6 @@ Items: {
 }
 
 Projectiles: {
-	MetaballProjectile.DisplayName: Metaball
 	StompHitbox.DisplayName: Stomp Hitbox
 	FireFlower.DisplayName: Fire Flower
 	IceFlower.DisplayName: Ice Flower

@@ -18,10 +18,7 @@ internal class StompHitbox : ModProjectile
 
     private void Stomp(Player player)
     {
-        JumpPlayer? jumpPlayer = player.GetModPlayerOrNull<JumpPlayer>();
-
-        if (jumpPlayer != null) jumpPlayer.currentJump = Jump.None;
-
+        player.GetModPlayerOrNull<JumpPlayer>()?.currentJump = Jump.None;
         player.velocity.Y = player.controlJump ? -(7.5f + player.jumpSpeedBoost) : -5;
 
         stompCooldown = 5;
@@ -31,10 +28,7 @@ internal class StompHitbox : ModProjectile
         if (stompCount > 7) player.Heal(1);
     }
 
-    public override bool PreDraw(ref Color lightColor)
-    {
-        return false;
-    }
+    public override bool PreDraw(ref Color lightColor) => false;
 
     public override void SetDefaults()
     {
@@ -89,7 +83,7 @@ internal class StompHitbox : ModProjectile
             else if (player.controlDown) player.velocity.Y = player.maxFallSpeed;
         }
 
-        capEffectsPlayer!.groundPounding = groundPound;
+        capEffectsPlayer?.groundPounding = groundPound;
     }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
@@ -116,10 +110,7 @@ internal class StompHitbox : ModProjectile
 
         IceBlockNPC? iceBlockNPC = target.GetGlobalNPCOrNull<IceBlockNPC>();
 
-        if (iceBlockNPC?.frozen ?? false)
-        {
-            iceBlockNPC.KillIceBlock(target);
-        }
+        if (iceBlockNPC?.frozen ?? false) iceBlockNPC.KillIceBlock(target);
     }
 
     public override bool? CanHitNPC(NPC target)

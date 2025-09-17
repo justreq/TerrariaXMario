@@ -29,7 +29,7 @@ internal class CapEffectsPlayer : ModPlayer
             Player.runAcceleration *= 1.5f;
         }
 
-        if (CapPlayer?.CurrentCap == "Luigi")
+        if (CapPlayer?.currentCap == "Luigi")
         {
             if (!crouching && Player.IsOnGroundPrecise()) Player.runSlowdown = 0.045f;
 
@@ -60,7 +60,7 @@ internal class CapEffectsPlayer : ModPlayer
         {
             if (!player.controlDown || player.IsOnGroundPrecise()) player.headPosition.X = 0;
 
-            if (CapPlayer?.CurrentCap == "Luigi")
+            if (CapPlayer?.currentCap == "Luigi")
             {
                 if (Player.sitting.isSitting) Player.headPosition.Y = 2;
                 else Player.bodyPosition.Y = Player.IsOnGroundPrecise() ? -2 : 0;

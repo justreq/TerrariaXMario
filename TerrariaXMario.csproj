@@ -2,8 +2,6 @@
 
 	<!-- Import tModLoader mod properties -->
 	<Import Project="..\tModLoader.targets" />
-	<Import Project=".\Core\Effects\Compiler\KBOFXCTask.props" />
-	<Import Project=".\Core\Effects\Compiler\KBOFXCTask.targets" />
 
 	<!-- General -->
 	<PropertyGroup>
@@ -15,6 +13,7 @@
 	<PropertyGroup>
 		<DefineConstants>$(DefineConstants);BUILDINGFROMCSPROJ_MOD</DefineConstants>
 		<OutputType>Exe</OutputType>
+		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
 
 	<Target Name="CreateTMLPathTxt" AfterTargets="AfterBuild">

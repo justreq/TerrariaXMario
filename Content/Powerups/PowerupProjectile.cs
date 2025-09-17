@@ -60,24 +60,19 @@ internal abstract class PowerupProjectile<T> : ModProjectile, ISpawnableObject w
         {
             if (!Projectile.Hitbox.Intersects(player.Hitbox)) continue;
 
-            CapPlayer? capPlayer = player.GetModPlayerOrNull<CapPlayer>();
-
-            if (capPlayer?.CanDoCapEffects ?? false)
+            if (!player.immune)
             {
-                if (!player.immune)
-                {
-                    player.immuneTime = 30;
-                    player.immune = true;
-                }
-
-                Projectile.Kill();
-
-                if (PowerupData == null) return;
-
-                SoundEngine.PlaySound(new(PowerupData.EquipSound) { Volume = 0.4f });
-                capPlayer.currentPowerup = PowerupData;
-                PowerupData.OnConsume(player);
+                player.immuneTime = 30;
+                player.immune = true;
             }
+
+            Projectile.Kill();
+
+            if (PowerupData == null) return;
+
+            SoundEngine.PlaySound(new(PowerupData.EquipSound) { Volume = 0.4f });
+            player.GetModPlayerOrNull<CapPlayer>()?.currentPowerup = PowerupData;
+            PowerupData.OnConsume(player);
         }
     }
 }

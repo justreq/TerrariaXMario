@@ -38,7 +38,7 @@ internal class PSpeedPlayer : CapEffectsPlayer
                 }
             }
 
-            Player.accRunSpeed *= CapPlayer!.CurrentCap == "Luigi" ? 1.5f : 1.25f;
+            Player.accRunSpeed *= CapPlayer!.currentCap == "Luigi" ? 1.5f : 1.25f;
         }
         else if (hasPSpeed) hasPSpeed = false;
     }

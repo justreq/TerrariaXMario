@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.Enums;
@@ -14,7 +15,7 @@ using TerrariaXMario.Utilities.Extensions;
 namespace TerrariaXMario.Content.Blocks;
 internal class ObjectSpawnerBlockEntity : ModTileEntity
 {
-    internal (SpawnableObjectGroup group, int type)[] spawnContents = [(SpawnableObjectGroup.Item, ItemID.GoldCoin)];
+    internal (SpawnableObjectGroup group, int type)[] spawnContents = [(SpawnableObjectGroup.Item, ItemID.None)];
 
     public override bool IsTileValidForEntity(int x, int y)
     {
@@ -25,7 +26,7 @@ internal class ObjectSpawnerBlockEntity : ModTileEntity
 
 internal class ObjectSpawnerBlockTile : ModTile
 {
-    internal virtual Color? MapColor => null;
+    internal virtual Color MapColor => Color.HotPink;
 
     internal static ObjectSpawnerBlockEntity? GetTileEntityOrNull(int i, int j) => TileEntity.TryGet(new(i, j), out ModTileEntity entity) ? entity as ObjectSpawnerBlockEntity : null;
     internal static ObjectSpawnerBlockEntity? GetTileEntityOrNull(Vector2 coords) => TileEntity.TryGet(new((int)coords.X, (int)coords.Y), out ModTileEntity entity) ? entity as ObjectSpawnerBlockEntity : null;
@@ -41,7 +42,7 @@ internal class ObjectSpawnerBlockTile : ModTile
         TileObjectData.newTile.AnchorBottom = new AnchorData(AnchorType.None, 0, 0);
         TileObjectData.newTile.HookPostPlaceMyPlayer = ModContent.GetInstance<ObjectSpawnerBlockEntity>().Generic_HookPostPlaceMyPlayer;
         TileObjectData.addTile(Type);
-        if (MapColor != null) AddMapEntry((Color)MapColor);
+        AddMapEntry(MapColor);
     }
 
     public override void KillMultiTile(int i, int j, int frameX, int frameY)
@@ -63,10 +64,21 @@ internal class ObjectSpawnerBlockTile : ModTile
             if (PlayerInput.Triggers.JustPressed.MouseLeft)
             {
                 Tile tile = Framing.GetTileSafely(i, j);
-
                 modPlayer.currentObjectSpawnerBlockToEdit = new(i - tile.TileFrameX / 18, j - tile.TileFrameY / 18);
             }
         }
+    }
+
+    public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
+    {
+        ObjectSpawnerBlockEntity? entity = GetTileEntityOrNull(i, j);
+
+        if (entity == null || entity != GetTileEntityOrNull(Main.LocalPlayer.GetModPlayerOrNull<CapEffectsPlayer>()?.currentObjectSpawnerBlockToEdit ?? Vector2.Zero)) return;
+
+        Tile tile = Framing.GetTileSafely(i, j);
+
+        Dust dust = Dust.NewDustPerfect(new Vector2(i, j).ToWorldCoordinates() + new Vector2(0.5f * (tile.TileFrameX / 18 == 0 ? 1 : -1), 0.5f * (tile.TileFrameY / 18 == 0 ? 1 : -1)) + Main.rand.NextVector2CircularEdge(16, 16), DustID.SeaSnail, Vector2.Zero, newColor: Color.White);
+        dust.noGravity = true;
     }
 }
 

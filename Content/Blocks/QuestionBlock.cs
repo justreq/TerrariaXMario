@@ -4,7 +4,7 @@ using Terraria;
 namespace TerrariaXMario.Content.Blocks;
 internal class QuestionBlockTile : ObjectSpawnerBlockTile
 {
-    internal override Color? MapColor => new(255, 196, 0);
+    internal override Color MapColor => new(255, 196, 0);
 
     public override void AnimateTile(ref int frame, ref int frameCounter)
     {

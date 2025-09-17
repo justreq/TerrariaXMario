@@ -3,7 +3,7 @@ using Terraria.ModLoader;
 using TerrariaXMario.Common.GearSlots;
 using TerrariaXMario.Utilities.Extensions;
 
-namespace TerrariaXMario.Utilities.Debug;
+namespace TerrariaXMario.Utilities.Dev;
 internal class GearSlotToggleCommand : ModCommand
 {
     public override void Action(CommandCaller caller, string input, string[] args)

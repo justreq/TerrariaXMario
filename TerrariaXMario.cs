@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using System.Linq;
 using Terraria.GameContent;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.ObjectSpawnerBlockUI;
@@ -31,7 +32,8 @@ internal class TerrariaXMario : Mod
         TextureAssets.Cursors = [.. TextureAssets.Cursors, ModContent.Request<Texture2D>($"{Textures}/CursorEdit")];
         CursorEditIndex = TextureAssets.Cursors.Length - 1;
 
-        spawnableObjects = [.. ModContent.GetContent<ISpawnableObject>()];
+        spawnableObjects = [.. ModContent.GetContent<ISpawnableObject>().OrderBy(x => x.GetType().Name)];
+
     }
 
     public override void Unload()

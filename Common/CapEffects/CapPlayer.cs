@@ -10,15 +10,14 @@ using TerrariaXMario.Utilities.Extensions;
 namespace TerrariaXMario.Common.CapEffects;
 internal class CapPlayer : ModPlayer
 {
-    private ModAccessorySlot CapSlot => LoaderManager.Get<AccessorySlotLoader>().Get(ModContent.GetInstance<GearSlot_Cap>().Type, Player);
     private GearSlotPlayer? GearSlotPlayer => Player.GetModPlayerOrNull<GearSlotPlayer>();
 
-    private string? oldCap = null;
-    internal string? CurrentCap => CapSlot?.FunctionalItem.IsAir ?? true ? null : CapSlot.FunctionalItem.ModItem.Name;
+    private string? oldCap;
+    internal string? currentCap;
 
-    internal Powerup? currentPowerup = null;
+    internal Powerup? currentPowerup;
 
-    internal bool CanDoCapEffects => CurrentCap != null && (GearSlotPlayer?.ShowGearSlots ?? false);
+    internal bool CanDoCapEffects => currentCap != null && (GearSlotPlayer?.ShowGearSlots ?? false);
 
     internal int forceDirection;
     internal int forceSwingDuration;
@@ -33,6 +32,11 @@ internal class CapPlayer : ModPlayer
         Player.direction = direction;
     }
 
+    public override void ResetEffects()
+    {
+        currentCap = null;
+    }
+
     public override void FrameEffects()
     {
         if (!CanDoCapEffects)
@@ -41,9 +45,9 @@ internal class CapPlayer : ModPlayer
             return;
         }
 
-        Player.head = EquipLoader.GetEquipSlot(Mod, $"{currentPowerup?.Name ?? ""}{CurrentCap}", EquipType.Head);
-        Player.body = EquipLoader.GetEquipSlot(Mod, $"{currentPowerup?.Name ?? ""}{CurrentCap}", EquipType.Body);
-        Player.legs = EquipLoader.GetEquipSlot(Mod, $"{currentPowerup?.Name ?? ""}{CurrentCap}", EquipType.Legs);
+        Player.head = EquipLoader.GetEquipSlot(Mod, $"{currentPowerup?.Name ?? ""}{currentCap}", EquipType.Head);
+        Player.body = EquipLoader.GetEquipSlot(Mod, $"{currentPowerup?.Name ?? ""}{currentCap}", EquipType.Body);
+        Player.legs = EquipLoader.GetEquipSlot(Mod, $"{currentPowerup?.Name ?? ""}{currentCap}", EquipType.Legs);
     }
 
     public override void ModifyHurt(ref Player.HurtModifiers modifiers)
@@ -63,7 +67,7 @@ internal class CapPlayer : ModPlayer
             SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/PowerDown") { Volume = 0.4f });
         }
 
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PlayerOverrides/{CurrentCap}Hurt{Main.rand.Next(1, 5)}") { Volume = 0.4f });
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PlayerOverrides/{currentCap}Hurt{Main.rand.Next(1, 5)}") { Volume = 0.4f });
     }
 
     public override void PostUpdateEquips()
@@ -81,10 +85,10 @@ internal class CapPlayer : ModPlayer
 
     public override void PostUpdate()
     {
-        if ((GearSlotPlayer?.ShowGearSlots ?? false) && oldCap != CurrentCap)
+        if ((GearSlotPlayer?.ShowGearSlots ?? false) && oldCap != currentCap)
         {
-            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{CurrentCap ?? oldCap}{(CurrentCap == null ? "Unequip" : "Equip")}") { Volume = 0.4f });
-            oldCap = CurrentCap;
+            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{currentCap ?? oldCap}{(currentCap == null ? "Unequip" : "Equip")}") { Volume = 0.4f });
+            oldCap = currentCap;
         }
 
         if (!CanDoCapEffects)
