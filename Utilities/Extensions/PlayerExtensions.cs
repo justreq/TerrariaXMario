@@ -2,6 +2,7 @@
 using System;
 using Terraria;
 using Terraria.ModLoader;
+using TerrariaXMario.Content.Blocks;
 
 namespace TerrariaXMario.Utilities.Extensions;
 internal static class PlayerExtensions
@@ -71,5 +72,39 @@ internal static class PlayerExtensions
         }
 
         return Main.tileSolid[t.TileType] || Main.tileSolidTop[t.TileType];
+    }
+
+    public static Point? IsBelowObjectSpawnerBlockPrecise(in float startX, float y, int width)
+    {
+        if (width <= 0)
+        {
+            throw new ArgumentException("width cannot be negative");
+        }
+
+        float fx = startX;
+
+        //Needs atleast one iteration (in case width is 0)
+        do
+        {
+            Point point = new Vector2(fx, y + 0.01f).ToTileCoordinates(); //0.01f is a magic number vanilla uses
+            if (SolidTile(point.X, point.Y) && TileLoader.GetTile(Framing.GetTileSafely(point).TileType) is ObjectSpawnerBlockTile)
+            {
+                return point;
+            }
+            fx += 16;
+        }
+        while (fx < startX + width);
+
+        return null;
+    }
+
+    public static Point? IsBelowObjectSpawnerBlockPrecise(this Entity entity, float yOffset = 0f)
+    {
+        Point? point = IsBelowObjectSpawnerBlockPrecise(entity.TopLeft.X, entity.TopLeft.Y - yOffset, entity.width);
+        if (point == null) return null;
+
+        if (entity.velocity.Y < 0) return point;
+
+        return null;
     }
 }

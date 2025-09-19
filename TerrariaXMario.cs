@@ -1,9 +1,12 @@
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System.Linq;
+using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.ObjectSpawnerBlockUI;
+using TerrariaXMario.Content.Blocks;
 
 namespace TerrariaXMario;
 internal class TerrariaXMario : Mod
@@ -21,6 +24,10 @@ internal class TerrariaXMario : Mod
     internal int CursorEditIndex = -1;
 
     internal ISpawnableObject[]? spawnableObjects;
+
+    internal static ObjectSpawnerBlockEntity? GetTileEntityOrNull(int i, int j) => TileEntity.TryGet(new(i, j), out ModTileEntity entity) ? entity as ObjectSpawnerBlockEntity : null;
+    internal static ObjectSpawnerBlockEntity? GetTileEntityOrNull(Vector2 coords) => TileEntity.TryGet(new((int)coords.X, (int)coords.Y), out ModTileEntity entity) ? entity as ObjectSpawnerBlockEntity : null;
+    internal static ObjectSpawnerBlockEntity? GetTileEntityOrNull(Point coords) => TileEntity.TryGet(new(coords.X, coords.Y), out ModTileEntity entity) ? entity as ObjectSpawnerBlockEntity : null;
 
     public override void Load()
     {

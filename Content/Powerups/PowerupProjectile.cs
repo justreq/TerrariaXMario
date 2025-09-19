@@ -1,16 +1,20 @@
 ﻿using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
+using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Common.ObjectSpawnerBlockUI;
+using TerrariaXMario.Content.Blocks;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Powerups;
 internal abstract class PowerupProjectile<T> : ModProjectile, ISpawnableObject where T : Powerup, new()
 {
     internal T? PowerupData = new();
+    private int timeBeforePickable;
 
     public override void Load()
     {
@@ -48,12 +52,24 @@ internal abstract class PowerupProjectile<T> : ModProjectile, ISpawnableObject w
     {
         Projectile.width = 32;
         Projectile.height = 32;
+        Projectile.hide = true;
     }
 
     public override bool OnTileCollide(Vector2 oldVelocity) => false;
 
+    public override void OnSpawn(IEntitySource source)
+    {
+        if (source is EntitySource_TileInteraction tileInteraction && TileLoader.GetTile(Framing.GetTileSafely(tileInteraction.TileCoords).TileType) is ObjectSpawnerBlockTile) timeBeforePickable = (int)Projectile.ai[0];
+    }
+
     public override void AI()
     {
+        if (timeBeforePickable > 0)
+        {
+            timeBeforePickable--;
+            return;
+        }
+
         PowerupData?.UpdateWorld(Projectile);
 
         foreach (Player player in Main.ActivePlayers)
@@ -74,5 +90,10 @@ internal abstract class PowerupProjectile<T> : ModProjectile, ISpawnableObject w
             player.GetModPlayerOrNull<CapPlayer>()?.currentPowerup = PowerupData;
             PowerupData.OnConsume(player);
         }
+    }
+
+    public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+    {
+        behindNPCsAndTiles.Add(index);
     }
 }
