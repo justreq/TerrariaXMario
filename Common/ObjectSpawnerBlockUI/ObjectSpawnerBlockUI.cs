@@ -11,6 +11,7 @@ using Terraria.ModLoader.UI.Elements;
 using Terraria.UI;
 using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Content.Blocks;
+using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.ObjectSpawnerBlockUI;
@@ -110,14 +111,17 @@ internal class ObjectSpawnerBlockUI : UIState
     {
         CapEffectsPlayer? modPlayer = Main.LocalPlayer.GetModPlayerOrNull<CapEffectsPlayer>();
 
-        if ((modPlayer?.CapPlayer?.CanDoCapEffects ?? false) && modPlayer.currentObjectSpawnerBlockToEdit != Vector2.Zero) base.Draw(spriteBatch);
+        if ((modPlayer?.CapPlayer?.CanDoCapEffects ?? false) && modPlayer.currentObjectSpawnerBlockToEdit != Vector2.Zero)
+        {
+            base.Draw(spriteBatch);
+
+            if (Container?.IsMouseHovering ?? false) Main.LocalPlayer.mouseInterface = true;
+        }
         else if (ObjectGrid?.Count > 0) ObjectGrid.Clear();
     }
 
     public override void Update(GameTime gameTime)
     {
-        if (Container?.IsMouseHovering ?? false) Main.LocalPlayer.mouseInterface = true;
-
         CapEffectsPlayer? modPlayer = Main.LocalPlayer.GetModPlayerOrNull<CapEffectsPlayer>();
 
         if (modPlayer?.currentObjectSpawnerBlockToEdit == Vector2.Zero)
@@ -211,7 +215,7 @@ internal class ObjectSpawnerBlockUI : UIState
             if (FinalListScrollbar != null) FinalListContainer?.AddElement(FinalListScrollbar);
         }
 
-        FinalList?.AddElement(new FinalListItem(FinalList, index == 0 ? null : TerrariaXMario.Instance.spawnableObjects?[index - 1]));
+        FinalList?.AddElement(new FinalListItem(FinalList, index == 0 ? new DefaultSpawnableObject() : TerrariaXMario.Instance.spawnableObjects?[index - 1] ?? new DefaultSpawnableObject()));
     }
 
     private void Exit(UIMouseEvent evt, UIElement listeningElement)
@@ -227,7 +231,7 @@ internal class ObjectSpawnerBlockUI : UIState
 
         for (int i = 0; i < FinalList?.Count; i++)
         {
-            ISpawnableObject? objectType = (FinalList._items[i] as FinalListItem)?.objectType;
+            ISpawnableObject objectType = (FinalList._items[i] as FinalListItem)?.objectType ?? new DefaultSpawnableObject();
 
             entity?.spawnContents = entity?.spawnContents.Append(objectType).ToArray() ?? [];
         }

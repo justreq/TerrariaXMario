@@ -8,25 +8,25 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.UI;
+using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.ObjectSpawnerBlockUI;
 /// <summary>
-/// List item for Object Spawner Blocks
+/// List item for Object Spawner Blocks<br></br>Set objectType as <see cref="DefaultSpawnableObject"/> for Gold Coin
 /// </summary>
-/// <param name="objectType">Leave as null for Gold Coin</param>
+/// <param name="objectType"></param>
 internal class FinalListItem : UIPanel
 {
-    internal readonly ISpawnableObject? objectType;
+    internal readonly ISpawnableObject objectType;
     private readonly UIList parentList;
-
     internal int position;
 
     private UIHoverImageButton? ShiftUpButton { get; set; }
     private UIHoverImageButton? ShiftDownButton { get; set; }
     private UIHoverImage? Thumbnail { get; set; }
 
-    internal FinalListItem(UIList parentList, ISpawnableObject? objectType = null) : base(ModContent.Request<Texture2D>($"{TerrariaXMario.Textures}/AlternativePanelBackground"), ModContent.Request<Texture2D>($"{TerrariaXMario.Textures}/AlternativePanelBorder"))
+    internal FinalListItem(UIList parentList, ISpawnableObject objectType) : base(ModContent.Request<Texture2D>($"{TerrariaXMario.Textures}/AlternativePanelBackground"), ModContent.Request<Texture2D>($"{TerrariaXMario.Textures}/AlternativePanelBorder"))
     {
         this.parentList = parentList;
         this.objectType = objectType;
@@ -40,9 +40,9 @@ internal class FinalListItem : UIPanel
 
         string assetPath = GetType().Namespace!.Replace(".", "/");
 
-        if (objectType == null) Main.instance.LoadItem(ItemID.GoldCoin);
+        if (objectType is DefaultSpawnableObject) Main.instance.LoadItem(ItemID.GoldCoin);
 
-        Thumbnail = new UIHoverImage(objectType == null ? TextureAssets.Item[ItemID.GoldCoin] : objectType is ModItem modItem ? ModContent.Request<Texture2D>(modItem.Texture) : objectType is ModProjectile modProjectile ? ModContent.Request<Texture2D>(modProjectile.Texture) : TextureAssets.Item[0], objectType is ModItem or ModProjectile ? Language.GetTextValue($"Mods.{nameof(TerrariaXMario)}.{(objectType is ModItem ? "Items" : "Projectiles")}.{objectType.GetType().Name}.DisplayName") : "").With(e =>
+        Thumbnail = new UIHoverImage(objectType is DefaultSpawnableObject ? TextureAssets.Item[ItemID.GoldCoin] : objectType is ModItem modItem ? ModContent.Request<Texture2D>(modItem.Texture) : objectType is ModProjectile modProjectile ? ModContent.Request<Texture2D>(modProjectile.Texture) : TextureAssets.Item[0], objectType is ModItem or ModProjectile ? Language.GetTextValue($"Mods.{nameof(TerrariaXMario)}.{(objectType is ModItem ? "Items" : "Projectiles")}.{objectType.GetType().Name}.DisplayName") : "").With(e =>
         {
             e.VAlign = 0.5f;
         });

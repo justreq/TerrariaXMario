@@ -78,6 +78,8 @@ internal class StompHitbox : ModProjectile
             player.legFrame.Y = 0;
             player.headPosition.X = 4 * player.direction;
             player.sitting.isSitting = true;
+            player.itemTime = 0;
+            player.itemAnimation = 0;
 
             if (groundPoundCooldown <= 15) player.velocity = new(0, 0.1f);
             else if (player.controlDown) player.velocity.Y = player.maxFallSpeed;

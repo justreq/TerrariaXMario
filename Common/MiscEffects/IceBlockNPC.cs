@@ -6,6 +6,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 
 namespace TerrariaXMario.Common.MiscEffects;
 public class IceBlockNPC : GlobalNPC
@@ -29,7 +30,7 @@ public class IceBlockNPC : GlobalNPC
         for (int i = 0; i < 4; i++)
         {
             int gore = Mod.Find<ModGore>($"IceBlockGore_{i + 1}").Type;
-            gore = Gore.NewGore(npc.GetSource_Misc("Ice BlockTile"), npc.Center, MathHelper.ToRadians(0 - i * 60).ToRotationVector2() * 2.5f * npc.oldVelocity, gore);
+            gore = Gore.NewGore(npc.GetSource_Misc("IceBlockTile"), npc.Center, MathHelper.ToRadians(0 - i * 60).ToRotationVector2() * 2.5f * npc.oldVelocity, gore);
             Main.gore[gore].timeLeft = 0;
         }
     }
@@ -150,5 +151,19 @@ public class IceBlockNPC : GlobalNPC
         spriteBatch.Draw(iceBlockTexture.Value, iceBlockRect.BottomRight() - new Vector2(8), new(28, 10, 4, 4), baseColor); // bottom right shine
 
         spriteBatch.Draw(iceBlockTexture.Value, new Rectangle(iceBlockRect.X + 4, iceBlockRect.Y + 4, iceBlockRect.Width - 8, (int)(iceBlockRect.Height * 0.67f)), new(0, 16, 32, 32), Color.White * 0.25f); // glare
+    }
+
+    public override void SaveData(NPC npc, TagCompound tag)
+    {
+        tag[nameof(frozen)] = frozen;
+        tag[nameof(frozenTimer)] = frozenTimer;
+        tag[nameof(defaultNoGravity)] = defaultNoGravity;
+    }
+
+    public override void LoadData(NPC npc, TagCompound tag)
+    {
+        if (tag.ContainsKey(nameof(frozen))) frozen = tag.GetBool(nameof(frozen));
+        if (tag.ContainsKey(nameof(frozenTimer))) frozenTimer = tag.GetInt(nameof(frozenTimer));
+        if (tag.ContainsKey(nameof(defaultNoGravity))) defaultNoGravity = tag.GetBool(nameof(defaultNoGravity));
     }
 }

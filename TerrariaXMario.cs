@@ -1,17 +1,36 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using System;
 using System.Linq;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ModLoader;
-using TerrariaXMario.Common.ObjectSpawnerBlockUI;
 using TerrariaXMario.Content.Blocks;
+using TerrariaXMario.Core;
 
 namespace TerrariaXMario;
+
+internal enum GearType
+{
+    None,
+    Cap,
+    Overalls,
+    Socks,
+    Boots,
+    Gloves,
+    Badge
+}
+
+[AttributeUsage(AttributeTargets.Class)]
+internal class GearTypeAttribute(GearType value) : Attribute
+{
+    internal GearType value = value;
+}
+
 internal class TerrariaXMario : Mod
 {
-    public static TerrariaXMario Instance => ModContent.GetInstance<TerrariaXMario>();
+    internal static TerrariaXMario Instance => ModContent.GetInstance<TerrariaXMario>();
 
     internal static string Textures => $"{nameof(TerrariaXMario)}/Assets/Textures";
     internal static string Sounds => $"{nameof(TerrariaXMario)}/Assets/Sounds";
@@ -39,8 +58,7 @@ internal class TerrariaXMario : Mod
         TextureAssets.Cursors = [.. TextureAssets.Cursors, ModContent.Request<Texture2D>($"{Textures}/CursorEdit")];
         CursorEditIndex = TextureAssets.Cursors.Length - 1;
 
-        spawnableObjects = [.. ModContent.GetContent<ISpawnableObject>().OrderBy(x => x.GetType().Name)];
-
+        spawnableObjects = [.. ModContent.GetContent<ISpawnableObject>().Where(e => e is not DefaultSpawnableObject).OrderBy(x => x.GetType().Name)];
     }
 
     public override void Unload()

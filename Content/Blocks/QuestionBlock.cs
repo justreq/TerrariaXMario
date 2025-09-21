@@ -17,9 +17,7 @@ internal class QuestionBlockTile : ObjectSpawnerBlockTile
 
     public override void AnimateIndividualTile(int type, int i, int j, ref int frameXOffset, ref int frameYOffset)
     {
-        ObjectSpawnerBlockEntity? entity = TerrariaXMario.GetTileEntityOrNull(i, j);
-
-        frameYOffset = (entity?.wasPreviouslyStruck ?? false && entity?.spawnContents.Length == 0 ? 4 : Main.tileFrame[type]) * 36;
+        frameYOffset = 36 * (TerrariaXMario.GetTileEntityOrNull(i, j)?.ShouldShowEmpty ?? false ? 4 : Main.tileFrame[type]);
     }
 }
 

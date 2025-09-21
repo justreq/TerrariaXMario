@@ -6,8 +6,8 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.CapEffects;
-using TerrariaXMario.Common.ObjectSpawnerBlockUI;
 using TerrariaXMario.Content.Blocks;
+using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Powerups;

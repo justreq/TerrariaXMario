@@ -7,9 +7,7 @@ internal class BrickBlockTile : ObjectSpawnerBlockTile
 
     public override void AnimateIndividualTile(int type, int i, int j, ref int frameXOffset, ref int frameYOffset)
     {
-        ObjectSpawnerBlockEntity? entity = TerrariaXMario.GetTileEntityOrNull(i, j);
-
-        frameYOffset = entity?.wasPreviouslyStruck ?? false && entity?.spawnContents.Length == 0 ? 36 : 0;
+        frameYOffset = TerrariaXMario.GetTileEntityOrNull(i, j)?.ShouldShowEmpty ?? false ? 36 : 0;
     }
 }
 

@@ -3,6 +3,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.GameInput;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 using TerrariaXMario.Common.GearSlots;
 using TerrariaXMario.Content.Powerups;
 using TerrariaXMario.Utilities.Extensions;

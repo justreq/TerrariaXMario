@@ -1,16 +1,17 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
+using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.Enums;
 using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 using TerrariaXMario.Common.CapEffects;
-using TerrariaXMario.Common.ObjectSpawnerBlockUI;
 using TerrariaXMario.Content.Tools;
+using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Blocks;
@@ -19,7 +20,10 @@ internal class ObjectSpawnerBlockEntity : ModTileEntity
     internal int strikeAnimationTimeleft;
     internal bool justStruck;
     internal bool wasPreviouslyStruck;
-    internal ISpawnableObject?[] spawnContents = [];
+    internal ISpawnableObject[] spawnContents = [];
+
+    internal string? tileInternalName;
+    internal bool ShouldShowEmpty => wasPreviouslyStruck && spawnContents.Length == 0;
 
     public override bool IsTileValidForEntity(int x, int y)
     {
@@ -36,6 +40,37 @@ internal class ObjectSpawnerBlockEntity : ModTileEntity
         }
 
         if (strikeAnimationTimeleft > 0) strikeAnimationTimeleft--;
+    }
+
+    public override void OnKill()
+    {
+        CapEffectsPlayer? modPlayer = Main.LocalPlayer.GetModPlayerOrNull<CapEffectsPlayer>();
+
+        for (int a = 0; a < 4; a++)
+        {
+            if (Mod.TryFind($"{(ShouldShowEmpty ? "EmptyBlockTile" : $"{tileInternalName}")}Gore_{a + 1}", out ModGore goreInstance))
+            {
+                int gore = goreInstance.Type;
+                gore = Gore.NewGore(null, Position.ToWorldCoordinates() + new Vector2(8, 8), MathHelper.ToRadians(0 - a * 60).ToRotationVector2() + new Vector2(0, -2), gore);
+                Main.gore[gore].timeLeft = 0;
+            }
+        }
+
+        if (modPlayer?.currentObjectSpawnerBlockToEdit == Position.ToVector2()) modPlayer?.currentObjectSpawnerBlockToEdit = Vector2.Zero;
+    }
+
+    public override void SaveData(TagCompound tag)
+    {
+        tag[nameof(wasPreviouslyStruck)] = wasPreviouslyStruck;
+        if (spawnContents.Length > 0) tag[nameof(spawnContents)] = spawnContents.ToList();
+        tag[nameof(tileInternalName)] = tileInternalName;
+    }
+
+    public override void LoadData(TagCompound tag)
+    {
+        if (tag.ContainsKey(nameof(wasPreviouslyStruck))) wasPreviouslyStruck = tag.GetBool(nameof(wasPreviouslyStruck));
+        if (tag.ContainsKey(nameof(spawnContents))) spawnContents = [.. tag.GetList<ISpawnableObject>(nameof(spawnContents))];
+        if (tag.ContainsKey(nameof(tileInternalName))) tileInternalName = tag.GetString(nameof(tileInternalName));
     }
 }
 
@@ -55,6 +90,13 @@ internal class ObjectSpawnerBlockTile : ModTile
         TileObjectData.addTile(Type);
         AddMapEntry(MapColor);
     }
+
+    public override void PlaceInWorld(int i, int j, Item item)
+    {
+        TerrariaXMario.GetTileEntityOrNull(i, j)?.tileInternalName = GetType().Name;
+    }
+
+    public override bool CanKillTile(int i, int j, ref bool blockDamaged) => TerrariaXMario.GetTileEntityOrNull(i, j)?.spawnContents.Length == 0;
 
     public override void KillMultiTile(int i, int j, int frameX, int frameY)
     {
@@ -87,9 +129,13 @@ internal class ObjectSpawnerBlockTile : ModTile
         if (entity == null || entity != TerrariaXMario.GetTileEntityOrNull(Main.LocalPlayer.GetModPlayerOrNull<CapEffectsPlayer>()?.currentObjectSpawnerBlockToEdit ?? Vector2.Zero)) return;
 
         Tile tile = Framing.GetTileSafely(i, j);
+        if (tile.TileFrameX != 0 || tile.TileFrameY != 0) return;
 
-        Dust dust = Dust.NewDustPerfect(new Vector2(i, j).ToWorldCoordinates() + new Vector2(0.5f * (tile.TileFrameX / 18 == 0 ? 1 : -1), 0.5f * (tile.TileFrameY / 18 == 0 ? 1 : -1)) + Main.rand.NextVector2CircularEdge(16, 16), DustID.SeaSnail, Vector2.Zero, newColor: Color.White);
-        dust.noGravity = true;
+        for (int a = 0; a < (Main.FrameSkipMode == FrameSkipMode.Off ? 1 : 4); a++)
+        {
+            Dust dust = Dust.NewDustPerfect(new Vector2(i, j).ToWorldCoordinates() + new Vector2(8f) + Main.rand.NextVector2Circular(24, 24), DustID.SeaSnail, Vector2.Zero, newColor: Color.White);
+            dust.noGravity = true;
+        }
     }
 
 

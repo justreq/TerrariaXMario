@@ -4,7 +4,7 @@ using Terraria.ModLoader;
 using Terraria.Utilities;
 using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Common.GearSlots;
-using TerrariaXMario.Common.ObjectSpawnerBlockUI;
+using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Caps;

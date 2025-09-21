@@ -1,8 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
-using Terraria.ID;
+using Terraria.GameInput;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.CapEffects;
@@ -15,7 +16,6 @@ internal class CapEffectsPlayer : ModPlayer
     internal bool groundPounding;
     internal Jump currentJump;
     internal bool hasPSpeed;
-
     internal Vector2 currentObjectSpawnerBlockToEdit;
 
     public override void PostUpdateRunSpeeds()
@@ -53,6 +53,7 @@ internal class CapEffectsPlayer : ModPlayer
             player.headPosition.X = 4 * player.direction;
             player.headPosition.Y = 8;
             player.headRotation = MathHelper.PiOver4 * 0.5f * player.direction;
+            Player.bodyFrame.Y = 56 * 2;
 
             if (!player.IsOnGroundPrecise()) player.legFrame.Y = 56 * 7;
         }
@@ -66,6 +67,8 @@ internal class CapEffectsPlayer : ModPlayer
                 else Player.bodyPosition.Y = Player.IsOnGroundPrecise() ? -2 : 0;
             }
         }
+
+        if (currentJump is Jump.Double or Jump.Triple && !PlayerInput.Triggers.Current.Down && !Player.IsOnGroundPrecise()) player.bodyFrame.Y = 56 * 10;
     }
 
     public override void PreUpdate()
@@ -84,7 +87,6 @@ internal class CapEffectsPlayer : ModPlayer
     {
         if (!CapPlayer?.CanDoCapEffects ?? true) return;
 
-        if (crouching) Player.bodyFrame.Y = 56 * 2;
     }
 
     public override void PostUpdateEquips()

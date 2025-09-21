@@ -3,6 +3,7 @@ using Terraria.Audio;
 using Terraria.GameContent.Drawing;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 using Terraria.UI;
 
 namespace TerrariaXMario.Common.GearSlots;
@@ -110,5 +111,17 @@ internal class GearSlotPlayer : ModPlayer
     public override void OnEquipmentLoadoutSwitched(int oldLoadoutIndex, int loadoutIndex)
     {
         lastUsedVanillaLoadout = loadoutIndex;
+    }
+
+    public override void SaveData(TagCompound tag)
+    {
+        tag[nameof(lastUsedVanillaLoadout)] = lastUsedVanillaLoadout;
+        tag[nameof(ShowGearSlots)] = ShowGearSlots;
+    }
+
+    public override void LoadData(TagCompound tag)
+    {
+        if (tag.ContainsKey(nameof(lastUsedVanillaLoadout))) lastUsedVanillaLoadout = tag.GetInt(nameof(lastUsedVanillaLoadout));
+        if (tag.ContainsKey(nameof(ShowGearSlots))) ShowGearSlots = tag.GetBool(nameof(ShowGearSlots));
     }
 }
