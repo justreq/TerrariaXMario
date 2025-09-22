@@ -62,9 +62,9 @@ internal class StompHitbox : ModProjectile
         if (groundPound) groundPoundCooldown++;
         else player.headPosition.X = 0;
 
-        CapEffectsPlayer? capEffectsPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
+        ObjectSpawnerBlockPlayer? modPlayer = player.GetModPlayerOrNull<ObjectSpawnerBlockPlayer>();
 
-        if (player.controlDown && (!capEffectsPlayer?.crouching ?? false) && !groundPound)
+        if (player.controlDown && (!modPlayer?.crouching ?? false) && !groundPound)
         {
             SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPoundStart") { Volume = 0.4f });
             player.fullRotation = 0;
@@ -82,10 +82,18 @@ internal class StompHitbox : ModProjectile
             player.itemAnimation = 0;
 
             if (groundPoundCooldown <= 15) player.velocity = new(0, 0.1f);
-            else if (player.controlDown) player.velocity.Y = player.maxFallSpeed;
+            else if (player.controlDown)
+            {
+                player.velocity.Y = player.maxFallSpeed;
+
+                foreach (Point point in modPlayer?.HitObjectSpawnerBlocks(1, true) ?? [])
+                {
+                    modPlayer?.SpawnObjectFromBlock(point, true);
+                }
+            }
         }
 
-        capEffectsPlayer?.groundPounding = groundPound;
+        modPlayer?.groundPounding = groundPound;
     }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)

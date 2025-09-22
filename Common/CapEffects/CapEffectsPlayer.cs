@@ -3,7 +3,6 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameInput;
 using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.CapEffects;
@@ -51,7 +50,7 @@ internal class CapEffectsPlayer : ModPlayer
         if (crouching)
         {
             player.headPosition.X = 4 * player.direction;
-            player.headPosition.Y = 8;
+            player.headPosition.Y = CapPlayer?.currentCap == "Luigi" ? 8 : 6;
             player.headRotation = MathHelper.PiOver4 * 0.5f * player.direction;
             Player.bodyFrame.Y = 56 * 2;
 
@@ -63,8 +62,13 @@ internal class CapEffectsPlayer : ModPlayer
 
             if (CapPlayer?.currentCap == "Luigi")
             {
-                if (Player.sitting.isSitting) Player.headPosition.Y = 2;
-                else Player.bodyPosition.Y = Player.IsOnGroundPrecise() ? -2 : 0;
+                Player.bodyPosition.Y = -2;
+
+                if (Player.sitting.isSitting)
+                {
+                    Player.headPosition.Y = 0;
+                    Player.legPosition.Y = -2;
+                }
             }
         }
 

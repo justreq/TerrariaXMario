@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
 using System.Linq;
+using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ModLoader;
@@ -69,5 +70,35 @@ internal class TerrariaXMario : Mod
         CursorThrowIndex = -1;
         CursorEditIndex = -1;
         spawnableObjects = null;
+    }
+
+    public static bool SolidTile(int i, int j)
+    {
+        return WorldGen.InWorld(i, j) && SolidTile(Main.tile[i, j]);
+    }
+
+    public static bool SolidTile(Tile t)
+    {
+        if (!t.HasTile || t.IsActuated)
+        {
+            return false;
+        }
+
+        return Main.tileSolid[t.TileType] && !Main.tileSolidTop[t.TileType];
+    }
+
+    public static bool SolidOrSolidTopTile(int i, int j)
+    {
+        return WorldGen.InWorld(i, j) && SolidOrSolidTopTile(Main.tile[i, j]);
+    }
+
+    public static bool SolidOrSolidTopTile(Tile t)
+    {
+        if (!t.HasTile || t.IsActuated)
+        {
+            return false;
+        }
+
+        return Main.tileSolid[t.TileType] || Main.tileSolidTop[t.TileType];
     }
 }

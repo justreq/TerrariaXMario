@@ -2,7 +2,6 @@
 using System;
 using Terraria;
 using Terraria.ModLoader;
-using TerrariaXMario.Content.Blocks;
 
 namespace TerrariaXMario.Utilities.Extensions;
 internal static class PlayerExtensions
@@ -27,7 +26,7 @@ internal static class PlayerExtensions
         do
         {
             Point point = new Vector2(fx, y + 0.01f).ToTileCoordinates(); //0.01f is a magic number vanilla uses
-            if (onlySolid && SolidTile(point.X, point.Y) || SolidOrSolidTopTile(point.X, point.Y))
+            if (onlySolid && TerrariaXMario.SolidTile(point.X, point.Y) || TerrariaXMario.SolidOrSolidTopTile(point.X, point.Y))
             {
                 return true;
             }
@@ -42,69 +41,5 @@ internal static class PlayerExtensions
     public static bool IsOnGroundPrecise(this Entity entity, float yOffset = 0f, bool onlySolid = false)
     {
         return entity.velocity.Y == 0 && IsOnGroundPrecise(entity.BottomLeft.X, entity.BottomLeft.Y + yOffset, entity.width, onlySolid);
-    }
-
-    public static bool SolidTile(int i, int j)
-    {
-        return WorldGen.InWorld(i, j) && SolidTile(Main.tile[i, j]);
-    }
-
-    public static bool SolidTile(Tile t)
-    {
-        if (!t.HasTile || t.IsActuated)
-        {
-            return false;
-        }
-
-        return Main.tileSolid[t.TileType] && !Main.tileSolidTop[t.TileType];
-    }
-
-    public static bool SolidOrSolidTopTile(int i, int j)
-    {
-        return WorldGen.InWorld(i, j) && SolidOrSolidTopTile(Main.tile[i, j]);
-    }
-
-    public static bool SolidOrSolidTopTile(Tile t)
-    {
-        if (!t.HasTile || t.IsActuated)
-        {
-            return false;
-        }
-
-        return Main.tileSolid[t.TileType] || Main.tileSolidTop[t.TileType];
-    }
-
-    public static Point? IsBelowObjectSpawnerBlockPrecise(in float startX, float y, int width)
-    {
-        if (width <= 0)
-        {
-            throw new ArgumentException("width cannot be negative");
-        }
-
-        float fx = startX;
-
-        //Needs atleast one iteration (in case width is 0)
-        do
-        {
-            Point point = new Vector2(fx, y + 0.01f).ToTileCoordinates(); //0.01f is a magic number vanilla uses
-            if (SolidTile(point.X, point.Y) && TileLoader.GetTile(Framing.GetTileSafely(point).TileType) is ObjectSpawnerBlockTile)
-            {
-                return point;
-            }
-            fx += 16;
-        }
-        while (fx < startX + width);
-
-        return null;
-    }
-
-    public static Point? IsBelowObjectSpawnerBlockPrecise(this Entity entity, float yOffset = 0f)
-    {
-        Point? point = IsBelowObjectSpawnerBlockPrecise(entity.TopLeft.X, entity.TopLeft.Y - yOffset, entity.width);
-        if (point == null) return null;
-
-        if (entity.velocity.Y < 0) return point;
-
-        return null;
     }
 }

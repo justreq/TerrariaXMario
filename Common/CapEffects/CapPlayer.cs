@@ -77,7 +77,7 @@ internal class CapPlayer : ModPlayer
 
         currentPowerup.UpdateConsumed(Player);
 
-        if (PlayerInput.Triggers.JustPressed.MouseLeft && !Player.mouseInterface && Main.cursorOverride != TerrariaXMario.Instance.CursorGrabIndex && Main.cursorOverride != TerrariaXMario.Instance.CursorThrowIndex)
+        if (PlayerInput.Triggers.JustPressed.MouseLeft && !Player.mouseInterface && Main.cursorOverride != TerrariaXMario.Instance.CursorGrabIndex && Main.cursorOverride != TerrariaXMario.Instance.CursorThrowIndex && Player.HeldItem.IsAir && Main.mouseItem.IsAir)
         {
             SetForceDirection(10, Math.Sign(Main.MouseWorld.X - Player.position.X));
             currentPowerup.OnLeftClick(Player);
