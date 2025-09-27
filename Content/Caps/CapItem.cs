@@ -10,30 +10,50 @@ using TerrariaXMario.Utilities.Extensions;
 namespace TerrariaXMario.Content.Caps;
 internal abstract class CapItem : ModItem, ISpawnableObject
 {
+    private void LoadEquipTextures(string variation = "", bool head = true, bool body = true, bool legs = true)
+    {
+        if (head) EquipLoader.AddEquipTexture(Mod, $"{Texture}{variation}_{EquipType.Head}", EquipType.Head, this, $"{Name}{variation}");
+        if (body) EquipLoader.AddEquipTexture(Mod, $"{Texture}{variation}_{EquipType.Body}", EquipType.Body, this, $"{Name}{variation}");
+        if (legs) EquipLoader.AddEquipTexture(Mod, $"{Texture}{variation}_{EquipType.Legs}", EquipType.Legs, this, $"{Name}{variation}");
+    }
+
+    private void SetupEquipTextures(string variation = "", bool head = true, bool body = true, bool legs = true)
+    {
+        if (head)
+        {
+            int equipSlotHead = EquipLoader.GetEquipSlot(Mod, $"{Name}{variation}", EquipType.Head);
+            if (equipSlotHead != -1) ArmorIDs.Head.Sets.DrawHead[equipSlotHead] = false;
+        }
+        if (body)
+        {
+            int equipSlotBody = EquipLoader.GetEquipSlot(Mod, $"{Name}{variation}", EquipType.Body);
+            if (equipSlotBody != -1)
+            {
+                ArmorIDs.Body.Sets.HidesTopSkin[equipSlotBody] = true;
+                ArmorIDs.Body.Sets.HidesArms[equipSlotBody] = true;
+            }
+        }
+        if (legs)
+        {
+            int equipSlotLegs = EquipLoader.GetEquipSlot(Mod, $"{Name}{variation}", EquipType.Legs);
+            if (equipSlotLegs != -1) ArmorIDs.Legs.Sets.HidesBottomSkin[equipSlotLegs] = true;
+        }
+    }
+
     public override void Load()
     {
         if (Main.netMode == NetmodeID.Server) return;
 
-        EquipLoader.AddEquipTexture(Mod, $"{Texture}_{EquipType.Head}", EquipType.Head, this);
-        EquipLoader.AddEquipTexture(Mod, $"{Texture}_{EquipType.Body}", EquipType.Body, this);
-        EquipLoader.AddEquipTexture(Mod, $"{Texture}_{EquipType.Legs}", EquipType.Legs, this);
+        LoadEquipTextures();
+        LoadEquipTextures("GroundPound", false, false);
     }
 
     public override void SetStaticDefaults()
     {
         if (Main.netMode == NetmodeID.Server) return;
 
-        int equipSlotHead = EquipLoader.GetEquipSlot(Mod, Name, EquipType.Head);
-        int equipSlotBody = EquipLoader.GetEquipSlot(Mod, Name, EquipType.Body);
-        int equipSlotLegs = EquipLoader.GetEquipSlot(Mod, Name, EquipType.Legs);
-
-        if (equipSlotHead != -1) ArmorIDs.Head.Sets.DrawHead[equipSlotHead] = false;
-        if (equipSlotBody != -1)
-        {
-            ArmorIDs.Body.Sets.HidesTopSkin[equipSlotBody] = true;
-            ArmorIDs.Body.Sets.HidesArms[equipSlotBody] = true;
-        }
-        if (equipSlotLegs != -1) ArmorIDs.Legs.Sets.HidesBottomSkin[equipSlotLegs] = true;
+        SetupEquipTextures();
+        SetupEquipTextures("GroundPound", false, false);
     }
 
     public override void SetDefaults()
@@ -62,7 +82,7 @@ internal abstract class CapItem : ModItem, ISpawnableObject
 
         capEffectsPlayer?.CapPlayer?.currentCap = Name;
 
-        if (!capEffectsPlayer?.crouching ?? false && !capEffectsPlayer.groundPounding) player.spikedBoots = 1;
+        if (!capEffectsPlayer?.crouching ?? false && !capEffectsPlayer.GroundPounding) player.spikedBoots = 1;
     }
 }
 

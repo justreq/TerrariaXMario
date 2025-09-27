@@ -24,4 +24,7 @@ internal class IceFlowerData : Powerup
     }
 }
 
-internal class IceFlower : PowerupProjectile<IceFlowerData>;
+internal class IceFlower : PowerupProjectile
+{
+    internal override Powerup PowerupData { get; set; } = new IceFlowerData();
+}

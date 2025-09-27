@@ -24,4 +24,7 @@ internal class FireFlowerData : Powerup
     }
 }
 
-internal class FireFlower : PowerupProjectile<FireFlowerData>;
+internal class FireFlower : PowerupProjectile
+{
+    internal override Powerup PowerupData { get; set; } = new FireFlowerData();
+}

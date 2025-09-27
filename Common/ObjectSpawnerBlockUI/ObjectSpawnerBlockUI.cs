@@ -69,7 +69,7 @@ internal class ObjectSpawnerBlockUI : UIState
             e.BackgroundColor = new Color(43, 62, 131) * 0.85f;
         }));
 
-        HowToUseText = FinalListContainer.AddElement(new UIText("Select an object from the left panel. Edit any properties or reorder the list from this panel.\n\nStrike the block to get its contents in listed order (from top to bottom).").With(e =>
+        HowToUseText = FinalListContainer.AddElement(new UIText(Language.GetTextValue($"Mods.{nameof(TerrariaXMario)}.UI.ObjectSpawnerBlock.HowTo")).With(e =>
         {
             e.Width = StyleDimension.FromPixelsAndPercent(-16, 1);
             e.HAlign = 0.5f;
@@ -93,13 +93,13 @@ internal class ObjectSpawnerBlockUI : UIState
             FinalList.SetScrollbar(e);
         });
 
-        Container.AddElement(new UIHoverImageButton(ModContent.Request<Texture2D>($"{GetType().Namespace!.Replace(".", "/")}/ButtonExit", ReLogic.Content.AssetRequestMode.ImmediateLoad), "Exit (WILL NOT SAVE!)").With(e =>
+        Container.AddElement(new UIHoverImageButton(ModContent.Request<Texture2D>($"{GetType().Namespace!.Replace(".", "/")}/ButtonExit", ReLogic.Content.AssetRequestMode.ImmediateLoad), Language.GetTextValue($"Mods.{nameof(TerrariaXMario)}.UI.ObjectSpawnerBlock.Exit")).With(e =>
         {
             e.VAlign = 1;
             e.OnLeftClick += Exit;
         }));
 
-        Container.AddElement(new UIHoverImageButton(ModContent.Request<Texture2D>($"{GetType().Namespace!.Replace(".", "/")}/ButtonSubmit", ReLogic.Content.AssetRequestMode.ImmediateLoad), "Save").With(e =>
+        Container.AddElement(new UIHoverImageButton(ModContent.Request<Texture2D>($"{GetType().Namespace!.Replace(".", "/")}/ButtonSubmit", ReLogic.Content.AssetRequestMode.ImmediateLoad), Language.GetTextValue($"Mods.{nameof(TerrariaXMario)}.UI.ObjectSpawnerBlock.Save")).With(e =>
         {
             e.HAlign = 1;
             e.VAlign = 1;
@@ -179,11 +179,30 @@ internal class ObjectSpawnerBlockUI : UIState
                     e.SetHoverImage(Main.Assets.Request<Texture2D>("Images/UI/CharCreation/CategoryPanelBorder"));
                     e.OnLeftClick += OnClickObjectButton;
 
-                    e.AddElement(new UIImage(obj is ModItem modItem ? ModContent.Request<Texture2D>(modItem.Texture) : obj is ModProjectile modProjectile ? ModContent.Request<Texture2D>(modProjectile.Texture) : TextureAssets.Item[0]).With(f =>
+                    if (obj is ModProjectile modProjectile)
                     {
-                        f.HAlign = 0.5f;
-                        f.VAlign = 0.5f;
-                    }));
+                        e.AddElement(new UIImageFramed(ModContent.Request<Texture2D>(modProjectile.Texture), new Rectangle(0, 0, modProjectile.Projectile.width, modProjectile.Projectile.height)).With(f =>
+                        {
+                            f.HAlign = 0.5f;
+                            f.VAlign = 0.5f;
+                        }));
+                    }
+                    else if (obj is ModItem modItem)
+                    {
+                        e.AddElement(new UIImage(ModContent.Request<Texture2D>(modItem.Texture)).With(f =>
+                        {
+                            f.HAlign = 0.5f;
+                            f.VAlign = 0.5f;
+                        }));
+                    }
+                    else
+                    {
+                        e.AddElement(new UIImage(TextureAssets.Item[ItemID.GoldCoin]).With(f =>
+                        {
+                            f.HAlign = 0.5f;
+                            f.VAlign = 0.5f;
+                        }));
+                    }
                 }));
             }
         }

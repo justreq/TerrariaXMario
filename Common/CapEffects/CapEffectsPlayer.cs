@@ -3,6 +3,7 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameInput;
 using Terraria.ModLoader;
+using TerrariaXMario.Common.MiscEffects;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.CapEffects;
@@ -12,9 +13,21 @@ internal class CapEffectsPlayer : ModPlayer
     internal CapPlayer? CapPlayer => Player.GetModPlayerOrNull<CapPlayer>();
 
     internal bool crouching;
-    internal bool groundPounding;
+
+    private bool groundPounding;
+    internal bool GroundPounding
+    {
+        get => groundPounding;
+        set
+        {
+            groundPounding = value;
+            CapPlayer?.currentLegsVariant = value ? "GroundPound" : null;
+        }
+    }
+
     internal Jump currentJump;
     internal bool hasPSpeed;
+
     internal Vector2 currentObjectSpawnerBlockToEdit;
 
     public override void PostUpdateRunSpeeds()
@@ -59,16 +72,10 @@ internal class CapEffectsPlayer : ModPlayer
         else
         {
             if (!player.controlDown || player.IsOnGroundPrecise()) player.headPosition.X = 0;
-
             if (CapPlayer?.currentCap == "Luigi")
             {
-                Player.bodyPosition.Y = -2;
-
-                if (Player.sitting.isSitting)
-                {
-                    Player.headPosition.Y = 0;
-                    Player.legPosition.Y = -2;
-                }
+                player.bodyPosition.Y = -2;
+                if (groundPounding) player.legPosition.Y = -2;
             }
         }
 
@@ -77,7 +84,7 @@ internal class CapEffectsPlayer : ModPlayer
 
     public override void PreUpdate()
     {
-        if (Player.mount.Active || (!CapPlayer?.CanDoCapEffects ?? true))
+        if (Player.mount.Active || Player.GetModPlayerOrNull<GrabPlayer>()?.grabbedNPC != null || (!CapPlayer?.CanDoCapEffects ?? true))
         {
             crouching = false;
             return;
@@ -85,12 +92,6 @@ internal class CapEffectsPlayer : ModPlayer
 
         if (Player.controlDown && Player.IsOnGroundPrecise()) crouching = true;
         if (crouching && !Player.controlDown) crouching = false;
-    }
-
-    public override void PostUpdate()
-    {
-        if (!CapPlayer?.CanDoCapEffects ?? true) return;
-
     }
 
     public override void PostUpdateEquips()

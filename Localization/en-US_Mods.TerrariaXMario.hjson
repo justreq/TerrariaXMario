@@ -1,3 +1,20 @@
+UI: {
+	GearType: {
+		Cap: Cap
+		Overalls: Overalls
+		Socks: Socks
+		Boots: Boots
+		Gloves: Gloves
+		Badge: Badge
+	}
+
+	ObjectSpawnerBlock: {
+		HowTo: Select an object from the left panel. Edit any properties or reorder the list from this panel.\n\nStrike the block to get its contents in listed order (from top to bottom).
+		Exit: Exit (WILL NOT SAVE!)
+		Save: Save
+	}
+}
+
 Items: {
 	Mario: {
 		DisplayName: Mario's Cap
@@ -32,4 +49,6 @@ Projectiles: {
 	FireFlowerFireball.DisplayName: Fire Flower Fireball
 	IceFlowerIceball.DisplayName: Ice Flower Iceball
 	IceBlock.DisplayName: Ice Block
+	SuperLeaf.DisplayName: Super Leaf
+	TanookiSuit.DisplayName: Tanooki Suit
 }

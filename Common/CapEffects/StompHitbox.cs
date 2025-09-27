@@ -60,7 +60,6 @@ internal class StompHitbox : ModProjectile
         }
 
         if (groundPound) groundPoundCooldown++;
-        else player.headPosition.X = 0;
 
         ObjectSpawnerBlockPlayer? modPlayer = player.GetModPlayerOrNull<ObjectSpawnerBlockPlayer>();
 
@@ -76,8 +75,6 @@ internal class StompHitbox : ModProjectile
             player.creativeGodMode = true;
             player.bodyFrame.Y = 0;
             player.legFrame.Y = 0;
-            player.headPosition.X = 4 * player.direction;
-            player.sitting.isSitting = true;
             player.itemTime = 0;
             player.itemAnimation = 0;
 
@@ -93,7 +90,7 @@ internal class StompHitbox : ModProjectile
             }
         }
 
-        modPlayer?.groundPounding = groundPound;
+        modPlayer?.GroundPounding = groundPound;
     }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
@@ -132,9 +129,10 @@ internal class StompHitbox : ModProjectile
 
     public override void OnKill(int timeLeft)
     {
-        if (!groundPound) return;
-
         Player player = Main.player[Projectile.owner];
+        player.GetModPlayerOrNull<CapEffectsPlayer>()?.GroundPounding = false;
+
+        if (!groundPound) return;
 
         SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPound") { Volume = 0.4f });
         for (int i = -2; i < 3; i++)

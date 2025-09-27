@@ -14,7 +14,7 @@
 		},
 		"Terraria (hot reload+ watcher)": {
 			"commandName": "Project",
-			"commandLineArgs": "\"$(TerrariaSteamPath)$(tMLPath)\" -skipselect"
+			"commandLineArgs": "\"$(TerrariaSteamPath)$(tMLPath)\" -skipselect \"Mod Testing:Mod Testing\""
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Reflection;
 using Terraria;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using TerrariaXMario.Utilities.Extensions;
 
@@ -30,7 +31,7 @@ internal abstract class GearSlot : ModAccessorySlot
     public override void OnMouseHover(AccessorySlotType context)
     {
         if (context == AccessorySlotType.DyeSlot) base.OnMouseHover(context);
-        else Main.hoverItemName = GearType.ToString();
+        else Main.hoverItemName = Language.GetTextValue($"Mods.{nameof(TerrariaXMario)}.UI.GearType.{GearType}");
     }
 
     public override void BackgroundDrawColor(AccessorySlotType context, ref Color color)

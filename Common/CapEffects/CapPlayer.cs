@@ -3,7 +3,6 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.GameInput;
 using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
 using TerrariaXMario.Common.GearSlots;
 using TerrariaXMario.Content.Powerups;
 using TerrariaXMario.Utilities.Extensions;
@@ -15,6 +14,9 @@ internal class CapPlayer : ModPlayer
 
     private string? oldCap;
     internal string? currentCap;
+    internal string? currentHeadVariant;
+    internal string? currentBodyVariant;
+    internal string? currentLegsVariant;
 
     internal Powerup? currentPowerup;
 
@@ -46,9 +48,9 @@ internal class CapPlayer : ModPlayer
             return;
         }
 
-        Player.head = EquipLoader.GetEquipSlot(Mod, $"{currentPowerup?.Name ?? ""}{currentCap}", EquipType.Head);
-        Player.body = EquipLoader.GetEquipSlot(Mod, $"{currentPowerup?.Name ?? ""}{currentCap}", EquipType.Body);
-        Player.legs = EquipLoader.GetEquipSlot(Mod, $"{currentPowerup?.Name ?? ""}{currentCap}", EquipType.Legs);
+        Player.head = EquipLoader.GetEquipSlot(Mod, $"{currentPowerup?.Name ?? ""}{currentCap}{currentHeadVariant ?? ""}", EquipType.Head);
+        Player.body = EquipLoader.GetEquipSlot(Mod, $"{currentPowerup?.Name ?? ""}{currentCap}{currentBodyVariant ?? ""}", EquipType.Body);
+        Player.legs = EquipLoader.GetEquipSlot(Mod, $"{currentPowerup?.Name ?? ""}{currentCap}{currentLegsVariant ?? ""}", EquipType.Legs);
     }
 
     public override void ModifyHurt(ref Player.HurtModifiers modifiers)
@@ -76,12 +78,6 @@ internal class CapPlayer : ModPlayer
         if (!CanDoCapEffects || currentPowerup == null) return;
 
         currentPowerup.UpdateConsumed(Player);
-
-        if (PlayerInput.Triggers.JustPressed.MouseLeft && !Player.mouseInterface && Main.cursorOverride != TerrariaXMario.Instance.CursorGrabIndex && Main.cursorOverride != TerrariaXMario.Instance.CursorThrowIndex && Player.HeldItem.IsAir && Main.mouseItem.IsAir)
-        {
-            SetForceDirection(10, Math.Sign(Main.MouseWorld.X - Player.position.X));
-            currentPowerup.OnLeftClick(Player);
-        }
     }
 
     public override void PostUpdate()
@@ -117,6 +113,12 @@ internal class CapPlayer : ModPlayer
                 forceSwingDuration = 0;
                 forceSwingTimer = 0;
             }
+        }
+
+        if (PlayerInput.Triggers.JustPressed.MouseLeft && !Player.mouseInterface && Main.cursorOverride != TerrariaXMario.Instance.CursorGrabIndex && Main.cursorOverride != TerrariaXMario.Instance.CursorThrowIndex && Player.HeldItem.IsAir && Main.mouseItem.IsAir)
+        {
+            SetForceDirection(10, Math.Sign(Main.MouseWorld.X - Player.position.X));
+            currentPowerup?.OnLeftClick(Player);
         }
     }
 }

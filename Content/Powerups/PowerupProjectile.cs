@@ -1,50 +1,82 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.Audio;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.CapEffects;
-using TerrariaXMario.Content.Blocks;
 using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Powerups;
-internal abstract class PowerupProjectile<T> : ModProjectile, ISpawnableObject where T : Powerup, new()
+internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
 {
-    internal T? PowerupData = new();
-    private int timeBeforePickable;
+    internal abstract Powerup PowerupData { get; set; }
 
-    public override void Load()
+    private void LoadEquipTextures(string cap, string variation = "", bool head = true, bool body = true, bool legs = true)
     {
-        if (Main.netMode == NetmodeID.Server) return;
-
-        for (int i = 0; i < PowerupData?.Caps.Length; i++)
-        {
-            EquipLoader.AddEquipTexture(Mod, $"{Texture}{PowerupData.Caps[i]}_{EquipType.Head}", EquipType.Head, name: $"{Name}{PowerupData.Caps[i]}");
-            EquipLoader.AddEquipTexture(Mod, $"{Texture}{PowerupData.Caps[i]}_{EquipType.Body}", EquipType.Body, name: $"{Name}{PowerupData.Caps[i]}");
-            EquipLoader.AddEquipTexture(Mod, $"{Texture}{PowerupData.Caps[i]}_{EquipType.Legs}", EquipType.Legs, name: $"{Name}{PowerupData.Caps[i]}");
-        }
+        if (head) EquipLoader.AddEquipTexture(Mod, $"{Texture}{cap}{variation}_{EquipType.Head}", EquipType.Head, name: $"{Name}{cap}{variation}");
+        if (body) EquipLoader.AddEquipTexture(Mod, $"{Texture}{cap}{variation}_{EquipType.Body}", EquipType.Body, name: $"{Name}{cap}{variation}");
+        if (legs) EquipLoader.AddEquipTexture(Mod, $"{Texture}{cap}{variation}_{EquipType.Legs}", EquipType.Legs, name: $"{Name}{cap}{variation}");
     }
 
-    public override void SetStaticDefaults()
+    private void SetupEquipTextures(string cap, string variation = "", bool head = true, bool body = true, bool legs = true)
     {
-        if (Main.netMode == NetmodeID.Server) return;
-
-        for (int i = 0; i < PowerupData?.Caps.Length; i++)
+        if (head)
         {
-            int equipSlotHead = EquipLoader.GetEquipSlot(Mod, $"{Name}{PowerupData.Caps[i]}", EquipType.Head);
-            int equipSlotBody = EquipLoader.GetEquipSlot(Mod, $"{Name}{PowerupData.Caps[i]}", EquipType.Body);
-            int equipSlotLegs = EquipLoader.GetEquipSlot(Mod, $"{Name}{PowerupData.Caps[i]}", EquipType.Legs);
-
+            int equipSlotHead = EquipLoader.GetEquipSlot(Mod, $"{Name}{cap}{variation}", EquipType.Head);
             if (equipSlotHead != -1) ArmorIDs.Head.Sets.DrawHead[equipSlotHead] = false;
+        }
+        if (body)
+        {
+            int equipSlotBody = EquipLoader.GetEquipSlot(Mod, $"{Name}{cap}{variation}", EquipType.Body);
             if (equipSlotBody != -1)
             {
                 ArmorIDs.Body.Sets.HidesTopSkin[equipSlotBody] = true;
                 ArmorIDs.Body.Sets.HidesArms[equipSlotBody] = true;
             }
+        }
+        if (legs)
+        {
+            int equipSlotLegs = EquipLoader.GetEquipSlot(Mod, $"{Name}{cap}{variation}", EquipType.Legs);
             if (equipSlotLegs != -1) ArmorIDs.Legs.Sets.HidesBottomSkin[equipSlotLegs] = true;
+        }
+    }
+
+    public override void Load()
+    {
+        if (Main.netMode == NetmodeID.Server || PowerupData == null) return;
+
+        for (int i = 0; i < PowerupData.Caps.Length; i++)
+        {
+            string cap = PowerupData.Caps[i];
+
+            LoadEquipTextures(cap);
+            LoadEquipTextures(cap, "GroundPound", false, false);
+
+            for (int j = 0; j < PowerupData.Variations.Length; j++)
+            {
+                LoadEquipTextures(cap, PowerupData.Variations[j]);
+            }
+        }
+    }
+
+    public override void SetStaticDefaults()
+    {
+        if (Main.netMode == NetmodeID.Server || PowerupData == null) return;
+
+        for (int i = 0; i < PowerupData.Caps.Length; i++)
+        {
+            string cap = PowerupData.Caps[i];
+
+            SetupEquipTextures(cap);
+            SetupEquipTextures(cap, "GroundPound", false, false);
+
+            for (int j = 0; j < PowerupData.Variations.Length; j++)
+            {
+                SetupEquipTextures(cap, PowerupData.Variations[j]);
+            }
         }
     }
 
@@ -57,20 +89,18 @@ internal abstract class PowerupProjectile<T> : ModProjectile, ISpawnableObject w
 
     public override bool OnTileCollide(Vector2 oldVelocity) => false;
 
-    public override void OnSpawn(IEntitySource source)
-    {
-        if (source is EntitySource_TileInteraction tileInteraction && TileLoader.GetTile(Framing.GetTileSafely(tileInteraction.TileCoords).TileType) is ObjectSpawnerBlockTile) timeBeforePickable = (int)Projectile.ai[0];
-    }
-
     public override void AI()
     {
-        if (timeBeforePickable > 0)
+        if (PowerupData == null) return;
+
+        if (PowerupData.TimeBeforePickable > 0)
         {
-            timeBeforePickable--;
+            PowerupData.TimeBeforePickable--;
             return;
         }
 
-        PowerupData?.UpdateWorld(Projectile);
+        PowerupData.UpdateWorld(Projectile);
+        PowerupData.updateCount++;
 
         foreach (Player player in Main.ActivePlayers)
         {
@@ -84,8 +114,6 @@ internal abstract class PowerupProjectile<T> : ModProjectile, ISpawnableObject w
 
             Projectile.Kill();
 
-            if (PowerupData == null) return;
-
             SoundEngine.PlaySound(new(PowerupData.EquipSound) { Volume = 0.4f });
             player.GetModPlayerOrNull<CapPlayer>()?.currentPowerup = PowerupData;
             PowerupData.OnConsume(player);
@@ -95,5 +123,11 @@ internal abstract class PowerupProjectile<T> : ModProjectile, ISpawnableObject w
     public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
     {
         behindNPCsAndTiles.Add(index);
+
+        if (PowerupData.TimeBeforePickable == 0 && behindNPCsAndTiles.Contains(index))
+        {
+            Projectile.hide = false;
+            behindNPCsAndTiles.Remove(index);
+        }
     }
 }

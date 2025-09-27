@@ -7,6 +7,7 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Content.Blocks;
+using TerrariaXMario.Content.Powerups;
 using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 
@@ -71,10 +72,10 @@ internal class ObjectSpawnerBlockPlayer : CapEffectsPlayer
 
         ISpawnableObject objectToSpawn = entity.spawnContents.Length == 0 && entity.tileInternalName == nameof(QuestionBlockTile) ? new DefaultSpawnableObject() : entity!.spawnContents[0];
 
-        if (objectToSpawn is ModProjectile projectile)
+        if (objectToSpawn is PowerupProjectile projectile)
         {
             SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/PowerupSpawn"));
-            Projectile.NewProjectile(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), entity.Position.ToWorldCoordinates() + new Vector2(8), new Vector2(0, 0.75f * (spawnFromBottom ? 1 : -1)), projectile.Type, 0, 0, ai0: 45);
+            Projectile.NewProjectile(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), entity.Position.ToWorldCoordinates() + new Vector2(8), new Vector2(0, spawnFromBottom ? projectile.PowerupData.SpawnDownSpeed : projectile.PowerupData.SpawnUpSpeed), projectile.Type, 0, 0);
         }
         else if (objectToSpawn is ModItem item)
         {

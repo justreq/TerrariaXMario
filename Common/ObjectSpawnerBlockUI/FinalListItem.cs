@@ -24,7 +24,6 @@ internal class FinalListItem : UIPanel
 
     private UIHoverImageButton? ShiftUpButton { get; set; }
     private UIHoverImageButton? ShiftDownButton { get; set; }
-    private UIHoverImage? Thumbnail { get; set; }
 
     internal FinalListItem(UIList parentList, ISpawnableObject objectType) : base(ModContent.Request<Texture2D>($"{TerrariaXMario.Textures}/AlternativePanelBackground"), ModContent.Request<Texture2D>($"{TerrariaXMario.Textures}/AlternativePanelBorder"))
     {
@@ -42,10 +41,27 @@ internal class FinalListItem : UIPanel
 
         if (objectType is DefaultSpawnableObject) Main.instance.LoadItem(ItemID.GoldCoin);
 
-        Thumbnail = new UIHoverImage(objectType is DefaultSpawnableObject ? TextureAssets.Item[ItemID.GoldCoin] : objectType is ModItem modItem ? ModContent.Request<Texture2D>(modItem.Texture) : objectType is ModProjectile modProjectile ? ModContent.Request<Texture2D>(modProjectile.Texture) : TextureAssets.Item[0], objectType is ModItem or ModProjectile ? Language.GetTextValue($"Mods.{nameof(TerrariaXMario)}.{(objectType is ModItem ? "Items" : "Projectiles")}.{objectType.GetType().Name}.DisplayName") : "").With(e =>
+        if (objectType is ModProjectile modProjectile)
         {
-            e.VAlign = 0.5f;
-        });
+            this.AddElement(new UIImageFramed(ModContent.Request<Texture2D>(modProjectile.Texture), new Rectangle(0, 0, modProjectile.Projectile.width, modProjectile.Projectile.height)).With(e =>
+            {
+                e.VAlign = 0.5f;
+            }));
+        }
+        else if (objectType is ModItem modItem)
+        {
+            this.AddElement(new UIImage(ModContent.Request<Texture2D>(modItem.Texture)).With(e =>
+            {
+                e.VAlign = 0.5f;
+            }));
+        }
+        else
+        {
+            this.AddElement(new UIImage(TextureAssets.Item[ItemID.GoldCoin]).With(e =>
+            {
+                e.VAlign = 0.5f;
+            }));
+        }
 
         foreach (string direction in new string[] { "Up", "Down" })
         {
@@ -116,9 +132,14 @@ internal class FinalListItem : UIPanel
             if (!HasChild(ShiftDownButton) && ShiftDownButton != null) this.AddElement(ShiftDownButton);
         }
 
-        if (!HasChild(Thumbnail) && Thumbnail != null) this.AddElement(Thumbnail);
-
         base.DrawChildren(spriteBatch);
+    }
+
+    public override void Draw(SpriteBatch spriteBatch)
+    {
+        base.Draw(spriteBatch);
+
+        if (IsMouseHovering) Main.hoverItemName = objectType.Name;
     }
 
     private void SwitchPosition(FinalListItem? otherItem)

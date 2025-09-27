@@ -7,6 +7,7 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.MiscEffects;
 public class IceBlockNPC : GlobalNPC
@@ -18,6 +19,9 @@ public class IceBlockNPC : GlobalNPC
 
     private bool defaultNoGravity;
 
+    internal Rectangle iceBlockRect = Rectangle.Empty;
+    internal bool thrown;
+
     private readonly Asset<Texture2D> iceBlockTexture = ModContent.Request<Texture2D>($"{nameof(TerrariaXMario)}/Common/MiscEffects/IceBlock");
 
     internal void KillIceBlock(NPC npc)
@@ -25,12 +29,13 @@ public class IceBlockNPC : GlobalNPC
         SoundEngine.PlaySound(SoundID.Item27);
 
         frozen = false;
+        thrown = false;
         frozenTimer = 0;
 
         for (int i = 0; i < 4; i++)
         {
             int gore = Mod.Find<ModGore>($"IceBlockGore_{i + 1}").Type;
-            gore = Gore.NewGore(npc.GetSource_Misc("IceBlockTile"), npc.Center, MathHelper.ToRadians(0 - i * 60).ToRotationVector2() * 2.5f * npc.oldVelocity, gore);
+            gore = Gore.NewGore(npc.GetSource_Misc("IceBlockTile"), npc.Center, MathHelper.ToRadians(0 - i * 60).ToRotationVector2() * 2.5f, gore);
             Main.gore[gore].timeLeft = 0;
         }
     }
@@ -60,8 +65,32 @@ public class IceBlockNPC : GlobalNPC
 
         if (frozen)
         {
-            npc.velocity = Vector2.Zero;
-            npc.noGravity = true;
+            if (thrown)
+            {
+                npc.velocity.Y += Player.defaultGravity;
+                npc.noGravity = false;
+
+                foreach (NPC target in Main.ActiveNPCs)
+                {
+                    IceBlockNPC? globalNPC = target.GetGlobalNPCOrNull<IceBlockNPC>();
+                    if (target != npc && globalNPC != null && globalNPC.frozen && iceBlockRect.Intersects(globalNPC.iceBlockRect))
+                    {
+                        globalNPC.KillIceBlock(target);
+                        target.StrikeInstantKill();
+                    }
+                }
+
+                if (npc.velocity.X == 0)
+                {
+                    KillIceBlock(npc);
+                    npc.StrikeInstantKill();
+                }
+            }
+            else
+            {
+                npc.velocity = Vector2.Zero;
+                npc.noGravity = true;
+            }
 
             frozenTimer--;
 
@@ -117,7 +146,11 @@ public class IceBlockNPC : GlobalNPC
     {
         base.PostDraw(npc, spriteBatch, screenPos, drawColor);
 
-        if (!frozen) return;
+        if (!frozen)
+        {
+            this.iceBlockRect = Rectangle.Empty;
+            return;
+        }
 
         Vector2 size = npc.frame.Size() * npc.scale;
         Vector2 position = new Vector2(npc.Bottom.X - size.X * 0.5f, npc.Bottom.Y - size.Y + 2) - screenPos;
@@ -125,6 +158,9 @@ public class IceBlockNPC : GlobalNPC
         if (frozenTimer <= 60) position.X += (float)(2 * Math.Sin((1500 / (frozenTimer + 15)) - 4.3));
 
         Rectangle iceBlockRect = new((int)position.X, (int)position.Y, (int)size.X, (int)size.Y);
+        this.iceBlockRect = iceBlockRect;
+        this.iceBlockRect.X += (int)screenPos.X;
+        this.iceBlockRect.Y += (int)screenPos.Y;
 
         Color baseColor = Color.White * 0.5f;
 
@@ -153,17 +189,31 @@ public class IceBlockNPC : GlobalNPC
         spriteBatch.Draw(iceBlockTexture.Value, new Rectangle(iceBlockRect.X + 4, iceBlockRect.Y + 4, iceBlockRect.Width - 8, (int)(iceBlockRect.Height * 0.67f)), new(0, 16, 32, 32), Color.White * 0.25f); // glare
     }
 
+    public override bool PreHoverInteract(NPC npc, bool mouseIntersects)
+    {
+        GrabPlayer? modPlayer = Main.LocalPlayer.GetModPlayerOrNull<GrabPlayer>();
+
+        if (!frozen || npc.type == NPCID.TargetDummy || npc == modPlayer?.grabbedNPC || Main.LocalPlayer.Distance(npc.Center) > 64) return base.PreHoverInteract(npc, mouseIntersects);
+
+        modPlayer?.hoverNPC ??= npc;
+
+        return false;
+    }
+
+    public override bool? DrawHealthBar(NPC npc, byte hbPosition, ref float scale, ref Vector2 position)
+    {
+        if (frozen) return false;
+
+        return base.DrawHealthBar(npc, hbPosition, ref scale, ref position);
+    }
+
     public override void SaveData(NPC npc, TagCompound tag)
     {
-        tag[nameof(frozen)] = frozen;
-        tag[nameof(frozenTimer)] = frozenTimer;
         tag[nameof(defaultNoGravity)] = defaultNoGravity;
     }
 
     public override void LoadData(NPC npc, TagCompound tag)
     {
-        if (tag.ContainsKey(nameof(frozen))) frozen = tag.GetBool(nameof(frozen));
-        if (tag.ContainsKey(nameof(frozenTimer))) frozenTimer = tag.GetInt(nameof(frozenTimer));
         if (tag.ContainsKey(nameof(defaultNoGravity))) defaultNoGravity = tag.GetBool(nameof(defaultNoGravity));
     }
 }
