@@ -18,5 +18,5 @@ internal class Hammer : ModItem
         Item.UseSound = SoundID.Item1;
     }
 
-    public override bool CanUseItem(Player player) => player.GetModPlayerOrNull<CapPlayer>()?.CanDoCapEffects ?? false;
+    public override bool CanUseItem(Player player) => player.GetModPlayerOrNull<CapEffectsPlayer>()?.CanDoCapEffects ?? false;
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
-using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
@@ -115,7 +114,7 @@ internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
             Projectile.Kill();
 
             SoundEngine.PlaySound(new(PowerupData.EquipSound) { Volume = 0.4f });
-            player.GetModPlayerOrNull<CapPlayer>()?.currentPowerup = PowerupData;
+            player.GetModPlayerOrNull<CapEffectsPlayer>()?.currentPowerup = PowerupData;
             PowerupData.OnConsume(player);
         }
     }

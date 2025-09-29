@@ -37,8 +37,8 @@ internal class Powerup : ModType
     /// <param name="player">The player that consumed this PowerupData</param>
     internal virtual void UpdateConsumed(Player player) { }
     /// <summary>
-    /// Use this method to spawn projectiles when left clicking, e.g. Fire Flower Fireball or Hammer Suit Hammer.
+    /// Use this method to spawn projectiles when left clicking, e.g. Fire Flower Fireball or Hammer Suit Hammer. Return true to force the player's front arm to swing
     /// </summary>
     /// <param name="player">The player that consumed this PowerupData</param>
-    internal virtual void OnLeftClick(Player player) { }
+    internal virtual bool OnLeftClick(Player player) => false;
 }

@@ -16,9 +16,9 @@ internal sealed class Patch_ForceDirection : BasePatch
     {
         orig(self);
 
-        CapPlayer? capPlayer = self.GetModPlayerOrNull<CapPlayer>();
+        CapEffectsPlayer? modPlayer = self.GetModPlayerOrNull<CapEffectsPlayer>();
 
-        if (capPlayer != null && capPlayer.forceDirection != 0) self.direction = capPlayer.forceDirection;
+        if (modPlayer != null && modPlayer.forceDirection != 0) self.direction = modPlayer.forceDirection;
 
     }
 
@@ -26,8 +26,8 @@ internal sealed class Patch_ForceDirection : BasePatch
     {
         orig(self, dir);
 
-        CapPlayer? capPlayer = self.GetModPlayerOrNull<CapPlayer>();
+        CapEffectsPlayer? modPlayer = self.GetModPlayerOrNull<CapEffectsPlayer>();
 
-        if (capPlayer != null && capPlayer.forceDirection != 0) self.direction = capPlayer.forceDirection;
+        if (modPlayer != null && modPlayer.forceDirection != 0) self.direction = modPlayer.forceDirection;
     }
 }

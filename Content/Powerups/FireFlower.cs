@@ -10,17 +10,19 @@ internal class FireFlowerData : Powerup
 {
     public override string Name => "FireFlower";
 
-    internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
+    internal override string[] Caps => [nameof(Mario)];
 
     internal override void UpdateWorld(Projectile projectile)
     {
         projectile.velocity.Y += 0.4f;
     }
 
-    internal override void OnLeftClick(Player player)
+    internal override bool OnLeftClick(Player player)
     {
         SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/FireFlowerShoot") { Volume = 0.4f });
         Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, new Vector2(player.direction * 5, 0f), ModContent.ProjectileType<FireFlowerFireball>(), 1, 0f, player.whoAmI);
+
+        return true;
     }
 }
 

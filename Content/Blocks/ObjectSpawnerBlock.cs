@@ -108,7 +108,7 @@ internal class ObjectSpawnerBlockTile : ModTile
         Player player = Main.LocalPlayer;
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
 
-        if (modPlayer == null || modPlayer.crouching || modPlayer.currentObjectSpawnerBlockToEdit != Vector2.Zero || (!modPlayer.CapPlayer?.CanDoCapEffects ?? true)) return;
+        if (modPlayer == null || modPlayer.currentObjectSpawnerBlockToEdit != Vector2.Zero || (!modPlayer?.CanDoCapEffects ?? true)) return;
 
         if ((player.HeldItem.type == ModContent.ItemType<Hammer>() || Main.mouseItem.type == ModContent.ItemType<Hammer>()) && modPlayer != null && TerrariaXMario.GetTileEntityOrNull(modPlayer.currentObjectSpawnerBlockToEdit.ToPoint())?.Position != TerrariaXMario.GetTileEntityOrNull(i, j)?.Position)
         {

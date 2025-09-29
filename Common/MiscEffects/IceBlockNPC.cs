@@ -7,6 +7,7 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.MiscEffects;
@@ -191,7 +192,7 @@ public class IceBlockNPC : GlobalNPC
 
     public override bool PreHoverInteract(NPC npc, bool mouseIntersects)
     {
-        GrabPlayer? modPlayer = Main.LocalPlayer.GetModPlayerOrNull<GrabPlayer>();
+        CapEffectsPlayer? modPlayer = Main.LocalPlayer.GetModPlayerOrNull<CapEffectsPlayer>();
 
         if (!frozen || npc.type == NPCID.TargetDummy || npc == modPlayer?.grabbedNPC || Main.LocalPlayer.Distance(npc.Center) > 64) return base.PreHoverInteract(npc, mouseIntersects);
 

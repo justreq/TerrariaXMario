@@ -28,9 +28,9 @@ internal class SuperLeafData : Powerup
 
     }
 
-    internal override void OnLeftClick(Player player)
+    internal override bool OnLeftClick(Player player)
     {
-
+        return false;
     }
 }
 

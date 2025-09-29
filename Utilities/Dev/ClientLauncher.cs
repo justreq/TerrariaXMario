@@ -11,17 +11,6 @@ using System.Threading.Tasks;
 using System;
 using Terraria.ModLoader;
 using Terraria;
-using System.Buffers.Binary;
-using System.Threading;
-using System.Text;
-using System.Runtime.InteropServices;
-using MonoMod.Core.Utils;
-using System.Collections;
-using System.IO.Compression;
-using Terraria.ModLoader.Core;
-using MonoMod.Cil;
-using System.Security.Cryptography;
-using Mono.Cecil.Cil;
 
 #if !BUILDINGFROMCSPROJ_MOD
 

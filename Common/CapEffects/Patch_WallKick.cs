@@ -22,6 +22,6 @@ internal sealed class Patch_WallKick : BasePatch
 
         c.Remove();
         c.EmitLdarg(0);
-        c.EmitDelegate((Player player) => (player.GetModPlayerOrNull<CapPlayer>()?.CanDoCapEffects ?? false) ? 5 : 3);
+        c.EmitDelegate((Player player) => (player.GetModPlayerOrNull<CapEffectsPlayer>()?.CanDoCapEffects ?? false) ? 5 : 3);
     }
 }

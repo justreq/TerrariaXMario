@@ -111,7 +111,7 @@ internal class ObjectSpawnerBlockUI : UIState
     {
         CapEffectsPlayer? modPlayer = Main.LocalPlayer.GetModPlayerOrNull<CapEffectsPlayer>();
 
-        if ((modPlayer?.CapPlayer?.CanDoCapEffects ?? false) && modPlayer.currentObjectSpawnerBlockToEdit != Vector2.Zero)
+        if ((modPlayer?.CanDoCapEffects ?? false) && modPlayer.currentObjectSpawnerBlockToEdit != Vector2.Zero)
         {
             base.Draw(spriteBatch);
 

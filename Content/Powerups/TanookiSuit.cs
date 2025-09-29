@@ -22,9 +22,9 @@ internal class TanookiSuitData : Powerup
 
     }
 
-    internal override void OnLeftClick(Player player)
+    internal override bool OnLeftClick(Player player)
     {
-
+        return false;
     }
 }
 

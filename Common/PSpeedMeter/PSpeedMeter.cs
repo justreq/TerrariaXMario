@@ -42,15 +42,15 @@ internal class PSpeedMeter : UIState
 
     public override void Draw(SpriteBatch spriteBatch)
     {
-        if (Main.LocalPlayer.GetModPlayerOrNull<CapPlayer>()?.CanDoCapEffects ?? false) base.Draw(spriteBatch);
+        if (Main.LocalPlayer.GetModPlayerOrNull<CapEffectsPlayer>()?.CanDoCapEffects ?? false) base.Draw(spriteBatch);
     }
 
     public override void Update(GameTime gameTime)
     {
         Player player = Main.LocalPlayer;
-        PSpeedPlayer? modPlayer = player.GetModPlayerOrNull<PSpeedPlayer>();
+        CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
 
-        if (!modPlayer?.CapPlayer?.CanDoCapEffects ?? true) return;
+        if (!modPlayer?.CanDoCapEffects ?? true) return;
 
         Container?.Left = StyleDimension.FromPixels(player.Bottom.X - Main.screenPosition.X - 28);
         Container?.Top = StyleDimension.FromPixels(player.Bottom.Y - Main.screenPosition.Y);

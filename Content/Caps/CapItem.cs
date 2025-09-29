@@ -80,9 +80,9 @@ internal abstract class CapItem : ModItem, ISpawnableObject
 
         CapEffectsPlayer? capEffectsPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
 
-        capEffectsPlayer?.CapPlayer?.currentCap = Name;
+        capEffectsPlayer?.currentCap = Name;
 
-        if (!capEffectsPlayer?.crouching ?? false && !capEffectsPlayer.GroundPounding) player.spikedBoots = 1;
+        if (!capEffectsPlayer?.GroundPounding ?? false) player.spikedBoots = 1;
     }
 }
 
