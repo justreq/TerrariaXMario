@@ -194,9 +194,9 @@ public class IceBlockNPC : GlobalNPC
     {
         CapEffectsPlayer? modPlayer = Main.LocalPlayer.GetModPlayerOrNull<CapEffectsPlayer>();
 
-        if (!frozen || npc.type == NPCID.TargetDummy || npc == modPlayer?.grabbedNPC || Main.LocalPlayer.Distance(npc.Center) > 64) return base.PreHoverInteract(npc, mouseIntersects);
+        if (!frozen || npc.type == NPCID.TargetDummy || npc.whoAmI == modPlayer?.grabbedNPCIndex || Main.LocalPlayer.Distance(npc.Center) > 64) return base.PreHoverInteract(npc, mouseIntersects);
 
-        modPlayer?.hoverNPC ??= npc;
+        modPlayer?.hoverNPCIndex ??= npc.whoAmI;
 
         return false;
     }

@@ -13,6 +13,8 @@ UI: {
 		Exit: Exit (WILL NOT SAVE!)
 		Save: Save
 	}
+
+	Showdown.Prompt: Initiate Showdown?
 }
 
 Items: {

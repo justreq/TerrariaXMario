@@ -10,6 +10,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.GearSlots;
 using TerrariaXMario.Common.MiscEffects;
+using TerrariaXMario.Common.ShowdownSystem;
 using TerrariaXMario.Content.Blocks;
 using TerrariaXMario.Content.Powerups;
 using TerrariaXMario.Core;
@@ -59,8 +60,8 @@ internal class CapEffectsPlayer : ModPlayer
     internal int runTimeRequiredForPSpeed = 120;
     internal bool hasPSpeed;
 
-    internal NPC? hoverNPC;
-    internal NPC? grabbedNPC;
+    internal int? hoverNPCIndex;
+    internal int? grabbedNPCIndex;
 
     internal Vector2 currentObjectSpawnerBlockToEdit;
 
@@ -170,6 +171,12 @@ internal class CapEffectsPlayer : ModPlayer
             hasPSpeed = false;
 
             return;
+        }
+
+        if ((Player.GetModPlayer<ShowdownPlayer>()?.DoShowdownEffects ?? false) && stompHitbox != null)
+        {
+            Main.projectile[(int)stompHitbox].Kill();
+            stompHitbox = null;
         }
 
         CapEffect();
@@ -328,13 +335,14 @@ internal class CapEffectsPlayer : ModPlayer
 
     private void GrabEffect()
     {
-        if (grabbedNPC != null)
+        if (grabbedNPCIndex != null)
         {
+            NPC grabbedNPC = Main.npc[(int)grabbedNPCIndex];
             IceBlockNPC? globalNPC = grabbedNPC.GetGlobalNPCOrNull<IceBlockNPC>();
 
             if (!globalNPC?.frozen ?? true)
             {
-                grabbedNPC = null;
+                grabbedNPCIndex = null;
                 return;
             }
 
@@ -347,29 +355,31 @@ internal class CapEffectsPlayer : ModPlayer
                 SetForceDirection(10, Math.Sign(Main.MouseWorld.X - Player.position.X));
                 grabbedNPC.velocity.X = 7.5f * forceDirection;
                 globalNPC?.thrown = true;
-                grabbedNPC = null;
+                grabbedNPCIndex = null;
             }
         }
-        else if (hoverNPC != null)
+        else if (hoverNPCIndex != null)
         {
+            NPC hoverNPC = Main.npc[(int)hoverNPCIndex];
             IceBlockNPC? globalNPC = hoverNPC.GetGlobalNPCOrNull<IceBlockNPC>();
+
             if (globalNPC == null) return;
 
             if (!globalNPC.frozen || globalNPC.thrown || !globalNPC.iceBlockRect.Intersects(new Rectangle((int)Main.MouseWorld.X, (int)Main.MouseWorld.Y, 1, 1)))
             {
-                hoverNPC = null;
+                hoverNPCIndex = null;
                 return;
             }
 
             Main.cursorOverride = TerrariaXMario.Instance.CursorGrabIndex;
 
-            if (PlayerInput.Triggers.JustPressed.MouseLeft) grabbedNPC = hoverNPC;
+            if (PlayerInput.Triggers.JustPressed.MouseLeft) grabbedNPCIndex = hoverNPCIndex;
         }
     }
 
     private void GrabEffectCompositeArms()
     {
-        if (grabbedNPC != null)
+        if (grabbedNPCIndex != null)
         {
             Player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, MathHelper.Pi);
             Player.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Full, MathHelper.Pi);

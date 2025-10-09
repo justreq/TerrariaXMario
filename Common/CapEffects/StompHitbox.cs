@@ -5,6 +5,7 @@ using Terraria.Audio;
 using Terraria.GameInput;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.MiscEffects;
+using TerrariaXMario.Common.ShowdownSystem;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.CapEffects;
@@ -47,7 +48,7 @@ internal class StompHitbox : ModProjectile
         Projectile.timeLeft++;
         Player player = Main.player[Projectile.owner];
 
-        if (player.IsOnGroundPrecise()) Projectile.Kill();
+        if (player.IsOnGroundPrecise() || (player.GetModPlayerOrNull<ShowdownPlayer>()?.DoShowdownEffects ?? false)) Projectile.Kill();
 
         if (stompCooldown > 0) stompCooldown--;
         else if (targetIndex != null) targetIndex = null;
@@ -64,7 +65,7 @@ internal class StompHitbox : ModProjectile
 
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
 
-        if (PlayerInput.Triggers.JustPressed.Down && !groundPound)
+        if (PlayerInput.Triggers.JustPressed.Down && !groundPound && (!player.GetModPlayerOrNull<ShowdownPlayer>()?.DoShowdownEffects ?? true))
         {
             SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPoundStart") { Volume = 0.4f });
             player.fullRotation = 0;
@@ -78,6 +79,7 @@ internal class StompHitbox : ModProjectile
             player.legFrame.Y = 0;
             player.itemTime = 0;
             player.itemAnimation = 0;
+            modPlayer?.currentJump = Jump.None;
 
             if (groundPoundCooldown <= 15) player.velocity = new(0, 0.1f);
             else if (player.controlDown)

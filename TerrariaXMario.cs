@@ -29,6 +29,13 @@ internal class GearTypeAttribute(GearType value) : Attribute
     internal GearType value = value;
 }
 
+internal enum ShowdownState
+{
+    None,
+    Queried,
+    Active
+}
+
 internal class TerrariaXMario : Mod
 {
     internal static TerrariaXMario Instance => ModContent.GetInstance<TerrariaXMario>();
