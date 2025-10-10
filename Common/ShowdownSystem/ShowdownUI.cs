@@ -15,13 +15,14 @@ internal class ShowdownUI : UIState
     internal static ShowdownUI Instance => instance ??= new();
 
     private static float Scale => MathHelper.Max(Main.screenWidth / 1024f, Main.screenHeight / 512f);
+    private Vector2 defaultScrollingBackgroundPositionViaScale;
 
     private UIPanel? ContentContainer { get; set; }
     private UIImage? ScrollingBackground { get; set; }
     private UIImage? Background { get; set; }
     private UIImage? Foreground { get; set; }
 
-    private UICharacter? PlayerPuppet { get; set; }
+    private ShowdownUICharacter? PlayerPuppet { get; set; }
 
     public override void OnInitialize()
     {
@@ -50,15 +51,16 @@ internal class ShowdownUI : UIState
         ContentContainer.Height = StyleDimension.FromPixels(512 * Scale);
         ContentContainer.Recalculate();
 
-        Vector2 positionOffsetByScale = new((1024 - 1024 * Scale) * -0.5f, (512 - 512 * Scale) * -0.5f);
-        StyleDimension newWidth = StyleDimension.FromPixels(positionOffsetByScale.X);
-        StyleDimension newHeight = StyleDimension.FromPixels(positionOffsetByScale.Y);
+        defaultScrollingBackgroundPositionViaScale = new((1552 - 1552 * Scale) * -0.5f, (512 - 512 * Scale) * -0.5f);
+        Vector2 defaultBackgroundPositionViaScale = new((1024 - 1024 * Scale) * -0.5f, (512 - 512 * Scale) * -0.5f);
+        StyleDimension newWidth = StyleDimension.FromPixels(defaultBackgroundPositionViaScale.X);
+        StyleDimension newHeight = StyleDimension.FromPixels(defaultBackgroundPositionViaScale.Y);
 
         Background?.Left = newWidth;
         Background?.Top = newHeight;
         Background?.ImageScale = Scale;
-        ScrollingBackground?.Left = newWidth;
-        ScrollingBackground?.Top = newHeight;
+        ScrollingBackground?.Left = StyleDimension.FromPixels(defaultScrollingBackgroundPositionViaScale.X);
+        ScrollingBackground?.Top = StyleDimension.FromPixels(defaultScrollingBackgroundPositionViaScale.Y);
         ScrollingBackground?.ImageScale = Scale;
         Foreground?.Left = newWidth;
         Foreground?.Top = newHeight;
@@ -70,11 +72,20 @@ internal class ShowdownUI : UIState
     {
         base.Update(gameTime);
         Player player = Main.LocalPlayer;
-        ShowdownPlayer? modPlayer = player.GetModPlayerOrNull<ShowdownPlayer>();
 
         if (ContentContainer?.IsMouseHovering ?? false) player.mouseInterface = true;
-        if (!modPlayer?.DoShowdownEffects ?? true) return;
+        if (!player.GetModPlayerOrNull<ShowdownPlayer>()?.DoShowdownEffects ?? true) return;
 
-        PlayerPuppet ??= ContentContainer?.AddElement(new UICharacter(player, true, false, useAClone: true));
+        PlayerPuppet ??= ContentContainer?.AddElement(new ShowdownUICharacter(player, 2.5f));
+
+        PlayerPuppet?.Left = StyleDimension.FromPixels(Main.screenWidth * 0.25f);
+        PlayerPuppet?.Top = StyleDimension.FromPixels(Main.screenHeight * 0.575f);
+        PlayerPuppet?.Recalculate();
+
+        if (ScrollingBackground != null)
+        {
+            ScrollingBackground.Left.Pixels = ScrollingBackground.Left.Pixels <= defaultScrollingBackgroundPositionViaScale.X - 528 * Scale ? defaultScrollingBackgroundPositionViaScale.X : ScrollingBackground.Left.Pixels - 0.25f;
+            ScrollingBackground.Recalculate();
+        }
     }
 }
