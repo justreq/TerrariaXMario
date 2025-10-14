@@ -36,6 +36,15 @@ internal enum ShowdownState
     Active
 }
 
+internal enum ShowdownPuppetState
+{
+    Idle,
+    Attack,
+    Flee,
+    PlayerJump,
+    FlyingNPCDodgeGroundAttack
+}
+
 internal class TerrariaXMario : Mod
 {
     internal static TerrariaXMario Instance => ModContent.GetInstance<TerrariaXMario>();

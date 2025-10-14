@@ -98,7 +98,7 @@ internal class StompHitbox : ModProjectile
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
     {
-        modifiers.SetInstantKill();
+        //modifiers.SetInstantKill();
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)

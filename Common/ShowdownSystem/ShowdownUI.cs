@@ -1,11 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.UI;
-using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.ShowdownSystem;
@@ -21,8 +19,6 @@ internal class ShowdownUI : UIState
     private UIImage? ScrollingBackground { get; set; }
     private UIImage? Background { get; set; }
     private UIImage? Foreground { get; set; }
-
-    private ShowdownUICharacter? PlayerPuppet { get; set; }
 
     public override void OnInitialize()
     {
@@ -72,15 +68,10 @@ internal class ShowdownUI : UIState
     {
         base.Update(gameTime);
         Player player = Main.LocalPlayer;
+        ShowdownPlayer? modPlayer = player.GetModPlayerOrNull<ShowdownPlayer>();
 
         if (ContentContainer?.IsMouseHovering ?? false) player.mouseInterface = true;
-        if (!player.GetModPlayerOrNull<ShowdownPlayer>()?.DoShowdownEffects ?? true) return;
-
-        PlayerPuppet ??= ContentContainer?.AddElement(new ShowdownUICharacter(player, 2.5f));
-
-        PlayerPuppet?.Left = StyleDimension.FromPixels(Main.screenWidth * 0.25f);
-        PlayerPuppet?.Top = StyleDimension.FromPixels(Main.screenHeight * 0.575f);
-        PlayerPuppet?.Recalculate();
+        if (!modPlayer?.DoShowdownEffects ?? true) return;
 
         if (ScrollingBackground != null)
         {

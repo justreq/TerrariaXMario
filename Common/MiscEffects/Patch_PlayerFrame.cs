@@ -1,5 +1,4 @@
-﻿using Mono.Cecil.Cil;
-using MonoMod.Cil;
+﻿using MonoMod.Cil;
 using Terraria;
 using Terraria.ModLoader;
 using TerrariaXMario.Core;
@@ -9,7 +8,7 @@ internal sealed class Patch_PlayerFrame : BasePatch
 {
     internal override void Patch(Mod mod)
     {
-        IL_Player.PlayerFrame += IL_Player_PlayerFrame;
+        //IL_Player.PlayerFrame += IL_Player_PlayerFrame;
     }
 
     private void IL_Player_PlayerFrame(ILContext il)

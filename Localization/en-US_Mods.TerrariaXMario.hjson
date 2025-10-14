@@ -54,3 +54,5 @@ Projectiles: {
 	SuperLeaf.DisplayName: Super Leaf
 	TanookiSuit.DisplayName: Tanooki Suit
 }
+
+NPCs.Goomba.DisplayName: Goomba

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using SubworldLibrary;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.Localization;
@@ -66,7 +67,7 @@ internal class PromptShowdownUI : UIState
         if (modPlayer?.showdownNPCIndex == null) return;
 
         modPlayer?.showdownState = ShowdownState.Active;
-        IngameFancyUI.OpenUIState(ShowdownUI.Instance);
+        SubworldSystem.Enter<ShowdownSubworld>();
         Main.npc[(int)modPlayer?.showdownNPCIndex!].GetGlobalNPCOrNull<ShowdownNPC>()?.inShowdown = true;
         promptBarWidth = 360;
         PromptBar?.SetFrame(new(0, 26, promptBarWidth, 24));
@@ -93,6 +94,11 @@ internal class PromptShowdownUI : UIState
             promptBarWidth = 360;
             PromptBar?.SetFrame(new(0, 26, promptBarWidth, 24));
             modPlayer.showdownState = ShowdownState.None;
+            if (modPlayer.showdownNPCIndex != null)
+            {
+                Main.npc[(int)modPlayer.showdownNPCIndex].GetGlobalNPCOrNull<ShowdownNPC>()?.queryShowdown = false;
+                modPlayer.showdownNPCIndex = null;
+            }
         }
 
         PromptBar?.SetFrame(new(0, 26, promptBarWidth, 24));

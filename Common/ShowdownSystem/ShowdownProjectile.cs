@@ -24,6 +24,8 @@ internal class ShowdownProjectile : GlobalProjectile
         ShowdownPlayer? modPlayer = target.GetModPlayerOrNull<ShowdownPlayer>();
 
         modPlayer?.showdownState = ShowdownState.Queried;
+        if (modPlayer?.showdownNPCIndex != null) Main.npc[(int)modPlayer?.showdownNPCIndex!].GetGlobalNPCOrNull<ShowdownNPC>()?.queryShowdown = false;
         modPlayer?.showdownNPCIndex = npcOwnerIndex;
+        Main.npc[(int)npcOwnerIndex].GetGlobalNPCOrNull<ShowdownNPC>()?.queryShowdown = true;
     }
 }

@@ -2,6 +2,8 @@
 
 	<!-- Import tModLoader mod properties -->
 	<Import Project="..\tModLoader.targets" />
+	<Import Project=".\Core\Effects\Compiler\KBOFXCTask.props" />
+	<Import Project=".\Core\Effects\Compiler\KBOFXCTask.targets" />
 
 	<!-- General -->
 	<PropertyGroup>
@@ -19,5 +21,11 @@
 	<Target Name="CreateTMLPathTxt" AfterTargets="AfterBuild">
 		<WriteLinesToFile File="$(OutDir)tmlpath.txt" Lines="$(TerrariaSteamPath)$(tMLPath)" />
 	</Target>
+
+	<ItemGroup>
+	  <Reference Include="SubworldLibrary">
+	    <HintPath>lib\SubworldLibrary.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
 
 </Project>

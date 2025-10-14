@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using SubworldLibrary;
 using Terraria;
 using Terraria.GameInput;
 using Terraria.ModLoader;
-using Terraria.UI;
 using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Utilities.Extensions;
 
@@ -22,8 +22,9 @@ internal class ShowdownPlayer : ModPlayer
         if (showdownNPCIndex == null || showdownState != ShowdownState.Active) return;
 
         showdownState = ShowdownState.None;
-        IngameFancyUI.Close();
+        SubworldSystem.Exit();
         Main.npc[(int)showdownNPCIndex].GetGlobalNPCOrNull<ShowdownNPC>()?.inShowdown = false;
+        showdownNPCIndex = null;
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -31,7 +32,9 @@ internal class ShowdownPlayer : ModPlayer
         if (showdownState == ShowdownState.Active || (!CapEffectsPlayer?.CanDoCapEffects ?? true)) return;
 
         showdownState = ShowdownState.Queried;
+        if (showdownNPCIndex != null) Main.npc[(int)showdownNPCIndex].GetGlobalNPCOrNull<ShowdownNPC>()?.queryShowdown = false;
         showdownNPCIndex = target.whoAmI;
+        target.GetGlobalNPCOrNull<ShowdownNPC>()?.queryShowdown = true;
     }
 
     public override void OnHitByNPC(NPC npc, Player.HurtInfo hurtInfo)
@@ -39,7 +42,9 @@ internal class ShowdownPlayer : ModPlayer
         if (showdownState == ShowdownState.Active || (!CapEffectsPlayer?.CanDoCapEffects ?? true)) return;
 
         showdownState = ShowdownState.Queried;
+        if (showdownNPCIndex != null) Main.npc[(int)showdownNPCIndex].GetGlobalNPCOrNull<ShowdownNPC>()?.queryShowdown = false;
         showdownNPCIndex = npc.whoAmI;
+        npc.GetGlobalNPCOrNull<ShowdownNPC>()?.queryShowdown = true;
     }
 
     public override bool CanBeHitByNPC(NPC npc, ref int cooldownSlot)
