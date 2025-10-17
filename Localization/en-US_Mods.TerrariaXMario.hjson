@@ -14,7 +14,7 @@ UI: {
 		Save: Save
 	}
 
-	Showdown.Prompt: Initiate Showdown?
+	Showdown.DisplayName: Showdown
 }
 
 Items: {
@@ -56,3 +56,4 @@ Projectiles: {
 }
 
 NPCs.Goomba.DisplayName: Goomba
+Keybinds.EnterShowdown.DisplayName: Enter Showdown

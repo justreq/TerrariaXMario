@@ -1,6 +1,9 @@
-﻿using Terraria;
+﻿using System.Linq;
+using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
+using TerrariaXMario.Common.KeybindSystem;
+using TerrariaXMario.Core.Effects;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.ShowdownSystem;
@@ -23,9 +26,10 @@ internal class ShowdownProjectile : GlobalProjectile
 
         ShowdownPlayer? modPlayer = target.GetModPlayerOrNull<ShowdownPlayer>();
 
-        modPlayer?.showdownState = ShowdownState.Queried;
-        if (modPlayer?.showdownNPCIndex != null) Main.npc[(int)modPlayer?.showdownNPCIndex!].GetGlobalNPCOrNull<ShowdownNPC>()?.queryShowdown = false;
+        if (modPlayer?.showdownNPCIndex != null) Main.npc[(int)modPlayer?.showdownNPCIndex!].GetGlobalNPCOrNull<ShowdownNPC>()?.showdownState = NPCShowdownState.None;
         modPlayer?.showdownNPCIndex = npcOwnerIndex;
-        Main.npc[(int)npcOwnerIndex].GetGlobalNPCOrNull<ShowdownNPC>()?.queryShowdown = true;
+        Main.npc[(int)npcOwnerIndex].GetGlobalNPCOrNull<ShowdownNPC>()?.showdownState = NPCShowdownState.Query;
+        target.GetModPlayerOrNull<KeybindPlayer>()?.keybindToShowInIndicator = KeybindSystem.KeybindSystem.EnterShowdownKeybind?.GetAssignedKeys().FirstOrDefault();
+        Outline.outlineNeeded = true;
     }
 }

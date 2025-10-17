@@ -4,23 +4,23 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace TerrariaXMario.Common.PromptShowdownUI;
+namespace TerrariaXMario.Common.KeybindSystem;
 [Autoload(Side = ModSide.Client)]
-internal class PromptShowdownUISystem : ModSystem
+internal class UIKeybindIndicatorSystem : ModSystem
 {
-    private UserInterface? PromptShowdownUserInterface;
-    private PromptShowdownUI? PromptShowdownUI;
+    private UserInterface? UIKeybindIndicatorUserInterface;
+    private UIKeybindIndicator? UIKeybindIndicator;
 
     public override void Load()
     {
-        PromptShowdownUI = new();
-        PromptShowdownUserInterface = new();
-        PromptShowdownUserInterface.SetState(PromptShowdownUI);
+        UIKeybindIndicator = new();
+        UIKeybindIndicatorUserInterface = new();
+        UIKeybindIndicatorUserInterface.SetState(UIKeybindIndicator);
     }
 
     public override void UpdateUI(GameTime gameTime)
     {
-        PromptShowdownUserInterface?.Update(gameTime);
+        UIKeybindIndicatorUserInterface?.Update(gameTime);
     }
 
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -30,10 +30,10 @@ internal class PromptShowdownUISystem : ModSystem
         if (index == -1) return;
 
         layers.Insert(index, new LegacyGameInterfaceLayer(
-            $"{nameof(TerrariaXMario)}: Prompt Showdown UI",
+            $"{nameof(TerrariaXMario)}: UI Keybind Indicator",
             () =>
             {
-                PromptShowdownUserInterface?.Draw(Main.spriteBatch, new());
+                UIKeybindIndicatorUserInterface?.Draw(Main.spriteBatch, new());
                 return true;
             },
             InterfaceScaleType.UI)

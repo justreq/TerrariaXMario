@@ -71,7 +71,7 @@ internal class ShowdownUI : UIState
         ShowdownPlayer? modPlayer = player.GetModPlayerOrNull<ShowdownPlayer>();
 
         if (ContentContainer?.IsMouseHovering ?? false) player.mouseInterface = true;
-        if (!modPlayer?.DoShowdownEffects ?? true) return;
+        if (!modPlayer?.IsPlayerInShowdownSubworld ?? true) return;
 
         if (ScrollingBackground != null)
         {

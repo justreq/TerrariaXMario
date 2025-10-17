@@ -48,7 +48,7 @@ internal class StompHitbox : ModProjectile
         Projectile.timeLeft++;
         Player player = Main.player[Projectile.owner];
 
-        if (player.IsOnGroundPrecise() || (player.GetModPlayerOrNull<ShowdownPlayer>()?.DoShowdownEffects ?? false)) Projectile.Kill();
+        if (player.IsOnGroundPrecise()) Projectile.Kill();
 
         if (stompCooldown > 0) stompCooldown--;
         else if (targetIndex != null) targetIndex = null;
@@ -65,7 +65,7 @@ internal class StompHitbox : ModProjectile
 
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
 
-        if (PlayerInput.Triggers.JustPressed.Down && !groundPound && (!player.GetModPlayerOrNull<ShowdownPlayer>()?.DoShowdownEffects ?? true))
+        if (PlayerInput.Triggers.JustPressed.Down && !groundPound)
         {
             SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPoundStart") { Volume = 0.4f });
             player.fullRotation = 0;
@@ -96,11 +96,6 @@ internal class StompHitbox : ModProjectile
         modPlayer?.GroundPounding = groundPound;
     }
 
-    public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
-    {
-        //modifiers.SetInstantKill();
-    }
-
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
         targetIndex ??= target.whoAmI;
@@ -125,6 +120,8 @@ internal class StompHitbox : ModProjectile
 
     public override bool? CanHitNPC(NPC target)
     {
+        if (target.friendly) return false;
+
         if (target.GetGlobalNPCOrNull<IceBlockNPC>()?.frozen ?? false) return groundPound;
 
         return groundPound || (targetIndex == null && stompCooldown == 0 && Projectile.Hitbox.Intersects(new Rectangle((int)target.position.X, (int)target.position.Y, target.width, 4)));

@@ -29,20 +29,11 @@ internal class GearTypeAttribute(GearType value) : Attribute
     internal GearType value = value;
 }
 
-internal enum ShowdownState
+internal enum NPCShowdownState
 {
     None,
-    Queried,
+    Query,
     Active
-}
-
-internal enum ShowdownPuppetState
-{
-    Idle,
-    Attack,
-    Flee,
-    PlayerJump,
-    FlyingNPCDodgeGroundAttack
 }
 
 internal class TerrariaXMario : Mod

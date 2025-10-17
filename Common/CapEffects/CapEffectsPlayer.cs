@@ -173,12 +173,6 @@ internal class CapEffectsPlayer : ModPlayer
             return;
         }
 
-        if ((Player.GetModPlayer<ShowdownPlayer>()?.DoShowdownEffects ?? false) && stompHitbox != null)
-        {
-            Main.projectile[(int)stompHitbox].Kill();
-            stompHitbox = null;
-        }
-
         CapEffect();
         JumpEffect();
         StompEffect();
