@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
+using Terraria.GameInput;
 using Terraria.ModLoader;
+using TerrariaXMario.Common.KeybindSystem;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.ShowdownSystem;
@@ -33,6 +35,8 @@ internal abstract class ActionBox : ModProjectile
             Projectile.position.Y -= 6;
             modPlayer?.queriedAction = Action;
             SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Showdown/ChooseAction") { Volume = 0.4f });
+
+            if (Action == ShowdownAction.Flee) player.GetModPlayerOrNull<KeybindPlayer>()?.keyToShowInIndicator = KeybindSystem.KeybindSystem.GetVanillaKeybindKey(TriggerNames.Jump);
         }
     }
 

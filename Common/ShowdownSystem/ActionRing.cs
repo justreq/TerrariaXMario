@@ -50,9 +50,9 @@ internal class ActionRing : ModProjectile
 
         Projectile.timeLeft++;
 
-        if (modPlayer?.queriedAction == ShowdownAction.None)
+        if (modPlayer?.queriedAction == ShowdownAction.None && modPlayer?.currentAction == ShowdownAction.None)
         {
-            if (Projectile.alpha > 0) Projectile.alpha -= 10;
+            if (Projectile.alpha > 0) Projectile.alpha -= 30;
             else if (Projectile.alpha != 0) Projectile.alpha = 0;
 
             if (actionBoxes.Length > 1 && player.IsOnGroundPrecise() && (PlayerInput.Triggers.JustPressed.Left || PlayerInput.Triggers.JustPressed.Right))
@@ -65,7 +65,7 @@ internal class ActionRing : ModProjectile
         }
         else
         {
-            if (Projectile.alpha < 255) Projectile.alpha += 10;
+            if (Projectile.alpha < 255) Projectile.alpha += 30;
             else if (Projectile.alpha != 0) Projectile.alpha = 255;
         }
 

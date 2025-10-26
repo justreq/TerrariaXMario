@@ -15,7 +15,7 @@ internal class UIKeypressIndicator : UIElement
 
     internal int frame;
     private int frameRate;
-    internal bool canDraw;
+    internal bool canDraw = true;
 
     internal UIKeypressIndicator() : base()
     {
@@ -47,7 +47,7 @@ internal class UIKeypressIndicator : UIElement
             e.Height = StyleDimension.Fill;
         }));
 
-        Text = this.AddElement(new UIText("").With(e =>
+        Text = this.AddElement(new UIText("", 0.4f, true).With(e =>
         {
             e.HAlign = 0.5f;
             e.VAlign = 0.5f;

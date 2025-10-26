@@ -36,7 +36,7 @@ internal class KeybindIndicatorSystem : ModSystem
                 UIKeybindIndicatorUserInterface?.Draw(Main.spriteBatch, new());
                 return true;
             },
-            InterfaceScaleType.UI)
+            InterfaceScaleType.Game)
         );
     }
 }

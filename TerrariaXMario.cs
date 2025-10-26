@@ -1,7 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using System;
 using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
@@ -11,40 +10,6 @@ using TerrariaXMario.Content.Blocks;
 using TerrariaXMario.Core;
 
 namespace TerrariaXMario;
-
-internal enum GearType
-{
-    None,
-    Cap,
-    Overalls,
-    Socks,
-    Boots,
-    Gloves,
-    Badge
-}
-
-[AttributeUsage(AttributeTargets.Class)]
-internal class GearTypeAttribute(GearType value) : Attribute
-{
-    internal GearType value = value;
-}
-
-internal enum NPCShowdownState
-{
-    None,
-    Query,
-    Active
-}
-
-internal enum ShowdownAction
-{
-    None,
-    Jump,
-    Special,
-    Item,
-    Flee
-}
-
 internal class TerrariaXMario : Mod
 {
     internal static TerrariaXMario Instance => ModContent.GetInstance<TerrariaXMario>();

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using System.Reflection;
 using Terraria;
 using Terraria.Localization;
@@ -6,6 +7,23 @@ using Terraria.ModLoader;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.GearSlots;
+internal enum GearType
+{
+    None,
+    Cap,
+    Overalls,
+    Socks,
+    Boots,
+    Gloves,
+    Badge
+}
+
+[AttributeUsage(AttributeTargets.Class)]
+internal class GearTypeAttribute(GearType value) : Attribute
+{
+    internal GearType value = value;
+}
+
 internal abstract class GearSlot : ModAccessorySlot
 {
     private GearType GearType => GetType().GetCustomAttribute<GearTypeAttribute>()?.value ?? GearType.None;

@@ -10,6 +10,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.GearSlots;
 using TerrariaXMario.Common.MiscEffects;
+using TerrariaXMario.Common.ShowdownSystem;
 using TerrariaXMario.Content.Blocks;
 using TerrariaXMario.Content.Powerups;
 using TerrariaXMario.Core;
@@ -220,7 +221,7 @@ internal class CapEffectsPlayer : ModPlayer
             }
         }
 
-        if (PlayerInput.Triggers.JustPressed.MouseLeft && !Player.mouseInterface && Main.cursorOverride != TerrariaXMario.Instance.CursorGrabIndex && Main.cursorOverride != TerrariaXMario.Instance.CursorThrowIndex && Player.HeldItem.IsAir && Main.mouseItem.IsAir)
+        if (PlayerInput.Triggers.JustPressed.MouseLeft && !Player.mouseInterface && Main.cursorOverride != TerrariaXMario.Instance.CursorGrabIndex && Main.cursorOverride != TerrariaXMario.Instance.CursorThrowIndex && Player.HeldItem.IsAir && Main.mouseItem.IsAir && (!Player.GetModPlayerOrNull<ShowdownPlayer>()?.isPlayerInShowdownSubworld ?? true))
         {
             if (currentPowerup?.OnLeftClick(Player) ?? false) SetForceDirection(10, Math.Sign(Main.MouseWorld.X - Player.position.X));
         }
@@ -305,7 +306,7 @@ internal class CapEffectsPlayer : ModPlayer
 
     private void PSpeedEffect()
     {
-        if (runTime != 0 && !Player.controlLeft && !Player.controlRight) runTime = 0;
+        if ((runTime != 0 && !Player.controlLeft && !Player.controlRight) || (Player.GetModPlayerOrNull<ShowdownPlayer>()?.isPlayerInShowdownSubworld ?? false)) runTime = 0;
         if (Player.IsOnGroundPrecise() && (Player.controlLeft || Player.controlRight) && Math.Abs(Player.velocity.X) > 2.5f) runTime++;
 
         if (runTime >= runTimeRequiredForPSpeed)

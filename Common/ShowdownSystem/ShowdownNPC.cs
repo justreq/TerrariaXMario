@@ -7,6 +7,12 @@ using TerrariaXMario.Core.Effects;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.ShowdownSystem;
+internal enum NPCShowdownState
+{
+    None,
+    Query,
+    Active
+}
 internal class ShowdownNPC : GlobalNPC
 {
     internal NPCShowdownState showdownState;

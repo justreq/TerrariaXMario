@@ -13,8 +13,6 @@ UI: {
 		Exit: Exit (WILL NOT SAVE!)
 		Save: Save
 	}
-
-	Showdown.DisplayName: Showdown
 }
 
 Items: {
@@ -62,3 +60,12 @@ Projectiles: {
 
 NPCs.Goomba.DisplayName: Goomba
 Keybinds.EnterShowdown.DisplayName: Enter Showdown
+
+Showdown: {
+	DisplayName: Showdown
+
+	UI: {
+		Cancel: Cancel
+		Confirm: Confirm
+	}
+}

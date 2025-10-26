@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using SteelSeries.GameSense.DeviceZone;
 using SubworldLibrary;
 using System.Linq;
 using Terraria;
-using Terraria.Audio;
 using Terraria.GameInput;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.CapEffects;
@@ -11,6 +11,14 @@ using TerrariaXMario.Core.Effects;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.ShowdownSystem;
+internal enum ShowdownAction
+{
+    None,
+    Jump,
+    Special,
+    Item,
+    Flee
+}
 internal class ShowdownPlayer : ModPlayer
 {
     CapEffectsPlayer? CapEffectsPlayer => Player.GetModPlayerOrNull<CapEffectsPlayer>();
@@ -20,10 +28,16 @@ internal class ShowdownPlayer : ModPlayer
     internal int? showdownNPCPuppetIndex;
     internal int? showdownNPCNetType;
 
+    internal int showdownQueryTimer = 300;
+
     internal bool isPlayerInShowdownSubworld;
     internal Vector2 lockCameraPosition;
 
     internal ShowdownAction queriedAction;
+    internal ShowdownAction currentAction;
+
+    internal int actionTime;
+    private float defaultZoom;
 
     internal void BeginShowdownQuery(NPC npc)
     {
@@ -35,6 +49,7 @@ internal class ShowdownPlayer : ModPlayer
         npc.GetGlobalNPCOrNull<ShowdownNPC>()?.showdownState = NPCShowdownState.Query;
         KeybindPlayer?.keyToShowInIndicator = KeybindSystem.KeybindSystem.EnterShowdownKeybind?.GetAssignedKeys().FirstOrDefault();
         Outline.outlineNeeded = true;
+        showdownQueryTimer = 300;
     }
 
     internal void BeginShowdown()
@@ -44,9 +59,11 @@ internal class ShowdownPlayer : ModPlayer
         ShowdownNPC? showdownNPC = Main.npc[(int)showdownNPCIndex].GetGlobalNPCOrNull<ShowdownNPC>();
         if (showdownNPC?.showdownState != NPCShowdownState.Query) return;
 
+        defaultZoom = Main.GameZoomTarget;
         showdownNPC.showdownState = NPCShowdownState.Active;
         isPlayerInShowdownSubworld = true;
         SubworldSystem.Enter<ShowdownSubworld>();
+        Main.GameZoomTarget = 2.5f;
         KeybindPlayer?.keyToShowInIndicator = null;
     }
 
@@ -64,13 +81,15 @@ internal class ShowdownPlayer : ModPlayer
     internal void EndShowdown()
     {
         if (showdownNPCIndex == null || showdownNPCNetType == null || !isPlayerInShowdownSubworld) return;
-
         SubworldSystem.Exit();
+        Main.GameZoomTarget = defaultZoom;
         isPlayerInShowdownSubworld = false;
         Main.npc[(int)showdownNPCIndex].GetGlobalNPCOrNull<ShowdownNPC>()?.showdownState = NPCShowdownState.None;
         showdownNPCIndex = null;
         showdownNPCNetType = null;
         Outline.outlineNeeded = false;
+        queriedAction = ShowdownAction.None;
+        currentAction = ShowdownAction.None;
     }
 
     public override void OnEnterWorld()
@@ -125,11 +144,35 @@ internal class ShowdownPlayer : ModPlayer
 
     public override void PostUpdate()
     {
+        if (showdownQueryTimer > 0) showdownQueryTimer--;
+        else if (!isPlayerInShowdownSubworld) EndShowdownQuery();
+
         if (!isPlayerInShowdownSubworld) return;
 
-        Player.direction = 1;
+        if (PlayerInput.Triggers.JustPressed.Inventory && queriedAction != ShowdownAction.None && currentAction == ShowdownAction.None)
+        {
+            KeybindPlayer?.keyToShowInIndicator = null;
+            queriedAction = ShowdownAction.None;
+        }
 
-        if (PlayerInput.Triggers.JustPressed.OpenCreativePowersMenu) EndShowdown();
+        if (PlayerInput.Triggers.JustPressed.Jump && queriedAction == ShowdownAction.Flee)
+        {
+            KeybindPlayer?.keyToShowInIndicator = null;
+            queriedAction = ShowdownAction.None;
+            currentAction = ShowdownAction.Flee;
+        }
+
+        if (currentAction != ShowdownAction.None)
+        {
+            actionTime++;
+
+            if (currentAction == ShowdownAction.Flee) Player.direction = -1;
+        }
+        else
+        {
+            Player.direction = 1;
+            actionTime = 0;
+        }
     }
 
     public override void PostUpdateEquips()
@@ -160,5 +203,25 @@ internal class ShowdownPlayer : ModPlayer
         Player.controlUp = false;
         Player.controlUseItem = false;
         Player.controlUseTile = false;
+
+        if (queriedAction != ShowdownAction.None || currentAction != ShowdownAction.None) Player.controlJump = false;
+
+        switch (currentAction)
+        {
+            case ShowdownAction.None:
+                break;
+            case ShowdownAction.Jump:
+                break;
+            case ShowdownAction.Special:
+                break;
+            case ShowdownAction.Item:
+                break;
+            case ShowdownAction.Flee:
+                Player.controlLeft = true;
+                if (actionTime > 100) EndShowdown();
+                break;
+            default:
+                break;
+        }
     }
 }

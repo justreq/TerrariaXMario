@@ -13,7 +13,7 @@ namespace TerrariaXMario.Common.ShowdownSystem;
 
 internal class ShowdownSubworld : Subworld
 {
-    public override LocalizedText DisplayName => Language.GetText($"Mods.{nameof(TerrariaXMario)}.UI.Showdown.DisplayName");
+    public override LocalizedText DisplayName => Language.GetText($"Mods.{nameof(TerrariaXMario)}.Showdown.DisplayName");
     public override int Width => 256;
     public override int Height => 512;
     public override bool ShouldSave => false;
@@ -38,7 +38,6 @@ internal class ShowdownSubworld : Subworld
 
     public override void Update()
     {
-        Main.GameZoomTarget = 2.5f;
         Main.playerInventory = false;
         Main.mapFullscreen = false;
     }
