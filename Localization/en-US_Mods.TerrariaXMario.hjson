@@ -53,6 +53,11 @@ Projectiles: {
 	IceBlock.DisplayName: Ice Block
 	SuperLeaf.DisplayName: Super Leaf
 	TanookiSuit.DisplayName: Tanooki Suit
+	ActionFlee.DisplayName: Action Flee
+	ActionItem.DisplayName: Action Item
+	ActionJump.DisplayName: Action Jump
+	ActionRing.DisplayName: Action Ring
+	ActionSpecial.DisplayName: Action Special
 }
 
 NPCs.Goomba.DisplayName: Goomba

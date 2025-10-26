@@ -2,22 +2,28 @@
 using SubworldLibrary;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.ID;
 using Terraria.IO;
 using Terraria.Localization;
+using Terraria.ModLoader;
 using Terraria.WorldBuilding;
+using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.ShowdownSystem;
 
 internal class ShowdownSubworld : Subworld
 {
-    internal int? currentPlayer;
-
     public override LocalizedText DisplayName => Language.GetText($"Mods.{nameof(TerrariaXMario)}.UI.Showdown.DisplayName");
     public override int Width => 256;
-    public override int Height => 256;
+    public override int Height => 512;
     public override bool ShouldSave => false;
     public override bool NoPlayerSaving => true;
     public override List<GenPass> Tasks => [new ShowdownSubworldPass()];
+
+    public override void OnEnter()
+    {
+        Main.time = Main.dayLength * 0.5f;
+    }
 
     public override bool ChangeAudio()
     {
@@ -32,7 +38,26 @@ internal class ShowdownSubworld : Subworld
 
     public override void Update()
     {
-        // basic update tasks (freeze time to midday, stop enemy spawns, etc)
+        Main.GameZoomTarget = 2.5f;
+        Main.playerInventory = false;
+        Main.mapFullscreen = false;
+    }
+}
+
+internal class ShowdownSubworldSystem : ModSystem
+{
+    public override void ModifyTimeRate(ref double timeRate, ref double tileUpdateRate, ref double eventUpdateRate)
+    {
+        if (SubworldSystem.Current != null && SubworldSystem.Current is ShowdownSubworld) timeRate = 0;
+    }
+
+    public override void ModifyScreenPosition()
+    {
+        if (SubworldSystem.Current != null && SubworldSystem.Current is ShowdownSubworld)
+        {
+            ShowdownPlayer? modPlayer = Main.LocalPlayer.GetModPlayerOrNull<ShowdownPlayer>();
+            if (modPlayer?.lockCameraPosition != Vector2.Zero) Main.screenPosition = (Vector2)modPlayer?.lockCameraPosition!;
+        }
     }
 }
 
@@ -42,18 +67,16 @@ internal class ShowdownSubworldPass : GenPass
 
     protected override void ApplyPass(GenerationProgress progress, GameConfiguration configuration)
     {
-        progress.Message = "";
         Main.worldSurface = Main.maxTilesY;
         Main.rockLayer = Main.maxTilesY;
+        int j = (int)(Main.maxTilesY * 0.5f);
+
         for (int i = 0; i < Main.maxTilesX; i++)
         {
-            for (int j = 0; j < Main.maxTilesY; j++)
-            {
-                //progress.Set((j + i * Main.maxTilesY) / (float)(Main.maxTilesX * Main.maxTilesY));
-                //Tile tile = Main.tile[i, j];
-                //tile.HasTile = true;
-                //tile.TileType = TileID.Dirt;
-            }
+            progress.Set((j + i * Main.maxTilesY) / (float)(Main.maxTilesX * Main.maxTilesY));
+            Tile tile = Main.tile[i, j];
+            tile.HasTile = true;
+            tile.TileType = TileID.EchoBlock;
         }
     }
 }

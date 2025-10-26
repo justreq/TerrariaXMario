@@ -6,10 +6,10 @@ using Terraria.UI;
 
 namespace TerrariaXMario.Common.KeybindSystem;
 [Autoload(Side = ModSide.Client)]
-internal class UIKeybindIndicatorSystem : ModSystem
+internal class KeybindIndicatorSystem : ModSystem
 {
     private UserInterface? UIKeybindIndicatorUserInterface;
-    private UIKeybindIndicator? UIKeybindIndicator;
+    private KeybindIndicator? UIKeybindIndicator;
 
     public override void Load()
     {

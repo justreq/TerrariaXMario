@@ -1,6 +1,8 @@
-﻿using SubworldLibrary;
+﻿using Microsoft.Xna.Framework;
+using SubworldLibrary;
 using System.Linq;
 using Terraria;
+using Terraria.Audio;
 using Terraria.GameInput;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.CapEffects;
@@ -15,98 +17,137 @@ internal class ShowdownPlayer : ModPlayer
     KeybindPlayer? KeybindPlayer => Player.GetModPlayerOrNull<KeybindPlayer>();
 
     internal int? showdownNPCIndex;
+    internal int? showdownNPCPuppetIndex;
+    internal int? showdownNPCNetType;
 
-    internal bool IsPlayerInShowdownSubworld => ModContent.GetInstance<ShowdownSubworld>().currentPlayer == Player.whoAmI;
+    internal bool isPlayerInShowdownSubworld;
+    internal Vector2 lockCameraPosition;
+
+    internal ShowdownAction queriedAction;
+
+    internal void BeginShowdownQuery(NPC npc)
+    {
+        if (isPlayerInShowdownSubworld || (!CapEffectsPlayer?.CanDoCapEffects ?? true)) return;
+
+        if (showdownNPCIndex != null) Main.npc[(int)showdownNPCIndex].GetGlobalNPCOrNull<ShowdownNPC>()?.showdownState = NPCShowdownState.None;
+        showdownNPCIndex = npc.whoAmI;
+        showdownNPCNetType = npc.netID;
+        npc.GetGlobalNPCOrNull<ShowdownNPC>()?.showdownState = NPCShowdownState.Query;
+        KeybindPlayer?.keyToShowInIndicator = KeybindSystem.KeybindSystem.EnterShowdownKeybind?.GetAssignedKeys().FirstOrDefault();
+        Outline.outlineNeeded = true;
+    }
+
+    internal void BeginShowdown()
+    {
+        if (showdownNPCIndex == null || showdownNPCNetType == null || isPlayerInShowdownSubworld || (!CapEffectsPlayer?.CanDoCapEffects ?? true)) return;
+
+        ShowdownNPC? showdownNPC = Main.npc[(int)showdownNPCIndex].GetGlobalNPCOrNull<ShowdownNPC>();
+        if (showdownNPC?.showdownState != NPCShowdownState.Query) return;
+
+        showdownNPC.showdownState = NPCShowdownState.Active;
+        isPlayerInShowdownSubworld = true;
+        SubworldSystem.Enter<ShowdownSubworld>();
+        KeybindPlayer?.keyToShowInIndicator = null;
+    }
 
     internal void EndShowdownQuery()
     {
-        if (showdownNPCIndex == null) return;
+        if (showdownNPCIndex == null || showdownNPCNetType == null) return;
 
         Main.npc[(int)showdownNPCIndex].GetGlobalNPCOrNull<ShowdownNPC>()?.showdownState = NPCShowdownState.None;
         showdownNPCIndex = null;
-        KeybindPlayer?.keybindToShowInIndicator = null;
+        showdownNPCNetType = null;
+        KeybindPlayer?.keyToShowInIndicator = null;
         Outline.outlineNeeded = false;
     }
 
     internal void EndShowdown()
     {
-        if (showdownNPCIndex == null || !IsPlayerInShowdownSubworld) return;
+        if (showdownNPCIndex == null || showdownNPCNetType == null || !isPlayerInShowdownSubworld) return;
 
         SubworldSystem.Exit();
+        isPlayerInShowdownSubworld = false;
         Main.npc[(int)showdownNPCIndex].GetGlobalNPCOrNull<ShowdownNPC>()?.showdownState = NPCShowdownState.None;
         showdownNPCIndex = null;
+        showdownNPCNetType = null;
         Outline.outlineNeeded = false;
+    }
+
+    public override void OnEnterWorld()
+    {
+        if (isPlayerInShowdownSubworld)
+        {
+            foreach (Item item in Player.inventory)
+            {
+                item.TurnToAir();
+            }
+
+            lockCameraPosition = Main.screenPosition + new Vector2(Main.screenWidth / Main.GameZoomTarget * 0.25f, 0);
+            NPC npc = NPC.NewNPCDirect(Player.GetSource_Misc("Showdown"), Player.Bottom + new Vector2(Main.screenWidth / Main.GameZoomTarget * 0.5f, Main.npc[(int)showdownNPCIndex!].height * 0.5f), (int)showdownNPCNetType!);
+            showdownNPCPuppetIndex = npc.whoAmI;
+
+            ShowdownNPC? globalNPC = npc.GetGlobalNPCOrNull<ShowdownNPC>();
+            globalNPC?.showdownState = NPCShowdownState.Active;
+            globalNPC?.isCopyOfShowdownNPC = true;
+
+            CapEffectsPlayer?.KillStompHitbox();
+            Projectile.NewProjectile(Player.GetSource_Misc("Showdown"), Player.Top - new Vector2(0, 64), Vector2.Zero, ModContent.ProjectileType<ActionRing>(), 0, 0, Player.whoAmI);
+        }
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
     {
-        if (IsPlayerInShowdownSubworld || (!CapEffectsPlayer?.CanDoCapEffects ?? true)) return;
-
-        if (showdownNPCIndex != null) Main.npc[(int)showdownNPCIndex].GetGlobalNPCOrNull<ShowdownNPC>()?.showdownState = NPCShowdownState.None;
-        showdownNPCIndex = target.whoAmI;
-        target.GetGlobalNPCOrNull<ShowdownNPC>()?.showdownState = NPCShowdownState.Query;
-        KeybindPlayer?.keybindToShowInIndicator = KeybindSystem.KeybindSystem.EnterShowdownKeybind?.GetAssignedKeys().FirstOrDefault();
-        Outline.outlineNeeded = true;
+        BeginShowdownQuery(target);
     }
 
     public override void OnHitByNPC(NPC npc, Player.HurtInfo hurtInfo)
     {
-        if (IsPlayerInShowdownSubworld || (!CapEffectsPlayer?.CanDoCapEffects ?? true)) return;
-
-        if (showdownNPCIndex != null) Main.npc[(int)showdownNPCIndex].GetGlobalNPCOrNull<ShowdownNPC>()?.showdownState = NPCShowdownState.None;
-        showdownNPCIndex = npc.whoAmI;
-        npc.GetGlobalNPCOrNull<ShowdownNPC>()?.showdownState = NPCShowdownState.Query;
-        KeybindPlayer?.keybindToShowInIndicator = KeybindSystem.KeybindSystem.EnterShowdownKeybind?.GetAssignedKeys().FirstOrDefault();
-        Outline.outlineNeeded = true;
+        BeginShowdownQuery(npc);
     }
 
     public override bool CanBeHitByNPC(NPC npc, ref int cooldownSlot)
     {
-        if (IsPlayerInShowdownSubworld) return false;
+        if (isPlayerInShowdownSubworld) return false;
         return base.CanBeHitByNPC(npc, ref cooldownSlot);
     }
 
     public override bool CanBeHitByProjectile(Projectile proj)
     {
-        if (IsPlayerInShowdownSubworld) return false;
+        if (isPlayerInShowdownSubworld) return false;
         return base.CanBeHitByProjectile(proj);
     }
 
     public override bool CanUseItem(Item item)
     {
-        if (IsPlayerInShowdownSubworld) return false;
+        if (isPlayerInShowdownSubworld) return false;
         return base.CanUseItem(item);
     }
 
     public override void PostUpdate()
     {
-        if (!IsPlayerInShowdownSubworld) return;
+        if (!isPlayerInShowdownSubworld) return;
 
-        Player.immune = true;
-        Main.mapStyle = 0;
-        Main.MouseShowBuildingGrid = false;
-        Main.GameZoomTarget = 2;
+        Player.direction = 1;
 
         if (PlayerInput.Triggers.JustPressed.OpenCreativePowersMenu) EndShowdown();
     }
 
     public override void PostUpdateEquips()
     {
-        if (!IsPlayerInShowdownSubworld) return;
+        if (!isPlayerInShowdownSubworld) return;
 
         Player.noKnockback = true;
     }
 
     public override void SetControls()
     {
-        if (!IsPlayerInShowdownSubworld) return;
+        if (!isPlayerInShowdownSubworld) return;
 
         Player.controlCreativeMenu = false;
         Player.controlDown = false;
         Player.controlDownHold = false;
         Player.controlHook = false;
         Player.controlInv = false;
-        Player.controlJump = false;
         Player.controlLeft = false;
         Player.controlMap = false;
         Player.controlMount = false;
@@ -119,7 +160,5 @@ internal class ShowdownPlayer : ModPlayer
         Player.controlUp = false;
         Player.controlUseItem = false;
         Player.controlUseTile = false;
-        Main.playerInventory = false;
-        Main.mapFullscreen = false;
     }
 }

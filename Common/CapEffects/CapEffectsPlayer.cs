@@ -10,7 +10,6 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.GearSlots;
 using TerrariaXMario.Common.MiscEffects;
-using TerrariaXMario.Common.ShowdownSystem;
 using TerrariaXMario.Content.Blocks;
 using TerrariaXMario.Content.Powerups;
 using TerrariaXMario.Core;
@@ -161,12 +160,7 @@ internal class CapEffectsPlayer : ModPlayer
     {
         if (!CanDoCapEffects || Player.mount.Active)
         {
-            if (stompHitbox != null)
-            {
-                Main.projectile[(int)stompHitbox].Kill();
-                stompHitbox = null;
-            }
-
+            KillStompHitbox();
             runTime = 0;
             hasPSpeed = false;
 
@@ -295,9 +289,14 @@ internal class CapEffectsPlayer : ModPlayer
     {
         if (!Player.IsOnGroundPrecise())
         {
-            stompHitbox ??= Projectile.NewProjectile(Player.GetSource_FromThis(), Player.BottomLeft, Vector2.Zero, ModContent.ProjectileType<StompHitbox>(), 1, 0, Player.whoAmI);
+            stompHitbox ??= Projectile.NewProjectile(Player.GetSource_FromThis(), Player.BottomLeft, Vector2.Zero, ModContent.ProjectileType<StompHitbox>(), 1, 4f, Player.whoAmI);
         }
-        else if (stompHitbox != null)
+        else KillStompHitbox();
+    }
+
+    internal void KillStompHitbox()
+    {
+        if (stompHitbox != null)
         {
             Main.projectile[(int)stompHitbox].Kill();
             stompHitbox = null;

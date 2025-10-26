@@ -11,7 +11,7 @@ internal sealed class Patch_ItemSwap : BasePatch
 
     internal override void Patch(Mod mod)
     {
-        // Prevents the player from quick-equipping items when gear slots are enabled
+        // Prevents the playerIndex from quick-equipping items when gear slots are enabled
         On_ItemSlot.ArmorSwap += On_ItemSlot_ArmorSwap;
     }
 

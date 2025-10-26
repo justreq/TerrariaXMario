@@ -18,9 +18,8 @@ internal sealed class Patch_DrawArmorSlots : BasePatch
     private void IL_Main_DrawInventory(ILContext il)
     {
         ILCursor c = new(il);
-        ILLabel originalLabel = c.DefineLabel();
 
-        if (!c.TryGotoNext(i => i.MatchLdsfld<Main>("EquipPage"), i => i.MatchBrtrue(out originalLabel!))) ThrowError("Ldsfld, Brtrue");
+        if (!c.TryGotoNext(i => i.MatchLdsfld<Main>("EquipPage"), i => i.MatchBrtrue(out _))) ThrowError("Ldsfld, Brtrue");
 
         c.Index++;
 

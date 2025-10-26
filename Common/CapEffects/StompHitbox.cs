@@ -38,7 +38,6 @@ internal class StompHitbox : ModProjectile
         Projectile.height = 4;
         Projectile.friendly = true;
         Projectile.penetrate = -1;
-        Projectile.timeLeft = 1;
     }
 
     public override bool OnTileCollide(Vector2 oldVelocity) => false;
@@ -65,7 +64,7 @@ internal class StompHitbox : ModProjectile
 
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
 
-        if (PlayerInput.Triggers.JustPressed.Down && !groundPound)
+        if (PlayerInput.Triggers.JustPressed.Down && !groundPound && (!player.GetModPlayerOrNull<ShowdownPlayer>()?.isPlayerInShowdownSubworld ?? true))
         {
             SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPoundStart") { Volume = 0.4f });
             player.fullRotation = 0;
@@ -94,6 +93,13 @@ internal class StompHitbox : ModProjectile
         }
 
         modPlayer?.GroundPounding = groundPound;
+    }
+
+    public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
+    {
+        if (!groundPound) modifiers.DisableKnockback();
+        else modifiers.HitDirectionOverride = -Math.Sign(Main.player[Projectile.owner].Center.X - target.Center.X);
+        base.ModifyHitNPC(target, ref modifiers);
     }
 
     public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)

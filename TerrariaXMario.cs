@@ -36,6 +36,15 @@ internal enum NPCShowdownState
     Active
 }
 
+internal enum ShowdownAction
+{
+    None,
+    Jump,
+    Special,
+    Item,
+    Flee
+}
+
 internal class TerrariaXMario : Mod
 {
     internal static TerrariaXMario Instance => ModContent.GetInstance<TerrariaXMario>();

@@ -22,14 +22,15 @@ internal class ShowdownProjectile : GlobalProjectile
     public override void OnHitPlayer(Projectile projectile, Player target, Player.HurtInfo info)
     {
         base.OnHitPlayer(projectile, target, info);
-        if (npcOwnerIndex == null) return;
+        if (npcOwnerIndex == null || (target.GetModPlayerOrNull<ShowdownPlayer>()?.isPlayerInShowdownSubworld ?? false)) return;
 
         ShowdownPlayer? modPlayer = target.GetModPlayerOrNull<ShowdownPlayer>();
 
         if (modPlayer?.showdownNPCIndex != null) Main.npc[(int)modPlayer?.showdownNPCIndex!].GetGlobalNPCOrNull<ShowdownNPC>()?.showdownState = NPCShowdownState.None;
         modPlayer?.showdownNPCIndex = npcOwnerIndex;
+        modPlayer?.showdownNPCNetType = Main.npc[(int)npcOwnerIndex].netID;
         Main.npc[(int)npcOwnerIndex].GetGlobalNPCOrNull<ShowdownNPC>()?.showdownState = NPCShowdownState.Query;
-        target.GetModPlayerOrNull<KeybindPlayer>()?.keybindToShowInIndicator = KeybindSystem.KeybindSystem.EnterShowdownKeybind?.GetAssignedKeys().FirstOrDefault();
+        target.GetModPlayerOrNull<KeybindPlayer>()?.keyToShowInIndicator = KeybindSystem.KeybindSystem.EnterShowdownKeybind?.GetAssignedKeys().FirstOrDefault();
         Outline.outlineNeeded = true;
     }
 }
