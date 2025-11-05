@@ -20,14 +20,23 @@ internal class ShowdownSubworld : Subworld
     public override bool NoPlayerSaving => true;
     public override List<GenPass> Tasks => [new ShowdownSubworldPass()];
 
+    public override void Load()
+    {
+        string showdownMusic = $"Assets/Sounds/Music/Showdown";
+        string showdownBossMusic = $"Assets/Sounds/Music/ShowdownBoss";
+        Main.musicNoCrossFade[MusicLoader.GetMusicSlot(showdownMusic)] = true;
+        Main.musicNoCrossFade[MusicLoader.GetMusicSlot(showdownBossMusic)] = true;
+    }
+
     public override void OnEnter()
     {
+        SubworldSystem.noReturn = true;
         Main.time = Main.dayLength * 0.5f;
     }
 
     public override bool ChangeAudio()
     {
-        // switch to showdown music
+        Main.newMusic = MusicLoader.GetMusicSlot($"{TerrariaXMario.Sounds}/Music/Showdown");
         return true;
     }
 
@@ -38,8 +47,10 @@ internal class ShowdownSubworld : Subworld
 
     public override void Update()
     {
-        Main.playerInventory = false;
         Main.mapFullscreen = false;
+        Main.CaptureModeDisabled = true;
+        Main.GameZoomTarget = 2.25f;
+        Main.mapStyle = 0;
     }
 }
 

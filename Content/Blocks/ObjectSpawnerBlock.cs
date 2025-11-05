@@ -4,7 +4,6 @@ using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.Enums;
-using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
@@ -113,12 +112,6 @@ internal class ObjectSpawnerBlockTile : ModTile
         if ((player.HeldItem.type == ModContent.ItemType<Hammer>() || Main.mouseItem.type == ModContent.ItemType<Hammer>()) && modPlayer != null && TerrariaXMario.GetTileEntityOrNull(modPlayer.currentObjectSpawnerBlockToEdit.ToPoint())?.Position != TerrariaXMario.GetTileEntityOrNull(i, j)?.Position)
         {
             Main.cursorOverride = TerrariaXMario.Instance.CursorEditIndex;
-
-            if (PlayerInput.Triggers.JustPressed.MouseLeft)
-            {
-                Tile tile = Framing.GetTileSafely(i, j);
-                modPlayer.currentObjectSpawnerBlockToEdit = new(i - tile.TileFrameX / 18, j - tile.TileFrameY / 18);
-            }
         }
     }
 

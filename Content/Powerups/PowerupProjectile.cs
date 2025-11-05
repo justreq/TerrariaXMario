@@ -13,6 +13,8 @@ internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
 {
     internal abstract Powerup PowerupData { get; set; }
 
+    private int updateCount;
+
     private void LoadEquipTextures(string cap, string variation = "", bool head = true, bool body = true, bool legs = true)
     {
         if (head) EquipLoader.AddEquipTexture(Mod, $"{Texture}{cap}{variation}_{EquipType.Head}", EquipType.Head, name: $"{Name}{cap}{variation}");
@@ -98,8 +100,8 @@ internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
             return;
         }
 
-        PowerupData.UpdateWorld(Projectile);
-        PowerupData.updateCount++;
+        PowerupData.UpdateWorld(Projectile, updateCount);
+        updateCount++;
 
         foreach (Player player in Main.ActivePlayers)
         {

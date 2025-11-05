@@ -21,6 +21,7 @@ internal enum Jump { None, Single, Double, Triple }
 internal class CapEffectsPlayer : ModPlayer
 {
     private GearSlotPlayer? GearSlotPlayer => Player.GetModPlayerOrNull<GearSlotPlayer>();
+    private ShowdownPlayer? ShowdownPlayer => Player.GetModPlayerOrNull<ShowdownPlayer>();
 
     private string? oldCap;
     internal string? currentCap;
@@ -177,6 +178,50 @@ internal class CapEffectsPlayer : ModPlayer
         if (currentJump is Jump.Double or Jump.Triple && !PlayerInput.Triggers.Current.Down && !Player.IsOnGroundPrecise()) Player.bodyFrame.Y = 56 * 10;
     }
 
+    public override void ProcessTriggers(TriggersSet triggersSet)
+    {
+        if (!CanDoCapEffects) return;
+
+        if (PlayerInput.Triggers.JustPressed.MouseLeft)
+        {
+            if (!Player.mouseInterface && Main.cursorOverride != TerrariaXMario.Instance.CursorGrabIndex && Main.cursorOverride != TerrariaXMario.Instance.CursorThrowIndex && Player.HeldItem.IsAir && Main.mouseItem.IsAir && (!ShowdownPlayer?.isPlayerInShowdownSubworld ?? true))
+            {
+                if (currentPowerup?.OnLeftClick(Player) ?? false) SetForceDirection(10, Math.Sign(Main.MouseWorld.X - Player.position.X));
+            }
+            else if (Main.cursorOverride == TerrariaXMario.Instance.CursorThrowIndex)
+            {
+
+                NPC grabbedNPC = Main.npc[(int)grabbedNPCIndex!];
+                SetForceDirection(10, Math.Sign(Main.MouseWorld.X - Player.position.X));
+                grabbedNPC.velocity.X = 7.5f * forceDirection;
+                grabbedNPC.GetGlobalNPCOrNull<IceBlockNPC>()?.thrown = true;
+                grabbedNPCIndex = null;
+            }
+            else if (Main.cursorOverride == TerrariaXMario.Instance.CursorGrabIndex) grabbedNPCIndex = hoverNPCIndex;
+            else if (Main.cursorOverride == TerrariaXMario.Instance.CursorEditIndex)
+            {
+                Point mouseTilePosition = Main.MouseWorld.ToTileCoordinates();
+
+                Tile tile = Framing.GetTileSafely(mouseTilePosition.X, mouseTilePosition.Y);
+                currentObjectSpawnerBlockToEdit = new(mouseTilePosition.X - tile.TileFrameX / 18, mouseTilePosition.Y - tile.TileFrameY / 18);
+            }
+        }
+
+        if (PlayerInput.Triggers.JustPressed.Down && stompHitbox != null && (!ShowdownPlayer?.isPlayerInShowdownSubworld ?? true))
+        {
+            StompHitbox proj = (StompHitbox)Main.projectile[(int)stompHitbox].ModProjectile;
+
+            if (!proj.groundPound)
+            {
+                SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPoundStart") { Volume = 0.4f });
+                Player.fullRotation = 0;
+                proj.groundPound = true;
+            }
+        }
+
+        if (Player.wet && PlayerInput.Triggers.JustPressed.Jump) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(Player.wet ? "Swim" : "Jump")}") { Volume = 0.4f });
+    }
+
     internal void SetForceDirection(int duration, int direction)
     {
         if (duration <= 0 || Math.Abs(direction) != 1) return;
@@ -202,9 +247,6 @@ internal class CapEffectsPlayer : ModPlayer
             return;
         }
 
-        if (Player.wet && PlayerInput.Triggers.JustPressed.Jump || Player.justJumped)
-            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(Player.wet ? "Swim" : "Jump")}") { Volume = 0.4f });
-
         if (forceSwingTimer > 0)
         {
             if (forceSwingDuration == 0) forceSwingDuration = forceSwingTimer;
@@ -219,11 +261,6 @@ internal class CapEffectsPlayer : ModPlayer
                 forceSwingDuration = 0;
                 forceSwingTimer = 0;
             }
-        }
-
-        if (PlayerInput.Triggers.JustPressed.MouseLeft && !Player.mouseInterface && Main.cursorOverride != TerrariaXMario.Instance.CursorGrabIndex && Main.cursorOverride != TerrariaXMario.Instance.CursorThrowIndex && Player.HeldItem.IsAir && Main.mouseItem.IsAir && (!Player.GetModPlayerOrNull<ShowdownPlayer>()?.isPlayerInShowdownSubworld ?? true))
-        {
-            if (currentPowerup?.OnLeftClick(Player) ?? false) SetForceDirection(10, Math.Sign(Main.MouseWorld.X - Player.position.X));
         }
     }
 
@@ -306,7 +343,7 @@ internal class CapEffectsPlayer : ModPlayer
 
     private void PSpeedEffect()
     {
-        if ((runTime != 0 && !Player.controlLeft && !Player.controlRight) || (Player.GetModPlayerOrNull<ShowdownPlayer>()?.isPlayerInShowdownSubworld ?? false)) runTime = 0;
+        if ((runTime != 0 && !Player.controlLeft && !Player.controlRight) || (ShowdownPlayer?.isPlayerInShowdownSubworld ?? false)) runTime = 0;
         if (Player.IsOnGroundPrecise() && (Player.controlLeft || Player.controlRight) && Math.Abs(Player.velocity.X) > 2.5f) runTime++;
 
         if (runTime >= runTimeRequiredForPSpeed)
@@ -343,14 +380,6 @@ internal class CapEffectsPlayer : ModPlayer
             Main.cursorOverride = TerrariaXMario.Instance.CursorThrowIndex;
 
             grabbedNPC.Bottom = Player.Top;
-
-            if (PlayerInput.Triggers.JustPressed.MouseLeft)
-            {
-                SetForceDirection(10, Math.Sign(Main.MouseWorld.X - Player.position.X));
-                grabbedNPC.velocity.X = 7.5f * forceDirection;
-                globalNPC?.thrown = true;
-                grabbedNPCIndex = null;
-            }
         }
         else if (hoverNPCIndex != null)
         {
@@ -366,8 +395,6 @@ internal class CapEffectsPlayer : ModPlayer
             }
 
             Main.cursorOverride = TerrariaXMario.Instance.CursorGrabIndex;
-
-            if (PlayerInput.Triggers.JustPressed.MouseLeft) grabbedNPCIndex = hoverNPCIndex;
         }
     }
 

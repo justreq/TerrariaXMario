@@ -12,7 +12,7 @@ internal class IceFlowerData : Powerup
 
     internal override string[] Caps => [nameof(Mario)];
 
-    internal override void UpdateWorld(Projectile projectile)
+    internal override void UpdateWorld(Projectile projectile, int updateCount)
     {
         projectile.velocity.Y += 0.4f;
     }
@@ -28,5 +28,5 @@ internal class IceFlowerData : Powerup
 
 internal class IceFlower : PowerupProjectile
 {
-    internal override Powerup PowerupData { get; set; } = new IceFlowerData();
+    internal override Powerup PowerupData { get; set; } = ModContent.GetInstance<IceFlowerData>();
 }

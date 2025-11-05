@@ -13,7 +13,7 @@ internal class ShowdownUISystem : ModSystem
     private UserInterface? ShowdownUIUserInterface;
     private ShowdownUI? ShowdownUI;
 
-    private readonly string[] disabledLayers = ["Vanilla: Map / Minimap", "Vanilla: Info Accessories Bar", "Vanilla: Hotbar"];
+    private readonly string[] enabledLayers = ["Vanilla: Cursor", "Vanilla: Mouse Over", "Vanilla: Resource Bars", "Vanilla: Entity Health Bars", "Vanilla: Achievement Complete Popups", "Vanilla: Fancy UI", "Vanilla: Ingame Options", "Vanilla: MP Player Names", "Vanilla: Mouse Text", "Vanilla: Interface Logic 1", "Vanilla: Interface Logic 2", "Vanilla: Interface Logic 3", "Vanilla: Interface Logic 4", "Vanilla: Player Chat"];
 
     public override void Load()
     {
@@ -45,11 +45,9 @@ internal class ShowdownUISystem : ModSystem
 
         if (!Main.LocalPlayer.GetModPlayerOrNull<ShowdownPlayer>()?.isPlayerInShowdownSubworld ?? true) return;
 
-        foreach (string layer in disabledLayers)
+        foreach (GameInterfaceLayer layer in layers)
         {
-            int i = layers.FindIndex(e => e.Name.Equals(layer));
-
-            if (i != -1) layers[i].Active = false;
+            if (layer.Name.Contains("Vanilla") && !enabledLayers.Contains(layer.Name)) layer.Active = false;
         }
     }
 }

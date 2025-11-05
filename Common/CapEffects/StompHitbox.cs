@@ -2,10 +2,8 @@
 using System;
 using Terraria;
 using Terraria.Audio;
-using Terraria.GameInput;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.MiscEffects;
-using TerrariaXMario.Common.ShowdownSystem;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.CapEffects;
@@ -15,7 +13,7 @@ internal class StompHitbox : ModProjectile
     private int stompCooldown;
     private int? targetIndex;
 
-    private bool groundPound;
+    internal bool groundPound;
     private int groundPoundCooldown;
 
     private void Stomp(Player player)
@@ -63,13 +61,6 @@ internal class StompHitbox : ModProjectile
         if (groundPound) groundPoundCooldown++;
 
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
-
-        if (PlayerInput.Triggers.JustPressed.Down && !groundPound && (!player.GetModPlayerOrNull<ShowdownPlayer>()?.isPlayerInShowdownSubworld ?? true))
-        {
-            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPoundStart") { Volume = 0.4f });
-            player.fullRotation = 0;
-            groundPound = true;
-        }
 
         if (groundPound)
         {
@@ -130,7 +121,7 @@ internal class StompHitbox : ModProjectile
 
         if (target.GetGlobalNPCOrNull<IceBlockNPC>()?.frozen ?? false) return groundPound;
 
-        return groundPound || (targetIndex == null && stompCooldown == 0 && Projectile.Hitbox.Intersects(new Rectangle((int)target.position.X, (int)target.position.Y, target.width, 4)));
+        return groundPound || (targetIndex == null && stompCooldown == 0 && Projectile.Hitbox.Intersects(target.getRect()));
     }
 
     public override void OnKill(int timeLeft)

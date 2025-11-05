@@ -33,6 +33,5 @@ internal class KeybindIndicator : UIState
         Indicator?.Left = StyleDimension.FromPixels(player.Top.X - Main.screenPosition.X - Indicator.GetDimensions().Width * 0.5f);
         Indicator?.Top = StyleDimension.FromPixels(player.GetModPlayerOrNull<ShowdownPlayer>()?.isPlayerInShowdownSubworld ?? false ? Main.screenHeight / Main.GameZoomTarget + 160 : player.Top.Y - Main.screenPosition.Y - 128);
         Indicator?.Recalculate();
-
     }
 }

@@ -2,11 +2,10 @@
 using Terraria.ModLoader;
 
 namespace TerrariaXMario.Content.Powerups;
-internal class Powerup : ModType
+internal abstract class Powerup : ModType
 {
     protected override void Register() { }
 
-    internal int updateCount;
     internal float SpawnUpSpeed { get; set; } = -0.75f;
     internal float SpawnDownSpeed { get; set; } = 0.75f;
     internal int TimeBeforePickable { get; set; } = 45;
@@ -25,7 +24,7 @@ internal class Powerup : ModType
     /// The behavior of this PowerupData when it exists in the world, e.g. movement behavior. Similar in concept to ModItem.Update.
     /// </summary>
     /// <param name="projectile">The projectile that exists in the world and gets consumed by the playerIndex upon contact.</param>
-    internal virtual void UpdateWorld(Projectile projectile) { }
+    internal virtual void UpdateWorld(Projectile projectile, int updateCount) { }
     /// <summary>
     /// Any special effects this PowerupData gives when consumed, e.g. dust or unrelated state changes.
     /// </summary>

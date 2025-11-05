@@ -1,24 +1,17 @@
 ﻿using Microsoft.Xna.Framework;
-using SteelSeries.GameSense.DeviceZone;
 using SubworldLibrary;
 using System.Linq;
 using Terraria;
+using Terraria.Audio;
 using Terraria.GameInput;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Common.KeybindSystem;
+using TerrariaXMario.Common.ShowdownActions;
 using TerrariaXMario.Core.Effects;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.ShowdownSystem;
-internal enum ShowdownAction
-{
-    None,
-    Jump,
-    Special,
-    Item,
-    Flee
-}
 internal class ShowdownPlayer : ModPlayer
 {
     CapEffectsPlayer? CapEffectsPlayer => Player.GetModPlayerOrNull<CapEffectsPlayer>();
@@ -27,17 +20,18 @@ internal class ShowdownPlayer : ModPlayer
     internal int? showdownNPCIndex;
     internal int? showdownNPCPuppetIndex;
     internal int? showdownNPCNetType;
+    internal int showdownNPCLife;
 
     internal int showdownQueryTimer = 300;
 
     internal bool isPlayerInShowdownSubworld;
     internal Vector2 lockCameraPosition;
 
-    internal ShowdownAction queriedAction;
-    internal ShowdownAction currentAction;
+    internal ShowdownAction? queriedAction;
+    internal ShowdownAction? currentAction;
 
-    internal int actionTime;
-    private float defaultZoom;
+    private float defaultGameZoomTarget;
+    private int defaultMapStyle;
 
     internal void BeginShowdownQuery(NPC npc)
     {
@@ -46,6 +40,7 @@ internal class ShowdownPlayer : ModPlayer
         if (showdownNPCIndex != null) Main.npc[(int)showdownNPCIndex].GetGlobalNPCOrNull<ShowdownNPC>()?.showdownState = NPCShowdownState.None;
         showdownNPCIndex = npc.whoAmI;
         showdownNPCNetType = npc.netID;
+        showdownNPCLife = npc.life;
         npc.GetGlobalNPCOrNull<ShowdownNPC>()?.showdownState = NPCShowdownState.Query;
         KeybindPlayer?.keyToShowInIndicator = KeybindSystem.KeybindSystem.EnterShowdownKeybind?.GetAssignedKeys().FirstOrDefault();
         Outline.outlineNeeded = true;
@@ -59,11 +54,13 @@ internal class ShowdownPlayer : ModPlayer
         ShowdownNPC? showdownNPC = Main.npc[(int)showdownNPCIndex].GetGlobalNPCOrNull<ShowdownNPC>();
         if (showdownNPC?.showdownState != NPCShowdownState.Query) return;
 
-        defaultZoom = Main.GameZoomTarget;
+        defaultGameZoomTarget = Main.GameZoomTarget;
+        defaultMapStyle = Main.mapStyle;
         showdownNPC.showdownState = NPCShowdownState.Active;
         isPlayerInShowdownSubworld = true;
         SubworldSystem.Enter<ShowdownSubworld>();
-        Main.GameZoomTarget = 2.5f;
+        Main.GameZoomTarget = 2.25f;
+        Main.mapStyle = 0;
         KeybindPlayer?.keyToShowInIndicator = null;
     }
 
@@ -81,15 +78,17 @@ internal class ShowdownPlayer : ModPlayer
     internal void EndShowdown()
     {
         if (showdownNPCIndex == null || showdownNPCNetType == null || !isPlayerInShowdownSubworld) return;
-        SubworldSystem.Exit();
-        Main.GameZoomTarget = defaultZoom;
+
+        Main.GameZoomTarget = defaultGameZoomTarget;
+        Main.mapStyle = defaultMapStyle;
         isPlayerInShowdownSubworld = false;
+        SubworldSystem.Exit();
         Main.npc[(int)showdownNPCIndex].GetGlobalNPCOrNull<ShowdownNPC>()?.showdownState = NPCShowdownState.None;
         showdownNPCIndex = null;
         showdownNPCNetType = null;
         Outline.outlineNeeded = false;
-        queriedAction = ShowdownAction.None;
-        currentAction = ShowdownAction.None;
+        queriedAction = null;
+        currentAction = null;
     }
 
     public override void OnEnterWorld()
@@ -101,13 +100,14 @@ internal class ShowdownPlayer : ModPlayer
                 item.TurnToAir();
             }
 
-            lockCameraPosition = Main.screenPosition + new Vector2(Main.screenWidth / Main.GameZoomTarget * 0.25f, 0);
+            lockCameraPosition = Main.screenPosition + new Vector2(Main.screenWidth / Main.GameZoomTarget * 0.25f, -Main.screenHeight / Main.GameZoomTarget * 0.15f);
             NPC npc = NPC.NewNPCDirect(Player.GetSource_Misc("Showdown"), Player.Bottom + new Vector2(Main.screenWidth / Main.GameZoomTarget * 0.5f, Main.npc[(int)showdownNPCIndex!].height * 0.5f), (int)showdownNPCNetType!);
             showdownNPCPuppetIndex = npc.whoAmI;
 
             ShowdownNPC? globalNPC = npc.GetGlobalNPCOrNull<ShowdownNPC>();
             globalNPC?.showdownState = NPCShowdownState.Active;
             globalNPC?.isCopyOfShowdownNPC = true;
+            npc.life = showdownNPCLife;
 
             CapEffectsPlayer?.KillStompHitbox();
             Projectile.NewProjectile(Player.GetSource_Misc("Showdown"), Player.Top - new Vector2(0, 64), Vector2.Zero, ModContent.ProjectileType<ActionRing>(), 0, 0, Player.whoAmI);
@@ -126,19 +126,19 @@ internal class ShowdownPlayer : ModPlayer
 
     public override bool CanBeHitByNPC(NPC npc, ref int cooldownSlot)
     {
-        if (isPlayerInShowdownSubworld) return false;
+        if (isPlayerInShowdownSubworld && currentAction != null) return false;
         return base.CanBeHitByNPC(npc, ref cooldownSlot);
     }
 
     public override bool CanBeHitByProjectile(Projectile proj)
     {
-        if (isPlayerInShowdownSubworld) return false;
+        if (isPlayerInShowdownSubworld && currentAction != null) return false;
         return base.CanBeHitByProjectile(proj);
     }
 
     public override bool CanUseItem(Item item)
     {
-        if (isPlayerInShowdownSubworld) return false;
+        if (isPlayerInShowdownSubworld && currentAction != null) return false;
         return base.CanUseItem(item);
     }
 
@@ -149,30 +149,9 @@ internal class ShowdownPlayer : ModPlayer
 
         if (!isPlayerInShowdownSubworld) return;
 
-        if (PlayerInput.Triggers.JustPressed.Inventory && queriedAction != ShowdownAction.None && currentAction == ShowdownAction.None)
-        {
-            KeybindPlayer?.keyToShowInIndicator = null;
-            queriedAction = ShowdownAction.None;
-        }
+        Main.playerInventory = false;
 
-        if (PlayerInput.Triggers.JustPressed.Jump && queriedAction == ShowdownAction.Flee)
-        {
-            KeybindPlayer?.keyToShowInIndicator = null;
-            queriedAction = ShowdownAction.None;
-            currentAction = ShowdownAction.Flee;
-        }
-
-        if (currentAction != ShowdownAction.None)
-        {
-            actionTime++;
-
-            if (currentAction == ShowdownAction.Flee) Player.direction = -1;
-        }
-        else
-        {
-            Player.direction = 1;
-            actionTime = 0;
-        }
+        if (currentAction == null) Player.direction = 1;
     }
 
     public override void PostUpdateEquips()
@@ -190,7 +169,6 @@ internal class ShowdownPlayer : ModPlayer
         Player.controlDown = false;
         Player.controlDownHold = false;
         Player.controlHook = false;
-        Player.controlInv = false;
         Player.controlLeft = false;
         Player.controlMap = false;
         Player.controlMount = false;
@@ -204,24 +182,47 @@ internal class ShowdownPlayer : ModPlayer
         Player.controlUseItem = false;
         Player.controlUseTile = false;
 
-        if (queriedAction != ShowdownAction.None || currentAction != ShowdownAction.None) Player.controlJump = false;
+        if (queriedAction != null || (currentAction != null && KeybindPlayer?.keyToShowInIndicator != KeybindSystem.KeybindSystem.GetVanillaKeybindKey(TriggerNames.Jump))) Player.controlJump = false;
 
-        switch (currentAction)
+        currentAction?.Update(Player);
+        currentAction?.updateCount += 1;
+    }
+
+    public override void ProcessTriggers(TriggersSet triggersSet)
+    {
+        if (!isPlayerInShowdownSubworld) return;
+
+        if (PlayerInput.Triggers.JustPressed.OpenCreativePowersMenu) EndShowdown();
+
+        if (PlayerInput.Triggers.JustPressed.Inventory)
         {
-            case ShowdownAction.None:
-                break;
-            case ShowdownAction.Jump:
-                break;
-            case ShowdownAction.Special:
-                break;
-            case ShowdownAction.Item:
-                break;
-            case ShowdownAction.Flee:
-                Player.controlLeft = true;
-                if (actionTime > 100) EndShowdown();
-                break;
-            default:
-                break;
+            if (queriedAction == null) IngameOptions.Open();
+            else if (currentAction == null)
+            {
+                KeybindPlayer?.keyToShowInIndicator = null;
+                queriedAction = null;
+            }
+        }
+
+        if (PlayerInput.Triggers.JustPressed.Jump && queriedAction != null && KeybindPlayer?.keyToShowInIndicator != null)
+        {
+            currentAction = queriedAction;
+
+            queriedAction = null;
+            KeybindPlayer?.keyToShowInIndicator = null;
+        }
+
+        if ((PlayerInput.Triggers.JustPressed.Left || PlayerInput.Triggers.JustPressed.Right) && queriedAction == null && currentAction == null && Player.IsOnGroundPrecise())
+        {
+            ActionRing? actionRing = (ActionRing?)Main.projectile.FirstOrDefault(e => e.type == ModContent.ProjectileType<ActionRing>())?.ModProjectile;
+
+            if (actionRing != null)
+            {
+                SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Showdown/ScrollActions") { Volume = 0.2f });
+
+                if (PlayerInput.Triggers.JustPressed.Left) actionRing.currentAction = (actionRing.currentAction == 0 ? actionRing.ActionCount : actionRing.currentAction) - 1;
+                if (PlayerInput.Triggers.JustPressed.Right) actionRing.currentAction = actionRing.currentAction == actionRing.ActionCount - 1 ? 0 : actionRing.currentAction + 1;
+            }
         }
     }
 }

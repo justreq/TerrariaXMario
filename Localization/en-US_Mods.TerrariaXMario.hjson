@@ -66,6 +66,6 @@ Showdown: {
 
 	UI: {
 		Cancel: Cancel
-		Confirm: Confirm
+		TargetSelect: Move mouse to select target
 	}
 }

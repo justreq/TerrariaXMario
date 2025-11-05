@@ -1,4 +1,5 @@
 ﻿using Terraria;
+using Terraria.ModLoader;
 using TerrariaXMario.Content.Caps;
 
 namespace TerrariaXMario.Content.Powerups;
@@ -12,7 +13,7 @@ internal class TanookiSuitData : Powerup
 
     internal override string EquipSound => $"{TerrariaXMario.Sounds}/PowerupEffects/TailPowerUp";
 
-    internal override void UpdateWorld(Projectile projectile)
+    internal override void UpdateWorld(Projectile projectile, int updateCount)
     {
         projectile.velocity.Y += 0.4f;
     }
@@ -30,5 +31,5 @@ internal class TanookiSuitData : Powerup
 
 internal class TanookiSuit : PowerupProjectile
 {
-    internal override Powerup PowerupData { get; set; } = new TanookiSuitData();
+    internal override Powerup PowerupData { get; set; } = ModContent.GetInstance<TanookiSuitData>();
 }

@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Terraria;
-using Terraria.Audio;
 using Terraria.DataStructures;
-using Terraria.GameInput;
 using Terraria.ModLoader;
 using TerrariaXMario.Utilities.Extensions;
 
@@ -12,6 +10,7 @@ internal class ActionRing : ModProjectile
     private readonly Vector2[] offsets = [new Vector2(0, 18), new Vector2(36, 0), new Vector2(0, -18), new Vector2(-36, 0)];
 
     private Projectile[] actionBoxes = [];
+    internal int ActionCount => actionBoxes.Length;
     internal int currentAction;
 
     public override void SetDefaults()
@@ -32,10 +31,10 @@ internal class ActionRing : ModProjectile
         {
             int type = i switch
             {
-                0 => ModContent.ProjectileType<ActionJump>(),
-                1 => ModContent.ProjectileType<ActionSpecial>(),
-                2 => ModContent.ProjectileType<ActionItem>(),
-                3 => ModContent.ProjectileType<ActionFlee>(),
+                0 => ModContent.ProjectileType<ActionBoxJump>(),
+                1 => ModContent.ProjectileType<ActionBoxSpecial>(),
+                2 => ModContent.ProjectileType<ActionBoxItem>(),
+                3 => ModContent.ProjectileType<ActionBoxFlee>(),
                 _ => 0,
             };
 
@@ -50,18 +49,10 @@ internal class ActionRing : ModProjectile
 
         Projectile.timeLeft++;
 
-        if (modPlayer?.queriedAction == ShowdownAction.None && modPlayer?.currentAction == ShowdownAction.None)
+        if (modPlayer?.queriedAction == null && modPlayer?.currentAction == null)
         {
             if (Projectile.alpha > 0) Projectile.alpha -= 30;
             else if (Projectile.alpha != 0) Projectile.alpha = 0;
-
-            if (actionBoxes.Length > 1 && player.IsOnGroundPrecise() && (PlayerInput.Triggers.JustPressed.Left || PlayerInput.Triggers.JustPressed.Right))
-            {
-                SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Showdown/ScrollActions") { Volume = 0.2f });
-
-                if (PlayerInput.Triggers.JustPressed.Left) currentAction = (currentAction == 0 ? actionBoxes.Length : currentAction) - 1;
-                if (PlayerInput.Triggers.JustPressed.Right) currentAction = currentAction == actionBoxes.Length - 1 ? 0 : currentAction + 1;
-            }
         }
         else
         {
@@ -69,7 +60,7 @@ internal class ActionRing : ModProjectile
             else if (Projectile.alpha != 0) Projectile.alpha = 255;
         }
 
-        for (int i = 0; i < actionBoxes.Length; i++)
+        for (int i = 0; i < ActionCount; i++)
         {
             Projectile actionBox = actionBoxes[i];
 

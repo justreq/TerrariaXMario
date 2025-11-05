@@ -72,16 +72,16 @@ internal class UIKeypressIndicator : UIElement
 
     internal void SetKey(string key)
     {
-        if (Text == null || KeyboardButton == null) return;
+        canDraw = false;
+        Text?.SetText(key == "Space" ? "" : key);
+        Text?.Recalculate();
 
-        Text.SetText(key == "Space" ? "" : key);
-        Text.Recalculate();
-
-        int width = key == "Space" ? 148 : (int)MathHelper.Max(22, Text.GetDimensions().Width + 16);
-        KeyboardButton.SetFrame(new(0, key == "Space" ? 32 : 0, width, 30));
-        KeyboardButton.Recalculate();
+        int width = key == "Space" ? 148 : (int)MathHelper.Max(22, Text?.GetDimensions().Width ?? 0 + 16);
+        KeyboardButton?.SetFrame(new(0, key == "Space" ? 32 : 0, width, 30));
+        KeyboardButton?.Recalculate();
         Width = StyleDimension.FromPixels(48 + width);
         Recalculate();
         RecalculateChildren();
+        canDraw = true;
     }
 }

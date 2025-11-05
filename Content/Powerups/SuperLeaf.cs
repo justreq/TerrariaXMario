@@ -1,11 +1,19 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using Terraria;
+using Terraria.ModLoader;
 using TerrariaXMario.Content.Caps;
 
 namespace TerrariaXMario.Content.Powerups;
 internal class SuperLeafData : Powerup
 {
+    protected override void Register()
+    {
+        SpawnUpSpeed = -5f;
+        SpawnDownSpeed = 2f;
+        TimeBeforePickable = 20;
+    }
+
     public override string Name => "SuperLeaf";
 
     internal override string[] Caps => [nameof(Mario)];
@@ -14,7 +22,7 @@ internal class SuperLeafData : Powerup
 
     internal override string EquipSound => $"{TerrariaXMario.Sounds}/PowerupEffects/TailPowerUp";
 
-    internal override void UpdateWorld(Projectile projectile)
+    internal override void UpdateWorld(Projectile projectile, int updateCount)
     {
         projectile.velocity.X = (float)(Math.Sin(MathHelper.Pi / 60 * updateCount % 60) * (updateCount <= 60 ? 1.5f : 3));
         projectile.velocity.Y = (60 - (updateCount % 60)) * 0.025f;
@@ -36,12 +44,7 @@ internal class SuperLeafData : Powerup
 
 internal class SuperLeaf : PowerupProjectile
 {
-    internal override Powerup PowerupData { get; set; } = new SuperLeafData()
-    {
-        SpawnUpSpeed = -5f,
-        SpawnDownSpeed = 2f,
-        TimeBeforePickable = 20
-    };
+    internal override Powerup PowerupData { get; set; } = ModContent.GetInstance<SuperLeafData>();
 
     public override void SetStaticDefaults()
     {

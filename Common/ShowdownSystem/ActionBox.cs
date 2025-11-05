@@ -5,6 +5,7 @@ using Terraria.Audio;
 using Terraria.GameInput;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.KeybindSystem;
+using TerrariaXMario.Common.ShowdownActions;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.ShowdownSystem;
@@ -27,6 +28,8 @@ internal abstract class ActionBox : ModProjectile
         Player player = Main.player[Projectile.owner];
         ShowdownPlayer? modPlayer = player.GetModPlayerOrNull<ShowdownPlayer>();
 
+        if (Projectile.Hitbox.Contains(Main.MouseWorld.ToPoint()) && Projectile.alpha == 0) Main.instance.MouseText(Name.Replace("Action", ""));
+
         Projectile.timeLeft++;
 
         if (modPlayer?.queriedAction != Action && Projectile.alpha == 0 && Projectile.Hitbox.Intersects(player.Hitbox))
@@ -36,13 +39,8 @@ internal abstract class ActionBox : ModProjectile
             modPlayer?.queriedAction = Action;
             SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Showdown/ChooseAction") { Volume = 0.4f });
 
-            if (Action == ShowdownAction.Flee) player.GetModPlayerOrNull<KeybindPlayer>()?.keyToShowInIndicator = KeybindSystem.KeybindSystem.GetVanillaKeybindKey(TriggerNames.Jump);
+            if (Action is ActionJump or ActionFlee) player.GetModPlayerOrNull<KeybindPlayer>()?.keyToShowInIndicator = KeybindSystem.KeybindSystem.GetVanillaKeybindKey(TriggerNames.Jump);
         }
-    }
-
-    public override void PostDraw(Color lightColor)
-    {
-        if (Projectile.Hitbox.Contains(Main.MouseWorld.ToPoint()) && Projectile.alpha == 0) Main.instance.MouseText(Name.Replace("Action", ""));
     }
 
     public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
@@ -51,19 +49,19 @@ internal abstract class ActionBox : ModProjectile
     }
 }
 
-internal class ActionJump : ActionBox
+internal class ActionBoxJump : ActionBox
 {
-    internal override ShowdownAction Action { get; set; } = ShowdownAction.Jump;
+    internal override ShowdownAction Action { get; set; } = new ActionJump();
 }
-internal class ActionSpecial : ActionBox
+internal class ActionBoxSpecial : ActionBox
 {
-    internal override ShowdownAction Action { get; set; } = ShowdownAction.Special;
+    internal override ShowdownAction Action { get; set; } = new ActionSpecial();
 }
-internal class ActionItem : ActionBox
+internal class ActionBoxItem : ActionBox
 {
-    internal override ShowdownAction Action { get; set; } = ShowdownAction.Item;
+    internal override ShowdownAction Action { get; set; } = new ActionItem();
 }
-internal class ActionFlee : ActionBox
+internal class ActionBoxFlee : ActionBox
 {
-    internal override ShowdownAction Action { get; set; } = ShowdownAction.Flee;
+    internal override ShowdownAction Action { get; set; } = new ActionFlee();
 }
