@@ -66,14 +66,22 @@ internal class StompHitbox : ModProjectile
         {
             player.creativeGodMode = true;
             player.bodyFrame.Y = 0;
-            player.legFrame.Y = 0;
+            player.legFrame.Y = Math.Clamp(groundPoundCooldown / 8, 0, 3) * 56;
             player.itemTime = 0;
             player.itemAnimation = 0;
             modPlayer?.currentJump = Jump.None;
 
-            if (groundPoundCooldown <= 15) player.velocity = new(0, 0.1f);
+            if (groundPoundCooldown <= 15)
+            {
+                player.velocity = new(0, 0.1f);
+                player.fullRotationOrigin = new Vector2(player.Size.X * 0.5f, player.Size.Y * 0.75f);
+
+                if (groundPoundCooldown <= 5) player.fullRotation = player.direction * (groundPoundCooldown * MathHelper.Pi * 0.2f);
+                else player.fullRotation = player.direction * (MathHelper.Pi + (groundPoundCooldown - 5) * MathHelper.Pi * 0.1f);
+            }
             else if (player.controlDown)
             {
+                player.fullRotation = 0;
                 player.velocity.Y = player.maxFallSpeed;
 
                 foreach (Point point in modPlayer?.HitObjectSpawnerBlocks(1, true) ?? [])

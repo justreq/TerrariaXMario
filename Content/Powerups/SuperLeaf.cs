@@ -7,18 +7,7 @@ using TerrariaXMario.Content.Caps;
 namespace TerrariaXMario.Content.Powerups;
 internal class SuperLeafData : Powerup
 {
-    protected override void Register()
-    {
-        SpawnUpSpeed = -5f;
-        SpawnDownSpeed = 2f;
-        TimeBeforePickable = 20;
-    }
-
     public override string Name => "SuperLeaf";
-
-    internal override string[] Caps => [nameof(Mario)];
-
-    internal override string[] Variations => ["Flying"];
 
     internal override string EquipSound => $"{TerrariaXMario.Sounds}/PowerupEffects/TailPowerUp";
 
@@ -44,12 +33,17 @@ internal class SuperLeafData : Powerup
 
 internal class SuperLeaf : PowerupProjectile
 {
-    internal override Powerup PowerupData { get; set; } = ModContent.GetInstance<SuperLeafData>();
+    internal override Powerup? PowerupData => ModContent.GetInstance<SuperLeafData>();
+    internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
+    internal override string[] Variations => ["Flying"];
+    internal override float SpawnUpSpeed => -5f;
+    internal override float SpawnDownSpeed => 2f;
+    internal override int TimeBeforePickable => 20;
 
     public override void SetStaticDefaults()
     {
-        base.SetStaticDefaults();
         Main.projFrames[Projectile.type] = 2;
+        base.SetStaticDefaults();
     }
 
     public override void SetDefaults()

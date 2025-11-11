@@ -4,7 +4,10 @@ using Terraria.ModLoader;
 namespace TerrariaXMario.Common.ShowdownActions;
 internal abstract class ShowdownAction : ModType
 {
-    protected override void Register() { }
+    protected override void Register()
+    {
+        ModTypeLookup<ShowdownAction>.Register(this);
+    }
 
     internal int updateCount;
 

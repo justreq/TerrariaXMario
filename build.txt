@@ -1,4 +1,4 @@
 displayName = [c/d91616:Mario] & [c/1b9504:Luigi]: Crossover
-author = Lacroix, Ray, Alinc, Lugnut
+author = Lacroix, Ray, Momlob, Lugnut
 version = 0.1.0
 modReferences = SubworldLibrary

@@ -7,10 +7,6 @@ internal class TanookiSuitData : Powerup
 {
     public override string Name => "TanookiSuit";
 
-    internal override string[] Caps => [nameof(Mario)];
-
-    internal override string[] Variations => ["Flying"];
-
     internal override string EquipSound => $"{TerrariaXMario.Sounds}/PowerupEffects/TailPowerUp";
 
     internal override void UpdateWorld(Projectile projectile, int updateCount)
@@ -31,5 +27,7 @@ internal class TanookiSuitData : Powerup
 
 internal class TanookiSuit : PowerupProjectile
 {
-    internal override Powerup PowerupData { get; set; } = ModContent.GetInstance<TanookiSuitData>();
+    internal override Powerup? PowerupData => ModContent.GetInstance<TanookiSuitData>();
+    internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
+    internal override string[] Variations => ["Flying"];
 }

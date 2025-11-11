@@ -4,20 +4,11 @@ using Terraria.ModLoader;
 namespace TerrariaXMario.Content.Powerups;
 internal abstract class Powerup : ModType
 {
-    protected override void Register() { }
+    protected override void Register()
+    {
+        ModTypeLookup<Powerup>.Register(this);
+    }
 
-    internal float SpawnUpSpeed { get; set; } = -0.75f;
-    internal float SpawnDownSpeed { get; set; } = 0.75f;
-    internal int TimeBeforePickable { get; set; } = 45;
-
-    /// <summary>
-    /// A list of the caps that can consume this PowerupData.
-    /// </summary>
-    internal virtual string[] Caps => [];
-    /// <summary>
-    /// A list of texture variations this PowerupData should use
-    /// </summary>
-    internal virtual string[] Variations => [];
     internal virtual string EquipSound => $"{TerrariaXMario.Sounds}/PowerupEffects/PowerUp";
 
     /// <summary>

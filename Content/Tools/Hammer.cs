@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using Microsoft.Xna.Framework;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.CapEffects;
@@ -19,4 +20,17 @@ internal class Hammer : ModItem
     }
 
     public override bool CanUseItem(Player player) => player.GetModPlayerOrNull<CapEffectsPlayer>()?.CanDoCapEffects ?? false;
+
+    public override bool? UseItem(Player player)
+    {
+        if (Main.cursorOverride == TerrariaXMario.Instance.CursorEditIndex)
+        {
+            Point mouseTilePosition = Main.MouseWorld.ToTileCoordinates();
+
+            Tile tile = Framing.GetTileSafely(mouseTilePosition.X, mouseTilePosition.Y);
+            player.GetModPlayerOrNull<CapEffectsPlayer>()?.currentObjectSpawnerBlockToEdit = new(mouseTilePosition.X - tile.TileFrameX / 18, mouseTilePosition.Y - tile.TileFrameY / 18);
+        }
+
+        return base.UseItem(player);
+    }
 }

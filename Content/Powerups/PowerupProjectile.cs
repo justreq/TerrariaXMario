@@ -11,7 +11,18 @@ using TerrariaXMario.Utilities.Extensions;
 namespace TerrariaXMario.Content.Powerups;
 internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
 {
-    internal abstract Powerup PowerupData { get; set; }
+    internal virtual Powerup? PowerupData => null;
+    /// <summary>
+    /// A list of the caps that can consume this PowerupData.
+    /// </summary>
+    internal virtual string[] Caps => [];
+    /// <summary>
+    /// A list of texture variations this PowerupData should use
+    /// </summary>
+    internal virtual string[] Variations => [];
+    internal virtual float SpawnUpSpeed => -0.75f;
+    internal virtual float SpawnDownSpeed => 0.75f;
+    internal virtual int TimeBeforePickable => 45;
 
     private int updateCount;
 
@@ -47,36 +58,36 @@ internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
 
     public override void Load()
     {
-        if (Main.netMode == NetmodeID.Server || PowerupData == null) return;
+        if (Main.netMode == NetmodeID.Server) return;
 
-        for (int i = 0; i < PowerupData.Caps.Length; i++)
+        for (int i = 0; i < Caps.Length; i++)
         {
-            string cap = PowerupData.Caps[i];
+            string cap = Caps[i];
 
             LoadEquipTextures(cap);
             LoadEquipTextures(cap, "GroundPound", false, false);
 
-            for (int j = 0; j < PowerupData.Variations.Length; j++)
+            for (int j = 0; j < Variations.Length; j++)
             {
-                LoadEquipTextures(cap, PowerupData.Variations[j]);
+                LoadEquipTextures(cap, Variations[j]);
             }
         }
     }
 
     public override void SetStaticDefaults()
     {
-        if (Main.netMode == NetmodeID.Server || PowerupData == null) return;
+        if (Main.netMode == NetmodeID.Server) return;
 
-        for (int i = 0; i < PowerupData.Caps.Length; i++)
+        for (int i = 0; i < Caps.Length; i++)
         {
-            string cap = PowerupData.Caps[i];
+            string cap = Caps[i];
 
             SetupEquipTextures(cap);
             SetupEquipTextures(cap, "GroundPound", false, false);
 
-            for (int j = 0; j < PowerupData.Variations.Length; j++)
+            for (int j = 0; j < Variations.Length; j++)
             {
-                SetupEquipTextures(cap, PowerupData.Variations[j]);
+                SetupEquipTextures(cap, Variations[j]);
             }
         }
     }
@@ -92,15 +103,13 @@ internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
 
     public override void AI()
     {
-        if (PowerupData == null) return;
-
-        if (PowerupData.TimeBeforePickable > 0)
+        if (PowerupData == null)
         {
-            PowerupData.TimeBeforePickable--;
+            Projectile.Kill();
             return;
         }
 
-        PowerupData.UpdateWorld(Projectile, updateCount);
+        if (updateCount > TimeBeforePickable) PowerupData.UpdateWorld(Projectile, updateCount);
         updateCount++;
 
         foreach (Player player in Main.ActivePlayers)
@@ -125,7 +134,7 @@ internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
     {
         behindNPCsAndTiles.Add(index);
 
-        if (PowerupData.TimeBeforePickable == 0 && behindNPCsAndTiles.Contains(index))
+        if (updateCount > TimeBeforePickable && behindNPCsAndTiles.Contains(index))
         {
             Projectile.hide = false;
             behindNPCsAndTiles.Remove(index);

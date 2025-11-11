@@ -10,8 +10,6 @@ internal class FireFlowerData : Powerup
 {
     public override string Name => "FireFlower";
 
-    internal override string[] Caps => [nameof(Mario)];
-
     internal override void UpdateWorld(Projectile projectile, int updateCount)
     {
         projectile.velocity.Y += 0.4f;
@@ -28,5 +26,6 @@ internal class FireFlowerData : Powerup
 
 internal class FireFlower : PowerupProjectile
 {
-    internal override Powerup PowerupData { get; set; } = ModContent.GetInstance<FireFlowerData>();
+    internal override Powerup? PowerupData => ModContent.GetInstance<FireFlowerData>();
+    internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
 }

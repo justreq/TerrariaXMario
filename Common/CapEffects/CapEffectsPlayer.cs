@@ -107,25 +107,6 @@ internal class CapEffectsPlayer : ModPlayer
     public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo)
     {
         Player player = drawInfo.drawPlayer;
-
-        if (player.mount.Active || !CanDoCapEffects)
-        {
-            player.headPosition = Vector2.Zero;
-            player.headRotation = 0;
-            return;
-        }
-
-        if (!player.controlDown || player.IsOnGroundPrecise()) player.headPosition.X = 0;
-
-        if (currentCap == "Luigi")
-        {
-            player.bodyPosition.Y = -2;
-
-            if (player.GetModPlayerOrNull<CapEffectsPlayer>()?.groundPounding ?? false)
-            {
-                player.legPosition.Y = -2;
-            }
-        }
     }
 
     public override void PreUpdate()
@@ -160,6 +141,8 @@ internal class CapEffectsPlayer : ModPlayer
 
     public override void PostUpdate()
     {
+        CapEffect();
+
         if (!CanDoCapEffects || Player.mount.Active)
         {
             KillStompHitbox();
@@ -169,7 +152,6 @@ internal class CapEffectsPlayer : ModPlayer
             return;
         }
 
-        CapEffect();
         JumpEffect();
         StompEffect();
         GrabEffectCompositeArms();
@@ -184,11 +166,7 @@ internal class CapEffectsPlayer : ModPlayer
 
         if (PlayerInput.Triggers.JustPressed.MouseLeft)
         {
-            if (!Player.mouseInterface && Main.cursorOverride != TerrariaXMario.Instance.CursorGrabIndex && Main.cursorOverride != TerrariaXMario.Instance.CursorThrowIndex && Player.HeldItem.IsAir && Main.mouseItem.IsAir && (!ShowdownPlayer?.isPlayerInShowdownSubworld ?? true))
-            {
-                if (currentPowerup?.OnLeftClick(Player) ?? false) SetForceDirection(10, Math.Sign(Main.MouseWorld.X - Player.position.X));
-            }
-            else if (Main.cursorOverride == TerrariaXMario.Instance.CursorThrowIndex)
+            if (Main.cursorOverride == TerrariaXMario.Instance.CursorThrowIndex)
             {
 
                 NPC grabbedNPC = Main.npc[(int)grabbedNPCIndex!];
@@ -198,12 +176,9 @@ internal class CapEffectsPlayer : ModPlayer
                 grabbedNPCIndex = null;
             }
             else if (Main.cursorOverride == TerrariaXMario.Instance.CursorGrabIndex) grabbedNPCIndex = hoverNPCIndex;
-            else if (Main.cursorOverride == TerrariaXMario.Instance.CursorEditIndex)
+            else if (!Player.mouseInterface && Player.HeldItem.IsAir && Main.mouseItem.IsAir && (!ShowdownPlayer?.isPlayerInShowdownSubworld ?? true) && (currentPowerup?.OnLeftClick(Player) ?? false))
             {
-                Point mouseTilePosition = Main.MouseWorld.ToTileCoordinates();
-
-                Tile tile = Framing.GetTileSafely(mouseTilePosition.X, mouseTilePosition.Y);
-                currentObjectSpawnerBlockToEdit = new(mouseTilePosition.X - tile.TileFrameX / 18, mouseTilePosition.Y - tile.TileFrameY / 18);
+                SetForceDirection(10, Math.Sign(Main.MouseWorld.X - Player.position.X));
             }
         }
 
@@ -306,7 +281,7 @@ internal class CapEffectsPlayer : ModPlayer
         else
         {
             if (jumpFlipDuration != 0) jumpFlipDuration = 0;
-            if (Player.fullRotation != 0) Player.fullRotation = 0;
+            if (Player.fullRotation != 0 && !groundPounding) Player.fullRotation = 0;
         }
 
         if (Player.justJumped)
@@ -468,7 +443,7 @@ internal class CapEffectsPlayer : ModPlayer
         if (objectToSpawn is PowerupProjectile projectile)
         {
             SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/PowerupSpawn"));
-            Projectile.NewProjectile(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), entity.Position.ToWorldCoordinates() + new Vector2(8), new Vector2(0, spawnFromBottom ? projectile.PowerupData.SpawnDownSpeed : projectile.PowerupData.SpawnUpSpeed), projectile.Type, 0, 0);
+            Projectile.NewProjectile(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), entity.Position.ToWorldCoordinates() + new Vector2(8), new Vector2(0, spawnFromBottom ? projectile.SpawnDownSpeed : projectile.SpawnUpSpeed), projectile.Type, 0, 0);
         }
         else if (objectToSpawn is ModItem item)
         {
