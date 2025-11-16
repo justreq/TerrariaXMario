@@ -59,7 +59,7 @@ internal class PSpeedMeter : UIState
         resourceWidth = modPlayer!.runTime == 0 ? resourceWidth - 1 : (int)((float)modPlayer.runTime / modPlayer.runTimeRequiredForPSpeed * 36);
         ImageResource?.SetFrame(new(0, 54, resourceWidth, 6));
 
-        ImageFrame?.Color = Color.Lerp(ImageFrame.Color, resourceWidth <= 18 ? Color.Transparent : Color.White, 0.075f);
+        ImageFrame?.Color = Color.Lerp(ImageFrame.Color, (modPlayer.flightState != FlightState.Flying && resourceWidth <= 18) ? Color.Transparent : Color.White, 0.075f);
         ImageResource?.Color = ImageFrame?.Color ?? Color.Transparent;
 
         if (modPlayer.hasPSpeed)

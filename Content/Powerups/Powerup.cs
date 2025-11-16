@@ -1,15 +1,27 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
+using TerrariaXMario.Common.CapEffects;
 
 namespace TerrariaXMario.Content.Powerups;
 internal abstract class Powerup : ModType
 {
+    internal int Type { get; set; }
+
     protected override void Register()
     {
         ModTypeLookup<Powerup>.Register(this);
+        Type = PowerupLoader.Add(this);
+    }
+
+    public override void SetupContent()
+    {
+        PowerupID.Search.Add(FullName, Type);
     }
 
     internal virtual string EquipSound => $"{TerrariaXMario.Sounds}/PowerupEffects/PowerUp";
+    internal virtual ForceArmMovementType RightClickArmMovementType => ForceArmMovementType.None;
+    internal virtual bool LookTowardRightClick => true;
+    internal virtual int RightClickActionCooldown => 5;
 
     /// <summary>
     /// The behavior of this PowerupData when it exists in the world, e.g. movement behavior. Similar in concept to ModItem.Update.
@@ -27,8 +39,13 @@ internal abstract class Powerup : ModType
     /// <param name="player">The playerIndex that consumed this PowerupData</param>
     internal virtual void UpdateConsumed(Player player) { }
     /// <summary>
-    /// Use this method to spawn projectiles when left clicking, e.g. Fire Flower Fireball or Hammer Suit Hammer. Return true to force the playerIndex's front arm to swing
+    /// Use this method to spawn projectiles when right clicking, e.g. Fire Flower Fireball or Hammer Suit Hammer.
     /// </summary>
     /// <param name="player">The playerIndex that consumed this PowerupData</param>
-    internal virtual bool OnLeftClick(Player player) => false;
+    internal virtual void OnRightClick(Player player) { }
+    /// <summary>
+    /// Use this method to do something while the Jump button is pressed down, e.g. Tail Gliding.
+    /// </summary>
+    /// <param name="player">The playerIndex that consumed this PowerupData</param>
+    internal virtual void OnJumpHeldDown(Player player) { }
 }

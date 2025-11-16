@@ -18,8 +18,7 @@ internal class StompHitbox : ModProjectile
 
     private void Stomp(Player player)
     {
-        player.GetModPlayerOrNull<CapEffectsPlayer>()?.currentJump = Jump.None;
-        player.velocity.Y = player.controlJump ? -(7.5f + player.jumpSpeedBoost) : -5;
+        player.velocity.Y = player.controlJump ? -8.5f : -5;
 
         stompCooldown = 5;
         stompCount++;
@@ -70,18 +69,21 @@ internal class StompHitbox : ModProjectile
             player.itemTime = 0;
             player.itemAnimation = 0;
             modPlayer?.currentJump = Jump.None;
+            modPlayer?.flightState = FlightState.None;
+            modPlayer?.runTime = 0;
+            modPlayer?.hasPSpeed = false;
 
-            if (groundPoundCooldown <= 15)
+            if (groundPoundCooldown <= 20)
             {
-                player.velocity = new(0, 0.1f);
                 player.fullRotationOrigin = new Vector2(player.Size.X * 0.5f, player.Size.Y * 0.75f);
+                player.velocity = new(0, 0.1f);
 
                 if (groundPoundCooldown <= 5) player.fullRotation = player.direction * (groundPoundCooldown * MathHelper.Pi * 0.2f);
-                else player.fullRotation = player.direction * (MathHelper.Pi + (groundPoundCooldown - 5) * MathHelper.Pi * 0.1f);
+                else if (groundPoundCooldown <= 15) player.fullRotation = player.direction * (MathHelper.Pi + (groundPoundCooldown - 5) * MathHelper.Pi * 0.1f);
             }
             else if (player.controlDown)
             {
-                player.fullRotation = 0;
+                player.maxFallSpeed = 50f;
                 player.velocity.Y = player.maxFallSpeed;
 
                 foreach (Point point in modPlayer?.HitObjectSpawnerBlocks(1, true) ?? [])

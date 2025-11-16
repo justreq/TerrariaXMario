@@ -8,7 +8,7 @@ internal static class PlayerExtensions
 {
     public static T? GetModPlayerOrNull<T>(this Player player) where T : ModPlayer => player.TryGetModPlayer(out T result) ? result : null;
 
-    // thank the lord for direworld420 vvv
+    // thanks direwolf
 
     /// <summary>
     /// If any of the tiles right below this are standable, return true

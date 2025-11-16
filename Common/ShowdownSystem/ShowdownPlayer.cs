@@ -35,6 +35,7 @@ internal class ShowdownPlayer : ModPlayer
 
     internal void BeginShowdownQuery(NPC npc)
     {
+        return;
         if (isPlayerInShowdownSubworld || (!CapEffectsPlayer?.CanDoCapEffects ?? true)) return;
 
         if (showdownNPCIndex != null) Main.npc[(int)showdownNPCIndex].GetGlobalNPCOrNull<ShowdownNPC>()?.showdownState = NPCShowdownState.None;

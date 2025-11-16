@@ -12,13 +12,12 @@ internal class GearSlotPlayer : ModPlayer
     private readonly EquipmentLoadout gearLoadout = new();
     private int lastUsedVanillaLoadout;
 
-    private bool showGearSlots;
     internal bool ShowGearSlots
     {
-        get => showGearSlots;
+        get => field;
         set
         {
-            showGearSlots = value;
+            field = value;
 
             if (Player.whoAmI != Main.myPlayer || (!(Player.itemTime > 0 || Player.itemAnimation > 0) && !Player.CCed && !Player.dead))
             {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,7 @@ using Terraria.DataStructures;
 using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 using TerrariaXMario.Common.GearSlots;
 using TerrariaXMario.Common.MiscEffects;
 using TerrariaXMario.Common.ShowdownSystem;
@@ -18,6 +20,8 @@ using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.CapEffects;
 internal enum Jump { None, Single, Double, Triple }
+internal enum ForceArmMovementType { None, Swing, Extend }
+internal enum FlightState { None, Gliding, Flying }
 internal class CapEffectsPlayer : ModPlayer
 {
     private GearSlotPlayer? GearSlotPlayer => Player.GetModPlayerOrNull<GearSlotPlayer>();
@@ -25,25 +29,29 @@ internal class CapEffectsPlayer : ModPlayer
 
     private string? oldCap;
     internal string? currentCap;
+    internal string? currentCapToDraw;
     internal string? currentHeadVariant;
     internal string? currentBodyVariant;
     internal string? currentLegsVariant;
 
-    internal Powerup? currentPowerup;
+    internal int? currentPowerupType;
+    internal Powerup? CurrentPowerup => currentPowerupType == null ? null : PowerupLoader.Powerups[(int)currentPowerupType];
 
     internal bool CanDoCapEffects => currentCap != null && (GearSlotPlayer?.ShowGearSlots ?? false);
 
+    private bool requestedPowerupRightClick;
     internal int forceDirection;
-    internal int forceSwingDuration;
-    internal int forceSwingTimer;
+    internal int forceSwitchDirectionCount;
+    internal ForceArmMovementType forceArmMovementType;
+    internal int forceArmMovementDuration;
+    internal int forceArmMovementTimer;
 
-    private bool groundPounding;
     internal bool GroundPounding
     {
-        get => groundPounding;
+        get => field;
         set
         {
-            groundPounding = value;
+            field = value;
             currentLegsVariant = value ? "GroundPound" : null;
         }
     }
@@ -66,9 +74,36 @@ internal class CapEffectsPlayer : ModPlayer
 
     internal Vector2 currentObjectSpawnerBlockToEdit;
 
+    internal int fireFlowerFireballsCast;
+    internal int fireFlowerCooldown;
+
+    internal FlightState flightState;
+    internal SlotId loopingSoundSlot;
+
+    private int glideLegAnimationTimer;
+    private int powerupRightClickActionTimer;
+
     public override void ResetEffects()
     {
         currentCap = null;
+        currentCapToDraw = null;
+    }
+
+    public override void SaveData(TagCompound tag)
+    {
+        if (currentPowerupType != null) tag[nameof(currentPowerupType)] = currentPowerupType;
+    }
+
+    public override void LoadData(TagCompound tag)
+    {
+        if (tag.ContainsKey(nameof(currentPowerupType))) currentPowerupType = tag.GetInt(nameof(currentPowerupType));
+    }
+
+    public override bool CanUseItem(Item item)
+    {
+        if (grabbedNPCIndex != null || currentJump is Jump.Double or Jump.Triple) return false;
+
+        return base.CanUseItem(item);
     }
 
     public override void ModifyHurt(ref Player.HurtModifiers modifiers)
@@ -82,9 +117,9 @@ internal class CapEffectsPlayer : ModPlayer
     {
         if (!CanDoCapEffects) return;
 
-        if (currentPowerup != null)
+        if (currentPowerupType != null)
         {
-            currentPowerup = null;
+            currentPowerupType = null;
             SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/PowerDown") { Volume = 0.4f });
         }
 
@@ -93,20 +128,36 @@ internal class CapEffectsPlayer : ModPlayer
 
     public override void FrameEffects()
     {
-        if (!CanDoCapEffects)
+        if (!CanDoCapEffects && !Main.gameMenu)
         {
-            if (currentPowerup != null) currentPowerup = null;
+            if (currentPowerupType != null) currentPowerupType = null;
             return;
         }
 
-        Player.head = EquipLoader.GetEquipSlot(Mod, $"{currentPowerup?.Name ?? ""}{currentCap}{currentHeadVariant ?? ""}", EquipType.Head);
-        Player.body = EquipLoader.GetEquipSlot(Mod, $"{currentPowerup?.Name ?? ""}{currentCap}{currentBodyVariant ?? ""}", EquipType.Body);
-        Player.legs = EquipLoader.GetEquipSlot(Mod, $"{currentPowerup?.Name ?? ""}{currentCap}{currentLegsVariant ?? ""}", EquipType.Legs);
+        Player.head = EquipLoader.GetEquipSlot(Mod, $"{CurrentPowerup?.Name}{currentCapToDraw}{currentHeadVariant ?? ""}", EquipType.Head);
+        Player.body = EquipLoader.GetEquipSlot(Mod, $"{CurrentPowerup?.Name}{currentCapToDraw}{currentBodyVariant ?? ""}", EquipType.Body);
+        Player.legs = EquipLoader.GetEquipSlot(Mod, $"{CurrentPowerup?.Name}{currentCapToDraw}{currentLegsVariant ?? ""}", EquipType.Legs);
     }
 
     public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo)
     {
         Player player = drawInfo.drawPlayer;
+
+        //if (flightState == FlightState.Gliding)
+        //{
+        //    glideLegAnimationTimer++;
+
+        //    if (glideLegAnimationTimer >= 15)
+        //    {
+        //        Main.NewText(player.legFrame.Y / 56);
+        //        player.legFrame.Y = player.legFrame.Y >= 56 * 19 ? 56 * 6 : player.legFrame.Y + 56;
+        //        glideLegAnimationTimer = 0;
+        //    }
+        //}
+        //else
+        //{
+        //    glideLegAnimationTimer = 0;
+        //}
     }
 
     public override void PreUpdate()
@@ -136,7 +187,7 @@ internal class CapEffectsPlayer : ModPlayer
         if (currentJump == Jump.Double) Player.jumpSpeedBoost += 1.25f;
         else if (currentJump == Jump.Triple) Player.jumpSpeedBoost += 2.5f;
 
-        currentPowerup?.UpdateConsumed(Player);
+        CurrentPowerup?.UpdateConsumed(Player);
     }
 
     public override void PostUpdate()
@@ -158,6 +209,17 @@ internal class CapEffectsPlayer : ModPlayer
         ObjectSpawnerBlockHitEffect();
 
         if (currentJump is Jump.Double or Jump.Triple && !PlayerInput.Triggers.Current.Down && !Player.IsOnGroundPrecise()) Player.bodyFrame.Y = 56 * 10;
+
+        if (fireFlowerCooldown > 0) fireFlowerCooldown--;
+        else if (fireFlowerFireballsCast > 0) fireFlowerFireballsCast = 0;
+
+        if (flightState != FlightState.None && Player.IsOnGroundPrecise())
+        {
+            currentHeadVariant = currentBodyVariant = currentLegsVariant = null;
+            flightState = FlightState.None;
+        }
+
+        if (powerupRightClickActionTimer > 0) powerupRightClickActionTimer--;
     }
 
     public override void ProcessTriggers(TriggersSet triggersSet)
@@ -170,15 +232,41 @@ internal class CapEffectsPlayer : ModPlayer
             {
 
                 NPC grabbedNPC = Main.npc[(int)grabbedNPCIndex!];
-                SetForceDirection(10, Math.Sign(Main.MouseWorld.X - Player.position.X));
+                SetForceDirection(10, ForceArmMovementType.Swing, Math.Sign(Main.MouseWorld.X - Player.position.X));
                 grabbedNPC.velocity.X = 7.5f * forceDirection;
                 grabbedNPC.GetGlobalNPCOrNull<IceBlockNPC>()?.thrown = true;
                 grabbedNPCIndex = null;
             }
             else if (Main.cursorOverride == TerrariaXMario.Instance.CursorGrabIndex) grabbedNPCIndex = hoverNPCIndex;
-            else if (!Player.mouseInterface && Player.HeldItem.IsAir && Main.mouseItem.IsAir && (!ShowdownPlayer?.isPlayerInShowdownSubworld ?? true) && (currentPowerup?.OnLeftClick(Player) ?? false))
+        }
+
+        if (CurrentPowerup != null && grabbedNPCIndex == null && (!ShowdownPlayer?.isPlayerInShowdownSubworld ?? true))
+        {
+            if (PlayerInput.Triggers.JustPressed.MouseRight && !Player.mouseInterface)
             {
-                SetForceDirection(10, Math.Sign(Main.MouseWorld.X - Player.position.X));
+                if (CurrentPowerup.LookTowardRightClick)
+                {
+                    requestedPowerupRightClick = true;
+                    SetForceDirection(10, CurrentPowerup.RightClickArmMovementType, Math.Sign(Main.MouseWorld.X - Player.position.X));
+                }
+                else if (powerupRightClickActionTimer == 0)
+                {
+                    CurrentPowerup.OnRightClick(Player);
+                    powerupRightClickActionTimer = CurrentPowerup.RightClickActionCooldown;
+                }
+            }
+
+            if (PlayerInput.Triggers.Current.Jump) CurrentPowerup?.OnJumpHeldDown(Player);
+
+            if (PlayerInput.Triggers.JustReleased.Jump)
+            {
+                if (flightState != FlightState.None)
+                {
+                    flightState = FlightState.None;
+                    currentHeadVariant = currentBodyVariant = currentLegsVariant = null;
+                }
+
+                loopingSoundSlot = SlotId.Invalid;
             }
         }
 
@@ -197,13 +285,26 @@ internal class CapEffectsPlayer : ModPlayer
         if (Player.wet && PlayerInput.Triggers.JustPressed.Jump) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(Player.wet ? "Swim" : "Jump")}") { Volume = 0.4f });
     }
 
-    internal void SetForceDirection(int duration, int direction)
+    internal void SetForceDirection(int duration, ForceArmMovementType type, int direction)
     {
         if (duration <= 0 || Math.Abs(direction) != 1) return;
 
-        forceSwingTimer = duration;
+        forceArmMovementType = type;
+        forceArmMovementTimer = duration;
         forceDirection = direction;
+        if (forceSwitchDirectionCount > 0) forceSwitchDirectionCount--;
         Player.direction = direction;
+
+        if (requestedPowerupRightClick)
+        {
+            if (CurrentPowerup != null && powerupRightClickActionTimer == 0)
+            {
+                CurrentPowerup.OnRightClick(Player);
+                powerupRightClickActionTimer = CurrentPowerup.RightClickActionCooldown;
+            }
+
+            requestedPowerupRightClick = false;
+        }
     }
 
     private void CapEffect()
@@ -217,24 +318,37 @@ internal class CapEffectsPlayer : ModPlayer
         if (!CanDoCapEffects)
         {
             forceDirection = 0;
-            forceSwingDuration = 0;
-            forceSwingTimer = 0;
+            forceSwitchDirectionCount = 0;
+            forceArmMovementType = ForceArmMovementType.None;
+            forceArmMovementDuration = 0;
+            forceArmMovementTimer = 0;
             return;
         }
 
-        if (forceSwingTimer > 0)
+        if (forceArmMovementTimer > 0)
         {
-            if (forceSwingDuration == 0) forceSwingDuration = forceSwingTimer;
+            if (forceArmMovementDuration == 0) forceArmMovementDuration = forceArmMovementTimer;
 
-            Player.bodyFrame.Y = 56 * Math.Clamp(Math.Max(1, 4 - (int)Math.Floor((double)forceSwingTimer / forceSwingDuration * 4)), 1, 4);
-
-            forceSwingTimer--;
-
-            if (forceSwingTimer <= 0)
+            if (forceArmMovementType != ForceArmMovementType.None)
             {
-                forceDirection = 0;
-                forceSwingDuration = 0;
-                forceSwingTimer = 0;
+                int i = Math.Clamp(Math.Max(1, 4 - (int)Math.Floor((double)forceArmMovementTimer / forceArmMovementDuration * 4)), 1, 4);
+
+                if (forceArmMovementType == ForceArmMovementType.Swing) Player.bodyFrame.Y = 56 * i;
+                else if (forceArmMovementType == ForceArmMovementType.Extend) Player.SetCompositeArmFront(true, (Player.CompositeArmStretchAmount)(i == 4 ? 0 : i), Player.Center.DirectionTo(Main.MouseWorld).ToRotation() - MathHelper.PiOver2);
+            }
+
+            forceArmMovementTimer--;
+
+            if (forceArmMovementTimer <= 0)
+            {
+                if (forceSwitchDirectionCount > 0) SetForceDirection(forceArmMovementDuration, forceArmMovementType, -forceDirection);
+                else
+                {
+                    forceDirection = 0;
+                    forceArmMovementType = ForceArmMovementType.None;
+                    forceArmMovementDuration = 0;
+                    forceArmMovementTimer = 0;
+                }
             }
         }
     }
@@ -281,7 +395,7 @@ internal class CapEffectsPlayer : ModPlayer
         else
         {
             if (jumpFlipDuration != 0) jumpFlipDuration = 0;
-            if (Player.fullRotation != 0 && !groundPounding) Player.fullRotation = 0;
+            if (Player.fullRotation != 0 && !GroundPounding) Player.fullRotation = 0;
         }
 
         if (Player.justJumped)
@@ -318,7 +432,9 @@ internal class CapEffectsPlayer : ModPlayer
 
     private void PSpeedEffect()
     {
-        if ((runTime != 0 && !Player.controlLeft && !Player.controlRight) || (ShowdownPlayer?.isPlayerInShowdownSubworld ?? false)) runTime = 0;
+        if (flightState == FlightState.Flying) return;
+
+        if ((runTime != 0 && !Player.controlLeft && !Player.controlRight) || (Player.controlLeft && Player.direction == 1) || (Player.controlRight && Player.direction == -1) || (ShowdownPlayer?.isPlayerInShowdownSubworld ?? false)) runTime = 0;
         if (Player.IsOnGroundPrecise() && (Player.controlLeft || Player.controlRight) && Math.Abs(Player.velocity.X) > 2.5f) runTime++;
 
         if (runTime >= runTimeRequiredForPSpeed)

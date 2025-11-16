@@ -11,7 +11,8 @@ using TerrariaXMario.Utilities.Extensions;
 namespace TerrariaXMario.Content.Powerups;
 internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
 {
-    internal virtual Powerup? PowerupData => null;
+    internal virtual int? PowerupType => null;
+    internal Powerup? Powerup => PowerupType == null ? null : PowerupLoader.Powerups[(int)PowerupType];
     /// <summary>
     /// A list of the caps that can consume this PowerupData.
     /// </summary>
@@ -103,13 +104,13 @@ internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
 
     public override void AI()
     {
-        if (PowerupData == null)
+        if (PowerupType == null)
         {
             Projectile.Kill();
             return;
         }
 
-        if (updateCount > TimeBeforePickable) PowerupData.UpdateWorld(Projectile, updateCount);
+        if (updateCount > TimeBeforePickable) Powerup!.UpdateWorld(Projectile, updateCount);
         updateCount++;
 
         foreach (Player player in Main.ActivePlayers)
@@ -124,9 +125,9 @@ internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
 
             Projectile.Kill();
 
-            SoundEngine.PlaySound(new(PowerupData.EquipSound) { Volume = 0.4f });
-            player.GetModPlayerOrNull<CapEffectsPlayer>()?.currentPowerup = PowerupData;
-            PowerupData.OnConsume(player);
+            SoundEngine.PlaySound(new(Powerup!.EquipSound) { Volume = 0.4f });
+            player.GetModPlayerOrNull<CapEffectsPlayer>()?.currentPowerupType = PowerupType;
+            Powerup!.OnConsume(player);
         }
     }
 

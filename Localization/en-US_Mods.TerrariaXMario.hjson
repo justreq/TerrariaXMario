@@ -56,6 +56,9 @@ Projectiles: {
 	ActionBoxJump.DisplayName: Action Box Jump
 	ActionBoxSpecial.DisplayName: Action Box Special
 	ActionRing.DisplayName: Action Ring
+	TailSwipe.DisplayName: Tail Swipe
+	HammerSuitHammer.DisplayName: Hammer Suit Hammer
+	HammerSuit.DisplayName: Hammer Suit
 }
 
 NPCs.Goomba.DisplayName: Goomba

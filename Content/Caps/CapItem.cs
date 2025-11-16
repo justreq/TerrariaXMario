@@ -80,9 +80,14 @@ internal abstract class CapItem : ModItem, ISpawnableObject
 
         CapEffectsPlayer? capEffectsPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
 
-        capEffectsPlayer?.currentCap = Name;
+        player.GetModPlayerOrNull<CapEffectsPlayer>()?.currentCap = Name;
 
         if (!capEffectsPlayer?.GroundPounding ?? false) player.spikedBoots = 1;
+    }
+
+    public override void UpdateVisibleAccessory(Player player, bool hideVisual)
+    {
+        player.GetModPlayerOrNull<CapEffectsPlayer>()?.currentCapToDraw = Name;
     }
 }
 

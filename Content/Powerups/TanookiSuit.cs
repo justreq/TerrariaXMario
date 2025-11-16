@@ -3,31 +3,24 @@ using Terraria.ModLoader;
 using TerrariaXMario.Content.Caps;
 
 namespace TerrariaXMario.Content.Powerups;
-internal class TanookiSuitData : Powerup
+internal class TanookiSuitData : SuperLeafData
 {
     public override string Name => "TanookiSuit";
-
-    internal override string EquipSound => $"{TerrariaXMario.Sounds}/PowerupEffects/TailPowerUp";
 
     internal override void UpdateWorld(Projectile projectile, int updateCount)
     {
         projectile.velocity.Y += 0.4f;
     }
 
-    internal override void UpdateConsumed(Player player)
+    internal override void OnJumpHeldDown(Player player)
     {
-
-    }
-
-    internal override bool OnLeftClick(Player player)
-    {
-        return false;
+        DoJumpHold(player, 3);
     }
 }
 
 internal class TanookiSuit : PowerupProjectile
 {
-    internal override Powerup? PowerupData => ModContent.GetInstance<TanookiSuitData>();
+    internal override int? PowerupType => ModContent.GetInstance<TanookiSuitData>().Type;
     internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
     internal override string[] Variations => ["Flying"];
 }
