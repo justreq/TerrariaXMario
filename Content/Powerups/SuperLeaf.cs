@@ -26,6 +26,13 @@ internal class SuperLeafData : Powerup
         projectile.spriteDirection = -Math.Sign(projectile.velocity.X);
     }
 
+    internal override void UpdateConsumed(Player player)
+    {
+        CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
+
+        if (modPlayer?.flightState == FlightState.None) modPlayer.currentHeadVariant = modPlayer.currentBodyVariant = modPlayer.currentLegsVariant = modPlayer.hasPSpeed ? "Flying" : null;
+    }
+
     internal override void OnRightClick(Player player)
     {
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
@@ -49,14 +56,11 @@ internal class SuperLeafData : Powerup
         switch (modPlayer.flightState)
         {
             case FlightState.None:
-                if (modPlayer.hasPSpeed)
-                {
-                    modPlayer.flightState = FlightState.Flying;
-                    modPlayer.currentHeadVariant = modPlayer.currentBodyVariant = modPlayer.currentLegsVariant = "Flying";
-                }
+                if (modPlayer.hasPSpeed) modPlayer.flightState = FlightState.Flying;
                 else if (player.velocity.Y > 0) modPlayer.flightState = FlightState.Gliding;
                 break;
             case FlightState.Gliding:
+                modPlayer.currentHeadVariant = modPlayer.currentBodyVariant = modPlayer.currentLegsVariant = "Flying";
                 if (player.velocity.Y > 0) player.velocity.Y = 1;
 
                 if (!SoundEngine.TryGetActiveSound(modPlayer.loopingSoundSlot, out var activeSound))
@@ -65,6 +69,7 @@ internal class SuperLeafData : Powerup
                 }
                 break;
             case FlightState.Flying:
+                modPlayer.currentHeadVariant = modPlayer.currentBodyVariant = modPlayer.currentLegsVariant = "Flying";
                 player.velocity.Y = -2;
 
                 if (Main.GameUpdateCount % runtimeDecayFactor == 0) modPlayer.runTime--;

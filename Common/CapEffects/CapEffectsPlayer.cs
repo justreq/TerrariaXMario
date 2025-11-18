@@ -81,6 +81,7 @@ internal class CapEffectsPlayer : ModPlayer
     internal SlotId loopingSoundSlot;
 
     private int glideLegAnimationTimer;
+    internal int? forceLegFrameY;
     private int powerupRightClickActionTimer;
 
     public override void ResetEffects()
@@ -143,28 +144,44 @@ internal class CapEffectsPlayer : ModPlayer
     {
         Player player = drawInfo.drawPlayer;
 
-        //if (flightState == FlightState.Gliding)
-        //{
-        //    glideLegAnimationTimer++;
+        if (!CanDoCapEffects || Player.mount.Active)
+        {
+            player.legPosition.Y = 0;
+            return;
+        }
 
-        //    if (glideLegAnimationTimer >= 15)
-        //    {
-        //        Main.NewText(player.legFrame.Y / 56);
-        //        player.legFrame.Y = player.legFrame.Y >= 56 * 19 ? 56 * 6 : player.legFrame.Y + 56;
-        //        glideLegAnimationTimer = 0;
-        //    }
-        //}
-        //else
-        //{
-        //    glideLegAnimationTimer = 0;
-        //}
+        if (flightState != FlightState.None && new int?[] { 10, 11, 12, 13, 17, 18, 19, 20 }.Contains(player.legFrame.Y / 56)) player.legPosition.Y = -2;
+        else player.legPosition.Y = 0;
     }
 
     public override void PreUpdate()
     {
-        if (!CanDoCapEffects || Player.mount.Active) return;
+        if (!CanDoCapEffects || Player.mount.Active)
+        {
+            glideLegAnimationTimer = 0;
+            forceLegFrameY = null;
+            return;
+        }
 
         GrabEffect();
+
+        if (flightState == FlightState.Gliding)
+        {
+            glideLegAnimationTimer++;
+
+            if (glideLegAnimationTimer >= 4)
+            {
+                forceLegFrameY ??= 7;
+                forceLegFrameY = forceLegFrameY >= 19 ? 7 : forceLegFrameY + 1;
+
+                glideLegAnimationTimer = 0;
+            }
+        }
+        else
+        {
+            forceLegFrameY = null;
+            glideLegAnimationTimer = 0;
+        }
     }
 
     public override void PostUpdateRunSpeeds()
@@ -208,7 +225,7 @@ internal class CapEffectsPlayer : ModPlayer
         GrabEffectCompositeArms();
         ObjectSpawnerBlockHitEffect();
 
-        if (currentJump is Jump.Double or Jump.Triple && !PlayerInput.Triggers.Current.Down && !Player.IsOnGroundPrecise()) Player.bodyFrame.Y = 56 * 10;
+        if (currentJump is Jump.Double or Jump.Triple && !PlayerInput.Triggers.Current.Down && !Player.IsOnGroundPrecise() && flightState == FlightState.None) Player.bodyFrame.Y = 56 * 10;
 
         if (fireFlowerCooldown > 0) fireFlowerCooldown--;
         else if (fireFlowerFireballsCast > 0) fireFlowerFireballsCast = 0;
@@ -256,17 +273,16 @@ internal class CapEffectsPlayer : ModPlayer
                 }
             }
 
-            if (PlayerInput.Triggers.Current.Jump) CurrentPowerup?.OnJumpHeldDown(Player);
+            if (PlayerInput.Triggers.Current.Jump && !Player.mount.Active) CurrentPowerup?.OnJumpHeldDown(Player);
 
             if (PlayerInput.Triggers.JustReleased.Jump)
             {
                 if (flightState != FlightState.None)
                 {
+                    if (flightState == FlightState.Gliding) loopingSoundSlot = SlotId.Invalid;
                     flightState = FlightState.None;
                     currentHeadVariant = currentBodyVariant = currentLegsVariant = null;
                 }
-
-                loopingSoundSlot = SlotId.Invalid;
             }
         }
 
@@ -435,7 +451,7 @@ internal class CapEffectsPlayer : ModPlayer
         if (flightState == FlightState.Flying) return;
 
         if ((runTime != 0 && !Player.controlLeft && !Player.controlRight) || (Player.controlLeft && Player.direction == 1) || (Player.controlRight && Player.direction == -1) || (ShowdownPlayer?.isPlayerInShowdownSubworld ?? false)) runTime = 0;
-        if (Player.IsOnGroundPrecise() && (Player.controlLeft || Player.controlRight) && Math.Abs(Player.velocity.X) > 2.5f) runTime++;
+        if (Player.IsOnGroundPrecise() && (Player.controlLeft || Player.controlRight) && Math.Abs(Player.velocity.X) > 2.5f && runTime < runTimeRequiredForPSpeed) runTime++;
 
         if (runTime >= runTimeRequiredForPSpeed)
         {

@@ -27,6 +27,6 @@ internal class HammerSuitData : Powerup
 
 internal class HammerSuit : PowerupProjectile
 {
-    internal override int? PowerupType => PowerupID.Search.GetId(typeof(HammerSuitData).FullName);
+    internal override int? PowerupType => ModContent.GetInstance<HammerSuitData>().Type;
     internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
 }

@@ -59,6 +59,8 @@ Projectiles: {
 	TailSwipe.DisplayName: Tail Swipe
 	HammerSuitHammer.DisplayName: Hammer Suit Hammer
 	HammerSuit.DisplayName: Hammer Suit
+	BoomerangFlowerBoomerang.DisplayName: Boomerang Flower Boomerang
+	BoomerangFlower.DisplayName: Boomerang Flower
 }
 
 NPCs.Goomba.DisplayName: Goomba
