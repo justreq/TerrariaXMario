@@ -16,6 +16,7 @@ internal class SuperLeafData : Powerup
     internal override string EquipSound => $"{TerrariaXMario.Sounds}/PowerupEffects/TailPowerUp";
 
     internal override bool LookTowardRightClick => false;
+    internal override bool ShowTail => true;
 
     internal override void UpdateWorld(Projectile projectile, int updateCount)
     {
@@ -30,16 +31,17 @@ internal class SuperLeafData : Powerup
     {
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
 
-        if (modPlayer?.flightState == FlightState.None) modPlayer.currentHeadVariant = modPlayer.currentBodyVariant = modPlayer.currentLegsVariant = modPlayer.hasPSpeed ? "Flying" : null;
+        if (modPlayer?.flightState == FlightState.None && !modPlayer.GroundPounding) modPlayer.currentHeadVariant = modPlayer.currentBodyVariant = modPlayer.currentLegsVariant = modPlayer.hasPSpeed ? "Flying" : null;
     }
 
     internal override void OnRightClick(Player player)
     {
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
 
+        if ((!modPlayer?.CanShowTail ?? true) || player.fullRotation != 0) return;
         modPlayer?.forceSwitchDirectionCount = 2;
-        modPlayer?.SetForceDirection(8, ForceArmMovementType.None, -player.direction);
         SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailSwipe") { Volume = 0.4f });
+        modPlayer?.SetForceDirection(10, ForceArmMovementType.None, -player.direction);
         Projectile.NewProjectile(player.GetSource_Misc("TailSwipe"), player.Center, Vector2.Zero, ModContent.ProjectileType<TailSwipe>(), 1, 7.5f, player.whoAmI);
     }
 
@@ -63,9 +65,9 @@ internal class SuperLeafData : Powerup
                 modPlayer.currentHeadVariant = modPlayer.currentBodyVariant = modPlayer.currentLegsVariant = "Flying";
                 if (player.velocity.Y > 0) player.velocity.Y = 1;
 
-                if (!SoundEngine.TryGetActiveSound(modPlayer.loopingSoundSlot, out var activeSound))
+                if (!SoundEngine.TryGetActiveSound(modPlayer.glideFlySoundSlot, out var glideSound))
                 {
-                    modPlayer.loopingSoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailGlide") { Volume = 0.4f });
+                    modPlayer.glideFlySoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailGlide") { Volume = 0.4f });
                 }
                 break;
             case FlightState.Flying:
@@ -78,6 +80,11 @@ internal class SuperLeafData : Powerup
                     modPlayer.hasPSpeed = false;
                     modPlayer.flightState = FlightState.None;
                     modPlayer.currentHeadVariant = modPlayer.currentBodyVariant = modPlayer.currentLegsVariant = null;
+                }
+
+                if (!SoundEngine.TryGetActiveSound(modPlayer.glideFlySoundSlot, out var flySound))
+                {
+                    modPlayer.glideFlySoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailFly") { Volume = 0.4f });
                 }
                 break;
         }
@@ -92,6 +99,8 @@ internal class SuperLeaf : PowerupProjectile
     internal override float SpawnUpSpeed => -5f;
     internal override float SpawnDownSpeed => 2f;
     internal override int TimeBeforePickable => 20;
+    internal override bool Legs => false;
+    internal override bool Body => false;
 
     public override void SetStaticDefaults()
     {

@@ -14,6 +14,7 @@ using TerrariaXMario.Common.GearSlots;
 using TerrariaXMario.Common.MiscEffects;
 using TerrariaXMario.Common.ShowdownSystem;
 using TerrariaXMario.Content.Blocks;
+using TerrariaXMario.Content.PowerupProjectiles;
 using TerrariaXMario.Content.Powerups;
 using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
@@ -78,11 +79,14 @@ internal class CapEffectsPlayer : ModPlayer
     internal int fireFlowerCooldown;
 
     internal FlightState flightState;
-    internal SlotId loopingSoundSlot;
+    internal SlotId glideFlySoundSlot;
+    internal SlotId pSpeedSoundSlot;
 
     private int glideLegAnimationTimer;
     internal int? forceLegFrameY;
     private int powerupRightClickActionTimer;
+
+    internal bool CanShowTail => !Main.projectile.Any(e => e.type == ModContent.ProjectileType<TailSwipe>() && e.active && e.owner == Player.whoAmI);
 
     public override void ResetEffects()
     {
@@ -135,9 +139,19 @@ internal class CapEffectsPlayer : ModPlayer
             return;
         }
 
-        Player.head = EquipLoader.GetEquipSlot(Mod, $"{CurrentPowerup?.Name}{currentCapToDraw}{currentHeadVariant ?? ""}", EquipType.Head);
-        Player.body = EquipLoader.GetEquipSlot(Mod, $"{CurrentPowerup?.Name}{currentCapToDraw}{currentBodyVariant ?? ""}", EquipType.Body);
-        Player.legs = EquipLoader.GetEquipSlot(Mod, $"{CurrentPowerup?.Name}{currentCapToDraw}{currentLegsVariant ?? ""}", EquipType.Legs);
+        int head = EquipLoader.GetEquipSlot(Mod, $"{CurrentPowerup?.Name}{currentCapToDraw}{currentHeadVariant ?? ""}", EquipType.Head);
+        Player.head = head == -1 ? EquipLoader.GetEquipSlot(Mod, $"{currentCapToDraw}{currentHeadVariant ?? ""}", EquipType.Head) : head;
+
+        int body = EquipLoader.GetEquipSlot(Mod, $"{CurrentPowerup?.Name}{currentCapToDraw}{currentBodyVariant ?? ""}", EquipType.Body);
+        Player.body = body == -1 ? EquipLoader.GetEquipSlot(Mod, $"{currentCapToDraw}{currentBodyVariant ?? ""}", EquipType.Body) : body;
+
+        int legs = EquipLoader.GetEquipSlot(Mod, $"{CurrentPowerup?.Name}{currentCapToDraw}{currentLegsVariant ?? ""}", EquipType.Legs);
+        Player.legs = legs == -1 ? EquipLoader.GetEquipSlot(Mod, $"{currentCapToDraw}{currentLegsVariant ?? ""}", EquipType.Legs) : legs;
+
+        if ((CurrentPowerup?.ShowTail ?? false) && CanShowTail)
+        {
+            Player.waist = EquipLoader.GetEquipSlot(Mod, $"{currentCapToDraw}Tail", EquipType.Waist);
+        }
     }
 
     public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo)
@@ -279,7 +293,7 @@ internal class CapEffectsPlayer : ModPlayer
             {
                 if (flightState != FlightState.None)
                 {
-                    if (flightState == FlightState.Gliding) loopingSoundSlot = SlotId.Invalid;
+                    glideFlySoundSlot = SlotId.Invalid;
                     flightState = FlightState.None;
                     currentHeadVariant = currentBodyVariant = currentLegsVariant = null;
                 }
@@ -467,8 +481,16 @@ internal class CapEffectsPlayer : ModPlayer
             }
 
             Player.accRunSpeed *= currentCap == "Luigi" ? 1.5f : 1.25f;
+            if (!SoundEngine.TryGetActiveSound(pSpeedSoundSlot, out var pSpeedSound))
+            {
+                pSpeedSoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/PSpeed") { Volume = 0.4f });
+            }
         }
-        else if (hasPSpeed) hasPSpeed = false;
+        else if (hasPSpeed)
+        {
+            hasPSpeed = false;
+            pSpeedSoundSlot = SlotId.Invalid;
+        }
     }
 
     private void GrabEffect()
@@ -579,7 +601,7 @@ internal class CapEffectsPlayer : ModPlayer
         }
         else if (objectToSpawn is ModItem item)
         {
-            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/PowerupSpawn"));
+            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/ItemSpawn") { Volume = 0.4f });
             int spawnedItem = Item.NewItem(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), entity.Position.ToWorldCoordinates() + new Vector2(8, 24 * (spawnFromBottom ? 1 : -1)), new Item(item.Type), noGrabDelay: true);
             Main.item[spawnedItem].noGrabDelay = 15;
             SpawnedItem? globalItem = Main.item[spawnedItem].GetGlobalItemOrNull<SpawnedItem>();
@@ -588,7 +610,7 @@ internal class CapEffectsPlayer : ModPlayer
         }
         else if (objectToSpawn is DefaultSpawnableObject)
         {
-            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/Coin") { Volume = 3f });
+            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/Coin") { Volume = 4f });
             int spawnedItem = Item.NewItem(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), entity.Position.ToWorldCoordinates() + new Vector2(8, 24 * (spawnFromBottom ? 1 : -1)), new Item(ItemID.GoldCoin), noGrabDelay: true);
             Main.item[spawnedItem].noGrabDelay = 15;
             SpawnedItem? globalItem = Main.item[spawnedItem].GetGlobalItemOrNull<SpawnedItem>();

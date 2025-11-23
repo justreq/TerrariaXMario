@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
 using System.Linq;
 using Terraria;
 using Terraria.ModLoader;
@@ -24,7 +23,9 @@ internal class BoomerangFlowerData : Powerup
     internal override void OnRightClick(Player player)
     {
         if (Main.projectile.Any(e => e.type == ModContent.ProjectileType<BoomerangFlowerBoomerang>() && e.active && e.owner == player.whoAmI)) return;
-        Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, new Vector2(Math.Sign(Main.MouseWorld.X - player.Center.X) * 6, 0), ModContent.ProjectileType<BoomerangFlowerBoomerang>(), 1, 0f, player.whoAmI);
+        Vector2 velocity = Main.MouseWorld - player.Center;
+        velocity.Normalize();
+        Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, velocity * 6, ModContent.ProjectileType<BoomerangFlowerBoomerang>(), 1, 0f, player.whoAmI);
     }
 }
 

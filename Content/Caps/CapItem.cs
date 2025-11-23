@@ -46,6 +46,9 @@ internal abstract class CapItem : ModItem, ISpawnableObject
 
         LoadEquipTextures();
         LoadEquipTextures("GroundPound", false, false);
+        LoadEquipTextures("Flying", false);
+
+        EquipLoader.AddEquipTexture(Mod, $"{Texture}Tail_{EquipType.Waist}", EquipType.Waist, this, $"{Name}Tail");
     }
 
     public override void SetStaticDefaults()
@@ -54,6 +57,7 @@ internal abstract class CapItem : ModItem, ISpawnableObject
 
         SetupEquipTextures();
         SetupEquipTextures("GroundPound", false, false);
+        SetupEquipTextures("Flying", false);
     }
 
     public override void SetDefaults()

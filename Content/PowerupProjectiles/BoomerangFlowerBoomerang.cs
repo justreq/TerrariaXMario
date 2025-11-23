@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -15,6 +16,7 @@ public class BoomerangFlowerBoomerang : ModProjectile
     private State state = State.Travelling;
 
     private int stateTimer = 30;
+    private SpriteEffects effect;
     public override void SetStaticDefaults()
     {
         Main.projFrames[Projectile.type] = 8;
@@ -35,6 +37,12 @@ public class BoomerangFlowerBoomerang : ModProjectile
         {
             Projectile.frameCounter = 0;
             Projectile.frame = ++Projectile.frame % Main.projFrames[Projectile.type];
+        }
+
+        if (Projectile.velocity != Vector2.Zero)
+        {
+            Projectile.rotation = (float)Math.Atan2(Projectile.velocity.Y, Projectile.velocity.X);
+            effect = Projectile.velocity.X < 0 ? SpriteEffects.FlipVertically : SpriteEffects.None;
         }
 
         switch (state)
@@ -68,9 +76,10 @@ public class BoomerangFlowerBoomerang : ModProjectile
         destinationRect.X -= (int)Main.screenPosition.X;
         destinationRect.Y -= (int)Main.screenPosition.Y;
         Rectangle sourceRect = new(0, Projectile.frame * Projectile.height + Projectile.frame * 2, Projectile.width, Projectile.height);
-        Main.EntitySpriteDraw(new(texture.Value, destinationRect, sourceRect, modPlayer == null ? lightColor : lightColor.MultiplyRGB(TerrariaXMario.capColors[modPlayer.currentCap!])));
+
+        Main.EntitySpriteDraw(new(texture.Value, destinationRect, sourceRect, modPlayer == null ? lightColor : lightColor.MultiplyRGB(TerrariaXMario.capColors[modPlayer.currentCap!]), Projectile.rotation, Projectile.Size * 0.5f, effect));
         sourceRect.X += Projectile.width + 2;
-        Main.EntitySpriteDraw(new(texture.Value, destinationRect, sourceRect, lightColor));
+        Main.EntitySpriteDraw(new(texture.Value, destinationRect, sourceRect, lightColor, Projectile.rotation, Projectile.Size * 0.5f, effect));
         return false;
     }
 

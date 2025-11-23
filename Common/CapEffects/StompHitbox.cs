@@ -57,9 +57,8 @@ internal class StompHitbox : ModProjectile
             groundPoundCooldown = 0;
         }
 
-        if (groundPound) groundPoundCooldown++;
-
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
+        modPlayer?.GroundPounding = groundPound;
 
         if (groundPound)
         {
@@ -91,9 +90,9 @@ internal class StompHitbox : ModProjectile
                     modPlayer?.SpawnObjectFromBlock(point, true);
                 }
             }
-        }
 
-        modPlayer?.GroundPounding = groundPound;
+            groundPoundCooldown++;
+        }
     }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)

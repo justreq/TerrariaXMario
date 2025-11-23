@@ -1,32 +1,69 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using System;
-using System.Collections.Generic;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.ModLoader;
+using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Common.MiscEffects;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.PowerupProjectiles;
 internal class TailSwipe : ModProjectile
 {
+    public override void SetStaticDefaults()
+    {
+        Main.projFrames[Type] = 10;
+    }
     public override void SetDefaults()
     {
-        Projectile.width = (int)(Main.player[Projectile.owner].width * 1.5f);
-        Projectile.height = (int)(Main.player[Projectile.owner].height * 0.75f);
+        Projectile.width = 50;
+        Projectile.height = 36;
         Projectile.friendly = true;
-        Projectile.timeLeft = 16;
+        Projectile.timeLeft = 20;
         Projectile.penetrate = -1;
-        Projectile.hide = true;
+    }
+
+    public override bool PreDraw(ref Color lightColor)
+    {
+        Asset<Texture2D> texture = ModContent.Request<Texture2D>(Texture + Main.player[Projectile.owner].GetModPlayerOrNull<CapEffectsPlayer>()?.currentCap);
+        Rectangle destinationRect = Projectile.getRect();
+        destinationRect.X -= (int)((int)Main.screenPosition.X - Projectile.width * 0.5f);
+        destinationRect.Y -= (int)((int)Main.screenPosition.Y - Projectile.height * 0.5f);
+        Main.EntitySpriteDraw(new(texture.Value, destinationRect, new(0, Projectile.frame * Projectile.height, Projectile.width, Projectile.height), lightColor, Projectile.rotation, Projectile.Size * 0.5f, Projectile.spriteDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally));
+        return false;
     }
 
     public override bool OnTileCollide(Vector2 oldVelocity) => false;
+
+    public override void OnSpawn(IEntitySource source)
+    {
+        Projectile.spriteDirection = Main.player[Projectile.owner].direction;
+    }
 
     public override void AI()
     {
         Player player = Main.player[Projectile.owner];
 
-        Projectile.Center = player.Center + new Vector2(player.width * 1.25f * -player.direction, player.height * 0.15f);
-        Projectile.spriteDirection = player.direction;
+        if (++Projectile.frameCounter >= 2)
+        {
+            Projectile.frameCounter = 0;
+            Projectile.frame = ++Projectile.frame % Main.projFrames[Projectile.type];
+        }
+
+        Vector2 offset = new(0, 10);
+
+        if (Projectile.spriteDirection == 1)
+        {
+            if (Projectile.frame < 5) Projectile.Right = player.Center + offset;
+            else Projectile.Left = player.Center + offset;
+        }
+        else
+        {
+            if (Projectile.frame < 5) Projectile.Left = player.Center + offset;
+            else Projectile.Right = player.Center + offset;
+        }
     }
 
     public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
@@ -40,10 +77,5 @@ internal class TailSwipe : ModProjectile
         IceBlockNPC? iceBlockNPC = target.GetGlobalNPCOrNull<IceBlockNPC>();
 
         if (iceBlockNPC?.frozen ?? false) iceBlockNPC.KillIceBlock(target);
-    }
-
-    public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
-    {
-        overPlayers.Add(index);
     }
 }

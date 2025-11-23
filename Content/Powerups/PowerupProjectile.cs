@@ -24,6 +24,9 @@ internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
     internal virtual float SpawnUpSpeed => -0.75f;
     internal virtual float SpawnDownSpeed => 0.75f;
     internal virtual int TimeBeforePickable => 45;
+    internal virtual bool Head => true;
+    internal virtual bool Body => true;
+    internal virtual bool Legs => true;
 
     private int updateCount;
 
@@ -65,12 +68,12 @@ internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
         {
             string cap = Caps[i];
 
-            LoadEquipTextures(cap);
-            LoadEquipTextures(cap, "GroundPound", false, false);
+            LoadEquipTextures(cap, head: Head, body: Body, legs: Legs);
+            if (Legs) LoadEquipTextures(cap, "GroundPound", false, false);
 
             for (int j = 0; j < Variations.Length; j++)
             {
-                LoadEquipTextures(cap, Variations[j]);
+                LoadEquipTextures(cap, Variations[j], head: Head, body: Body, legs: Legs);
             }
         }
     }
@@ -84,11 +87,11 @@ internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
             string cap = Caps[i];
 
             SetupEquipTextures(cap);
-            SetupEquipTextures(cap, "GroundPound", false, false);
+            if (Legs) SetupEquipTextures(cap, "GroundPound", false, false);
 
             for (int j = 0; j < Variations.Length; j++)
             {
-                SetupEquipTextures(cap, Variations[j]);
+                SetupEquipTextures(cap, Variations[j], head: Head, body: Body, legs: Legs);
             }
         }
     }

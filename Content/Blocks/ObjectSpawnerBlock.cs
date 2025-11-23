@@ -87,6 +87,7 @@ internal class ObjectSpawnerBlockTile : ModTile
         TileObjectData.newTile.AnchorBottom = new AnchorData(AnchorType.None, 0, 0);
         TileObjectData.newTile.HookPostPlaceMyPlayer = ModContent.GetInstance<ObjectSpawnerBlockEntity>().Generic_HookPostPlaceMyPlayer;
         TileObjectData.addTile(Type);
+        TileID.Sets.DrawsWalls[Type] = true;
         AddMapEntry(MapColor);
     }
 
