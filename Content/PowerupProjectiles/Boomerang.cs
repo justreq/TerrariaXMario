@@ -1,22 +1,27 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using ReLogic.Utilities;
 using System;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.PowerupProjectiles;
-public class BoomerangFlowerBoomerang : ModProjectile
+internal class Boomerang : InteractiveWithObjectSpawnerTileProjectile
 {
     private enum State { Travelling, Waiting, Returning }
 
     private State state = State.Travelling;
+    private int stateTimer = 20;
 
-    private int stateTimer = 30;
+    private SlotId spinSoundSlot;
     private SpriteEffects effect;
+
+    internal override float TileCheckExtent => 0.1f;
     public override void SetStaticDefaults()
     {
         Main.projFrames[Projectile.type] = 8;
@@ -24,7 +29,7 @@ public class BoomerangFlowerBoomerang : ModProjectile
 
     public override void SetDefaults()
     {
-        Projectile.width = 32;
+        Projectile.width = 20;
         Projectile.height = 20;
         Projectile.friendly = true;
         Projectile.penetrate = 1;
@@ -43,6 +48,11 @@ public class BoomerangFlowerBoomerang : ModProjectile
         {
             Projectile.rotation = (float)Math.Atan2(Projectile.velocity.Y, Projectile.velocity.X);
             effect = Projectile.velocity.X < 0 ? SpriteEffects.FlipVertically : SpriteEffects.None;
+        }
+
+        if (!SoundEngine.TryGetActiveSound(spinSoundSlot, out var spinSound))
+        {
+            spinSoundSlot = SoundEngine.PlaySound(new($"{GetType().FullName!.Replace(".", "/")}Spin") { Volume = 0.4f });
         }
 
         switch (state)
@@ -72,14 +82,21 @@ public class BoomerangFlowerBoomerang : ModProjectile
     {
         Asset<Texture2D> texture = ModContent.Request<Texture2D>(Texture);
         CapEffectsPlayer? modPlayer = Main.player[Projectile.owner].GetModPlayerOrNull<CapEffectsPlayer>();
-        Rectangle destinationRect = Projectile.getRect();
-        destinationRect.X -= (int)Main.screenPosition.X;
-        destinationRect.Y -= (int)Main.screenPosition.Y;
-        Rectangle sourceRect = new(0, Projectile.frame * Projectile.height + Projectile.frame * 2, Projectile.width, Projectile.height);
+        Vector2 position = Projectile.Center - Main.screenPosition;
+        Rectangle sourceRect = new(0, Projectile.frame * 20, 34, 20);
+        Vector2 origin = new(17, 10);
 
-        Main.EntitySpriteDraw(new(texture.Value, destinationRect, sourceRect, modPlayer == null ? lightColor : lightColor.MultiplyRGB(TerrariaXMario.capColors[modPlayer.currentCap!]), Projectile.rotation, Projectile.Size * 0.5f, effect));
-        sourceRect.X += Projectile.width + 2;
-        Main.EntitySpriteDraw(new(texture.Value, destinationRect, sourceRect, lightColor, Projectile.rotation, Projectile.Size * 0.5f, effect));
+        Main.EntitySpriteDraw(new(texture.Value, position, sourceRect, modPlayer == null ? lightColor : lightColor.MultiplyRGB(TerrariaXMario.capColors[modPlayer.currentCap!]), Projectile.rotation, origin, Projectile.scale, effect));
+        sourceRect.X += 34;
+        Main.EntitySpriteDraw(new(texture.Value, position, sourceRect, lightColor, Projectile.rotation, origin, Projectile.scale, effect));
+        return false;
+    }
+
+    public override bool OnTileCollide(Vector2 oldVelocity)
+    {
+        if (state == State.Returning) return true;
+
+        state = State.Returning;
         return false;
     }
 

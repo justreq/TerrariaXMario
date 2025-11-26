@@ -4,6 +4,8 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.MiscEffects;
+using TerrariaXMario.Content.PowerupProjectiles;
+using TerrariaXMario.Content.Powerups;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.CapEffects;
@@ -18,6 +20,8 @@ internal class StompHitbox : ModProjectile
 
     private void Stomp(Player player)
     {
+        if (player.GetModPlayerOrNull<CapEffectsPlayer>()?.statueForm ?? false) return;
+
         player.velocity.Y = player.controlJump ? -8.5f : -5;
 
         stompCooldown = 5;
@@ -58,7 +62,8 @@ internal class StompHitbox : ModProjectile
         }
 
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
-        modPlayer?.GroundPounding = groundPound;
+        if (modPlayer == null) return;
+        modPlayer.GroundPounding = groundPound;
 
         if (groundPound)
         {
@@ -67,27 +72,30 @@ internal class StompHitbox : ModProjectile
             player.legFrame.Y = Math.Clamp(groundPoundCooldown / 8, 0, 3) * 56;
             player.itemTime = 0;
             player.itemAnimation = 0;
-            modPlayer?.currentJump = Jump.None;
-            modPlayer?.flightState = FlightState.None;
-            modPlayer?.runTime = 0;
-            modPlayer?.hasPSpeed = false;
+            modPlayer.currentJump = Jump.None;
+            modPlayer.flightState = FlightState.None;
+            modPlayer.runTime = 0;
+            modPlayer.hasPSpeed = false;
 
             if (groundPoundCooldown <= 20)
             {
                 player.fullRotationOrigin = new Vector2(player.Size.X * 0.5f, player.Size.Y * 0.75f);
                 player.velocity = new(0, 0.1f);
 
-                if (groundPoundCooldown <= 5) player.fullRotation = player.direction * (groundPoundCooldown * MathHelper.Pi * 0.2f);
-                else if (groundPoundCooldown <= 15) player.fullRotation = player.direction * (MathHelper.Pi + (groundPoundCooldown - 5) * MathHelper.Pi * 0.1f);
+                if (modPlayer.CurrentPowerup is not TanookiSuitData)
+                {
+                    if (groundPoundCooldown <= 5) player.fullRotation = player.direction * (groundPoundCooldown * MathHelper.Pi * 0.2f);
+                    else if (groundPoundCooldown <= 15) player.fullRotation = player.direction * (MathHelper.Pi + (groundPoundCooldown - 5) * MathHelper.Pi * 0.1f);
+                }
             }
             else if (player.controlDown)
             {
                 player.maxFallSpeed = 50f;
                 player.velocity.Y = player.maxFallSpeed;
 
-                foreach (Point point in modPlayer?.HitObjectSpawnerBlocks(1, true) ?? [])
+                foreach (Point point in modPlayer.HitObjectSpawnerBlocks(1, true) ?? [])
                 {
-                    modPlayer?.SpawnObjectFromBlock(point, true);
+                    modPlayer.SpawnObjectFromBlock(point, true, true);
                 }
             }
 

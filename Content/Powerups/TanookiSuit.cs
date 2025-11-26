@@ -1,6 +1,8 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
+using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Content.Caps;
+using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Powerups;
 internal class TanookiSuitData : SuperLeafData

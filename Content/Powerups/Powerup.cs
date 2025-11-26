@@ -23,6 +23,7 @@ internal abstract class Powerup : ModType
     internal virtual bool LookTowardRightClick => true;
     internal virtual int RightClickActionCooldown => 5;
     internal virtual bool ShowTail => false;
+    internal virtual bool ShowCape => false;
 
     /// <summary>
     /// The behavior of this PowerupData when it exists in the world, e.g. movement behavior. Similar in concept to ModItem.Update.

@@ -13,6 +13,7 @@ using Terraria.ModLoader.IO;
 using TerrariaXMario.Common.GearSlots;
 using TerrariaXMario.Common.MiscEffects;
 using TerrariaXMario.Common.ShowdownSystem;
+using TerrariaXMario.Common.StatueForm;
 using TerrariaXMario.Content.Blocks;
 using TerrariaXMario.Content.PowerupProjectiles;
 using TerrariaXMario.Content.Powerups;
@@ -87,6 +88,11 @@ internal class CapEffectsPlayer : ModPlayer
     private int powerupRightClickActionTimer;
 
     internal bool CanShowTail => !Main.projectile.Any(e => e.type == ModContent.ProjectileType<TailSwipe>() && e.active && e.owner == Player.whoAmI);
+    internal bool CanShowCape => !Main.projectile.Any(e => e.type == ModContent.ProjectileType<CapeSpin>() && e.active && e.owner == Player.whoAmI);
+
+    internal bool statueForm;
+    private int statueFormCooldown;
+    private int directionWhenTurnedToStatue = 1;
 
     public override void ResetEffects()
     {
@@ -135,12 +141,17 @@ internal class CapEffectsPlayer : ModPlayer
     {
         if (!CanDoCapEffects && !Main.gameMenu)
         {
+            currentHeadVariant = currentBodyVariant = currentLegsVariant = null;
             if (currentPowerupType != null) currentPowerupType = null;
             return;
         }
 
-        int head = EquipLoader.GetEquipSlot(Mod, $"{CurrentPowerup?.Name}{currentCapToDraw}{currentHeadVariant ?? ""}", EquipType.Head);
+        if (statueForm) currentHeadVariant = "Statue";
+
+        int head = EquipLoader.GetEquipSlot(Mod, $"{(statueForm ? "" : CurrentPowerup?.Name)}{currentCapToDraw}{currentHeadVariant ?? ""}", EquipType.Head);
         Player.head = head == -1 ? EquipLoader.GetEquipSlot(Mod, $"{currentCapToDraw}{currentHeadVariant ?? ""}", EquipType.Head) : head;
+
+        if (statueForm) return;
 
         int body = EquipLoader.GetEquipSlot(Mod, $"{CurrentPowerup?.Name}{currentCapToDraw}{currentBodyVariant ?? ""}", EquipType.Body);
         Player.body = body == -1 ? EquipLoader.GetEquipSlot(Mod, $"{currentCapToDraw}{currentBodyVariant ?? ""}", EquipType.Body) : body;
@@ -150,7 +161,7 @@ internal class CapEffectsPlayer : ModPlayer
 
         if ((CurrentPowerup?.ShowTail ?? false) && CanShowTail)
         {
-            Player.waist = EquipLoader.GetEquipSlot(Mod, $"{currentCapToDraw}Tail", EquipType.Waist);
+            Player.waist = EquipLoader.GetEquipSlot(Mod, $"{currentCapToDraw}Tail{(flightState == FlightState.Flying ? "Flying" : "")}", EquipType.Waist);
         }
     }
 
@@ -158,14 +169,9 @@ internal class CapEffectsPlayer : ModPlayer
     {
         Player player = drawInfo.drawPlayer;
 
-        if (!CanDoCapEffects || Player.mount.Active)
-        {
-            player.legPosition.Y = 0;
-            return;
-        }
+        if (!CanDoCapEffects || Player.mount.Active) return;
 
-        if (flightState != FlightState.None && new int?[] { 10, 11, 12, 13, 17, 18, 19, 20 }.Contains(player.legFrame.Y / 56)) player.legPosition.Y = -2;
-        else player.legPosition.Y = 0;
+        if (flightState != FlightState.None && !Player.IsOnGroundPrecise() && new int?[] { 10, 11, 12, 13, 17, 18, 19, 20 }.Contains(player.legFrame.Y / 56)) player.legPosition.Y = -2;
     }
 
     public override void PreUpdate()
@@ -196,6 +202,9 @@ internal class CapEffectsPlayer : ModPlayer
             forceLegFrameY = null;
             glideLegAnimationTimer = 0;
         }
+
+
+        if (statueForm) Player.fullRotation = 0;
     }
 
     public override void PostUpdateRunSpeeds()
@@ -230,6 +239,7 @@ internal class CapEffectsPlayer : ModPlayer
             KillStompHitbox();
             runTime = 0;
             hasPSpeed = false;
+            statueForm = false;
 
             return;
         }
@@ -251,6 +261,14 @@ internal class CapEffectsPlayer : ModPlayer
         }
 
         if (powerupRightClickActionTimer > 0) powerupRightClickActionTimer--;
+
+        if (statueFormCooldown > 0) statueFormCooldown--;
+        else if (statueForm && !Player.controlDown)
+        {
+            statueForm = false;
+            Player.direction = directionWhenTurnedToStatue;
+            SpawnStatueSparkle();
+        }
     }
 
     public override void ProcessTriggers(TriggersSet triggersSet)
@@ -273,7 +291,7 @@ internal class CapEffectsPlayer : ModPlayer
 
         if (CurrentPowerup != null && grabbedNPCIndex == null && (!ShowdownPlayer?.isPlayerInShowdownSubworld ?? true))
         {
-            if (PlayerInput.Triggers.JustPressed.MouseRight && !Player.mouseInterface)
+            if (PlayerInput.Triggers.JustPressed.MouseRight && !Player.mouseInterface && Main.mouseItem.IsAir && !statueForm)
             {
                 if (CurrentPowerup.LookTowardRightClick)
                 {
@@ -302,17 +320,65 @@ internal class CapEffectsPlayer : ModPlayer
 
         if (PlayerInput.Triggers.JustPressed.Down && stompHitbox != null && (!ShowdownPlayer?.isPlayerInShowdownSubworld ?? true))
         {
-            StompHitbox proj = (StompHitbox)Main.projectile[(int)stompHitbox].ModProjectile;
+            StompHitbox stompHitboxProjectile = (StompHitbox)Main.projectile[(int)stompHitbox].ModProjectile;
 
-            if (!proj.groundPound)
+            if (!stompHitboxProjectile.groundPound)
             {
                 SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPoundStart") { Volume = 0.4f });
                 Player.fullRotation = 0;
-                proj.groundPound = true;
+                stompHitboxProjectile.groundPound = true;
+            }
+
+            if (CurrentPowerup is TanookiSuitData && !statueForm)
+            {
+                foreach (Projectile projectile in Main.ActiveProjectiles)
+                {
+                    if (projectile.owner == Player.whoAmI && projectile.type == ModContent.ProjectileType<TailSwipe>()) projectile.Kill();
+                }
+
+                SpawnStatueSparkle();
+                directionWhenTurnedToStatue = Player.direction;
+                Player.direction = 1;
+                statueForm = true;
+                statueFormCooldown = 15;
             }
         }
 
         if (Player.wet && PlayerInput.Triggers.JustPressed.Jump) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(Player.wet ? "Swim" : "Jump")}") { Volume = 0.4f });
+    }
+
+    public override void SetControls()
+    {
+        if (!CanDoCapEffects) return;
+
+        if (statueForm)
+        {
+            Player.controlLeft = false;
+            Player.controlMap = false;
+            Player.controlMount = false;
+            Player.controlQuickHeal = false;
+            Player.controlQuickMana = false;
+            Player.controlRight = false;
+            Player.controlUp = false;
+            Player.controlUseItem = false;
+            Player.controlJump = false;
+        }
+    }
+
+    public override void HideDrawLayers(PlayerDrawSet drawInfo)
+    {
+        if (!CanDoCapEffects) return;
+
+        if (statueForm)
+        {
+            foreach (PlayerDrawLayer layer in PlayerDrawLayerLoader.Layers)
+            {
+                if (layer != PlayerDrawLayers.Head && layer is not StatueDrawLayer)
+                {
+                    layer.Hide();
+                }
+            }
+        }
     }
 
     internal void SetForceDirection(int duration, ForceArmMovementType type, int direction)
@@ -464,7 +530,7 @@ internal class CapEffectsPlayer : ModPlayer
     {
         if (flightState == FlightState.Flying) return;
 
-        if ((runTime != 0 && !Player.controlLeft && !Player.controlRight) || (Player.controlLeft && Player.direction == 1) || (Player.controlRight && Player.direction == -1) || (ShowdownPlayer?.isPlayerInShowdownSubworld ?? false)) runTime = 0;
+        if ((runTime != 0 && !Player.controlLeft && !Player.controlRight) || (ShowdownPlayer?.isPlayerInShowdownSubworld ?? false)) runTime = 0;
         if (Player.IsOnGroundPrecise() && (Player.controlLeft || Player.controlRight) && Math.Abs(Player.velocity.X) > 2.5f && runTime < runTimeRequiredForPSpeed) runTime++;
 
         if (runTime >= runTimeRequiredForPSpeed)
@@ -483,7 +549,7 @@ internal class CapEffectsPlayer : ModPlayer
             Player.accRunSpeed *= currentCap == "Luigi" ? 1.5f : 1.25f;
             if (!SoundEngine.TryGetActiveSound(pSpeedSoundSlot, out var pSpeedSound))
             {
-                pSpeedSoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/PSpeed") { Volume = 0.4f });
+                pSpeedSoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/PSpeed") { Volume = 0.2f });
             }
         }
         else if (hasPSpeed)
@@ -542,7 +608,7 @@ internal class CapEffectsPlayer : ModPlayer
 
         foreach (Point point in HitObjectSpawnerBlocks(1))
         {
-            SpawnObjectFromBlock(point);
+            SpawnObjectFromBlock(point, bufferPlayer: true);
         }
     }
 
@@ -577,7 +643,7 @@ internal class CapEffectsPlayer : ModPlayer
         return HitObjectSpawnerBlocks(checkBottom ? Player.BottomLeft.X : Player.TopLeft.X, checkBottom ? Player.BottomLeft.Y + yOffset : Player.TopLeft.Y - yOffset, Player.width);
     }
 
-    internal void SpawnObjectFromBlock(Point? point, bool spawnFromBottom = false)
+    internal void SpawnObjectFromBlock(Point? point, bool spawnFromBottom = false, bool bufferPlayer = false)
     {
         if (point == null) return;
 
@@ -621,6 +687,11 @@ internal class CapEffectsPlayer : ModPlayer
         entity?.spawnContents = [.. entity.spawnContents.Skip(1).ToArray()];
         entity?.justStruck = true;
         if (entity?.spawnContents.Length == 0) entity.wasPreviouslyStruck = true;
-        Player.velocity.Y = 1;
+        if (bufferPlayer) Player.velocity.Y = 1;
+    }
+
+    private void SpawnStatueSparkle()
+    {
+        Projectile.NewProjectile(Player.GetSource_Misc("Statue"), Player.Center, Vector2.Zero, ModContent.ProjectileType<StatueSparkle>(), 0, 0, Player.whoAmI);
     }
 }

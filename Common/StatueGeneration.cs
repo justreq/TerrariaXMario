@@ -1,0 +1,39 @@
+﻿using System;
+using Terraria;
+using Terraria.DataStructures;
+using Terraria.ModLoader;
+using Terraria.WorldBuilding;
+using TerrariaXMario.Content.Furniture;
+
+namespace TerrariaXMario.Common;
+internal class StatueGeneration : ModSystem
+{
+    public override void Load()
+    {
+        On_WorldGen.SetupStatueList += On_WorldGen_SetupStatueList;
+    }
+
+    private void On_WorldGen_SetupStatueList(On_WorldGen.orig_SetupStatueList orig)
+    {
+        orig();
+
+        int startIndex = GenVars.statueList.Length;
+
+        (int type, bool shouldBeWired, ushort placeStyle)[] statueTypesToAdd = [
+            (ModContent.TileType<MarioStatueTile>(), true, 0),
+            (ModContent.TileType<LuigiStatueTile>(), true, 0),
+            ];
+
+        Array.Resize(ref GenVars.statueList, GenVars.statueList.Length + statueTypesToAdd.Length);
+
+        for (int i = 0; i < statueTypesToAdd.Length; i++)
+        {
+            int arrayIndex = startIndex + i;
+            (int statueType, bool shouldBeWired, ushort placeStyle) = statueTypesToAdd[i];
+
+            GenVars.statueList[arrayIndex] = new Point16(statueType, placeStyle);
+
+            if (shouldBeWired) GenVars.StatuesWithTraps.Add(arrayIndex);
+        }
+    }
+}

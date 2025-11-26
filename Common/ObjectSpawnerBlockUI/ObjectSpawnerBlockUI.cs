@@ -69,7 +69,7 @@ internal class ObjectSpawnerBlockUI : UIState
             e.BackgroundColor = new Color(43, 62, 131) * 0.85f;
         }));
 
-        HowToUseText = FinalListContainer.AddElement(new UIText(Language.GetTextValue($"Mods.{nameof(TerrariaXMario)}.UI.ObjectSpawnerBlock.HowTo")).With(e =>
+        HowToUseText = FinalListContainer.AddElement(new UIText(Language.GetText($"Mods.{nameof(TerrariaXMario)}.UI.ObjectSpawnerBlock.HowTo")).With(e =>
         {
             e.Width = StyleDimension.FromPixelsAndPercent(-16, 1);
             e.HAlign = 0.5f;
@@ -93,13 +93,13 @@ internal class ObjectSpawnerBlockUI : UIState
             FinalList.SetScrollbar(e);
         });
 
-        Container.AddElement(new UIHoverImageButton(ModContent.Request<Texture2D>($"{GetType().Namespace!.Replace(".", "/")}/ButtonExit", ReLogic.Content.AssetRequestMode.ImmediateLoad), Language.GetTextValue($"Mods.{nameof(TerrariaXMario)}.UI.ObjectSpawnerBlock.Exit")).With(e =>
+        Container.AddElement(new UIHoverImageButton(ModContent.Request<Texture2D>($"{GetType().Namespace!.Replace(".", "/")}/ButtonExit", ReLogic.Content.AssetRequestMode.ImmediateLoad), Language.GetText($"Mods.{nameof(TerrariaXMario)}.UI.ObjectSpawnerBlock.Exit")).With(e =>
         {
             e.VAlign = 1;
             e.OnLeftClick += Exit;
         }));
 
-        Container.AddElement(new UIHoverImageButton(ModContent.Request<Texture2D>($"{GetType().Namespace!.Replace(".", "/")}/ButtonSubmit", ReLogic.Content.AssetRequestMode.ImmediateLoad), Language.GetTextValue($"Mods.{nameof(TerrariaXMario)}.UI.ObjectSpawnerBlock.Save")).With(e =>
+        Container.AddElement(new UIHoverImageButton(ModContent.Request<Texture2D>($"{GetType().Namespace!.Replace(".", "/")}/ButtonSubmit", ReLogic.Content.AssetRequestMode.ImmediateLoad), Language.GetText($"Mods.{nameof(TerrariaXMario)}.UI.ObjectSpawnerBlock.Save")).With(e =>
         {
             e.HAlign = 1;
             e.VAlign = 1;

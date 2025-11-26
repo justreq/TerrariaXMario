@@ -46,7 +46,7 @@ internal class TerrariaXMario : Mod
         TextureAssets.Cursors = [.. TextureAssets.Cursors, ModContent.Request<Texture2D>($"{Textures}/CursorEdit")];
         CursorEditIndex = TextureAssets.Cursors.Length - 1;
 
-        spawnableObjects = [.. ModContent.GetContent<ISpawnableObject>().Where(e => e is not DefaultSpawnableObject).OrderBy(x => x.GetType().Name)];
+        spawnableObjects = [.. ModContent.GetContent<ISpawnableObject>().Where(e => e is not DefaultSpawnableObject).OrderBy(x => x.GetType().BaseType?.Name)];
     }
 
     public override void Unload()

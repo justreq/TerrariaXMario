@@ -40,6 +40,16 @@ Items: {
 		DisplayName: Hammer
 		Tooltip: Useful on certain special blocks
 	}
+
+	LuigiStatue: {
+		DisplayName: Luigi Statue
+		Tooltip: "'Some say there are voices trapped within these stones'"
+	}
+
+	MarioStatue: {
+		DisplayName: Mario Statue
+		Tooltip: "'Some say there are voices trapped within these stones'"
+	}
 }
 
 Projectiles: {
@@ -61,6 +71,10 @@ Projectiles: {
 	HammerSuit.DisplayName: Hammer Suit
 	BoomerangFlowerBoomerang.DisplayName: Boomerang Flower Boomerang
 	BoomerangFlower.DisplayName: Boomerang Flower
+	Boomerang.DisplayName: Boomerang
+	StatueSparkle.DisplayName: Statue Sparkle
+	CapeSpin.DisplayName: Cape Spin
+	CapeFeather.DisplayName: Cape Feather
 }
 
 NPCs.Goomba.DisplayName: Goomba

@@ -5,6 +5,7 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.UI;
 using TerrariaXMario.Core;
@@ -132,13 +133,6 @@ internal class FinalListItem : UIPanel
         }
 
         base.DrawChildren(spriteBatch);
-    }
-
-    public override void Draw(SpriteBatch spriteBatch)
-    {
-        base.Draw(spriteBatch);
-
-        if (IsMouseHovering) Main.hoverItemName = objectType.Name;
     }
 
     private void SwitchPosition(FinalListItem? otherItem)

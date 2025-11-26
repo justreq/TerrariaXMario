@@ -10,7 +10,7 @@ using TerrariaXMario.Common.MiscEffects;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.PowerupProjectiles;
-internal class TailSwipe : InteractiveWithObjectSpawnerTileProjectile
+internal class CapeSpin : InteractiveWithObjectSpawnerTileProjectile
 {
     public override void SetStaticDefaults()
     {

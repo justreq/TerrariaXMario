@@ -46,9 +46,11 @@ internal abstract class CapItem : ModItem, ISpawnableObject
 
         LoadEquipTextures();
         LoadEquipTextures("GroundPound", false, false);
-        LoadEquipTextures("Flying", false);
+        LoadEquipTextures("Flying");
+        LoadEquipTextures("Statue", body: false, legs: false);
 
         EquipLoader.AddEquipTexture(Mod, $"{Texture}Tail_{EquipType.Waist}", EquipType.Waist, this, $"{Name}Tail");
+        EquipLoader.AddEquipTexture(Mod, $"{Texture}TailFlying_{EquipType.Waist}", EquipType.Waist, this, $"{Name}TailFlying");
     }
 
     public override void SetStaticDefaults()
