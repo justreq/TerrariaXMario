@@ -100,6 +100,7 @@ internal class SuperLeaf : PowerupProjectile
     internal override int TimeBeforePickable => 20;
     internal override bool Legs => false;
     internal override bool Body => false;
+    internal override string[] Variations => ["Flying"];
 
     public override void SetStaticDefaults()
     {

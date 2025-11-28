@@ -21,8 +21,8 @@ internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
     /// A list of texture variations this PowerupData should use
     /// </summary>
     internal virtual string[] Variations => [];
-    internal virtual float SpawnUpSpeed => -0.75f;
-    internal virtual float SpawnDownSpeed => 0.75f;
+    internal virtual float SpawnUpSpeed => -0.61f;
+    internal virtual float SpawnDownSpeed => 0.61f;
     internal virtual int TimeBeforePickable => 45;
     internal virtual bool Head => true;
     internal virtual bool Body => true;

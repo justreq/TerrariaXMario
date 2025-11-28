@@ -10,9 +10,9 @@ using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using Terraria.ObjectData;
 using TerrariaXMario.Common.GearSlots;
 using TerrariaXMario.Common.MiscEffects;
-using TerrariaXMario.Common.ShowdownSystem;
 using TerrariaXMario.Common.StatueForm;
 using TerrariaXMario.Content.Blocks;
 using TerrariaXMario.Content.PowerupProjectiles;
@@ -27,7 +27,6 @@ internal enum FlightState { None, Gliding, Flying }
 internal class CapEffectsPlayer : ModPlayer
 {
     private GearSlotPlayer? GearSlotPlayer => Player.GetModPlayerOrNull<GearSlotPlayer>();
-    private ShowdownPlayer? ShowdownPlayer => Player.GetModPlayerOrNull<ShowdownPlayer>();
 
     private string? oldCap;
     internal string? currentCap;
@@ -147,6 +146,7 @@ internal class CapEffectsPlayer : ModPlayer
         }
 
         if (statueForm) currentHeadVariant = "Statue";
+        else if (currentHeadVariant == "Statue") currentHeadVariant = null;
 
         int head = EquipLoader.GetEquipSlot(Mod, $"{(statueForm ? "" : CurrentPowerup?.Name)}{currentCapToDraw}{currentHeadVariant ?? ""}", EquipType.Head);
         Player.head = head == -1 ? EquipLoader.GetEquipSlot(Mod, $"{currentCapToDraw}{currentHeadVariant ?? ""}", EquipType.Head) : head;
@@ -185,7 +185,7 @@ internal class CapEffectsPlayer : ModPlayer
 
         GrabEffect();
 
-        if (flightState == FlightState.Gliding)
+        if (flightState == FlightState.Gliding && CurrentPowerup is not CapeFeatherData)
         {
             glideLegAnimationTimer++;
 
@@ -248,6 +248,7 @@ internal class CapEffectsPlayer : ModPlayer
         StompEffect();
         GrabEffectCompositeArms();
         ObjectSpawnerBlockHitEffect();
+        DoPowerupRightClick();
 
         if (currentJump is Jump.Double or Jump.Triple && !PlayerInput.Triggers.Current.Down && !Player.IsOnGroundPrecise() && flightState == FlightState.None) Player.bodyFrame.Y = 56 * 10;
 
@@ -269,6 +270,8 @@ internal class CapEffectsPlayer : ModPlayer
             Player.direction = directionWhenTurnedToStatue;
             SpawnStatueSparkle();
         }
+
+        if (statueForm && CurrentPowerup is not TanookiSuitData) statueForm = false;
     }
 
     public override void ProcessTriggers(TriggersSet triggersSet)
@@ -289,22 +292,8 @@ internal class CapEffectsPlayer : ModPlayer
             else if (Main.cursorOverride == TerrariaXMario.Instance.CursorGrabIndex) grabbedNPCIndex = hoverNPCIndex;
         }
 
-        if (CurrentPowerup != null && grabbedNPCIndex == null && (!ShowdownPlayer?.isPlayerInShowdownSubworld ?? true))
+        if (CurrentPowerup != null && grabbedNPCIndex == null)
         {
-            if (PlayerInput.Triggers.JustPressed.MouseRight && !Player.mouseInterface && Main.mouseItem.IsAir && !statueForm)
-            {
-                if (CurrentPowerup.LookTowardRightClick)
-                {
-                    requestedPowerupRightClick = true;
-                    SetForceDirection(10, CurrentPowerup.RightClickArmMovementType, Math.Sign(Main.MouseWorld.X - Player.position.X));
-                }
-                else if (powerupRightClickActionTimer == 0)
-                {
-                    CurrentPowerup.OnRightClick(Player);
-                    powerupRightClickActionTimer = CurrentPowerup.RightClickActionCooldown;
-                }
-            }
-
             if (PlayerInput.Triggers.Current.Jump && !Player.mount.Active) CurrentPowerup?.OnJumpHeldDown(Player);
 
             if (PlayerInput.Triggers.JustReleased.Jump)
@@ -318,7 +307,7 @@ internal class CapEffectsPlayer : ModPlayer
             }
         }
 
-        if (PlayerInput.Triggers.JustPressed.Down && stompHitbox != null && (!ShowdownPlayer?.isPlayerInShowdownSubworld ?? true))
+        if (PlayerInput.Triggers.JustPressed.Down && stompHitbox != null)
         {
             StompHitbox stompHitboxProjectile = (StompHitbox)Main.projectile[(int)stompHitbox].ModProjectile;
 
@@ -337,6 +326,7 @@ internal class CapEffectsPlayer : ModPlayer
                 }
 
                 SpawnStatueSparkle();
+                forceDirection = 0;
                 directionWhenTurnedToStatue = Player.direction;
                 Player.direction = 1;
                 statueForm = true;
@@ -530,7 +520,7 @@ internal class CapEffectsPlayer : ModPlayer
     {
         if (flightState == FlightState.Flying) return;
 
-        if ((runTime != 0 && !Player.controlLeft && !Player.controlRight) || (ShowdownPlayer?.isPlayerInShowdownSubworld ?? false)) runTime = 0;
+        if ((runTime != 0 && !Player.controlLeft && !Player.controlRight)) runTime = 0;
         if (Player.IsOnGroundPrecise() && (Player.controlLeft || Player.controlRight) && Math.Abs(Player.velocity.X) > 2.5f && runTime < runTimeRequiredForPSpeed) runTime++;
 
         if (runTime >= runTimeRequiredForPSpeed)
@@ -612,6 +602,23 @@ internal class CapEffectsPlayer : ModPlayer
         }
     }
 
+    private void DoPowerupRightClick()
+    {
+        if (!Player.tileInteractionHappened && CurrentPowerup != null && grabbedNPCIndex == null && PlayerInput.Triggers.JustPressed.MouseRight && !Player.mouseInterface && Main.mouseItem.IsAir && !statueForm)
+        {
+            if (CurrentPowerup.LookTowardRightClick)
+            {
+                requestedPowerupRightClick = true;
+                SetForceDirection(10, CurrentPowerup.RightClickArmMovementType, Math.Sign(Main.MouseWorld.X - Player.position.X));
+            }
+            else if (powerupRightClickActionTimer == 0)
+            {
+                CurrentPowerup.OnRightClick(Player);
+                powerupRightClickActionTimer = CurrentPowerup.RightClickActionCooldown;
+            }
+        }
+    }
+
     internal Point[] HitObjectSpawnerBlocks(float yOffset = 0f, bool checkBottom = false)
     {
         static Point[] HitObjectSpawnerBlocks(in float startX, float y, int width)
@@ -659,16 +666,18 @@ internal class CapEffectsPlayer : ModPlayer
         }
 
         ISpawnableObject objectToSpawn = entity.spawnContents.Length == 0 && entity.tileInternalName == nameof(QuestionBlockTile) ? new DefaultSpawnableObject() : entity!.spawnContents[0];
+        Vector2 center = TerrariaXMario.CenterOfMultitileInWorld((Point)point);
+        TileObjectData data = TileObjectData.GetTileData(Framing.GetTileSafely((Point)point));
 
         if (objectToSpawn is PowerupProjectile projectile)
         {
             SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/PowerupSpawn"));
-            Projectile.NewProjectile(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), entity.Position.ToWorldCoordinates() + new Vector2(8), new Vector2(0, spawnFromBottom ? projectile.SpawnDownSpeed : projectile.SpawnUpSpeed), projectile.Type, 0, 0);
+            Projectile.NewProjectile(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), center + new Vector2(0, spawnFromBottom ? 4 : -4), new Vector2(0, spawnFromBottom ? projectile.SpawnDownSpeed : projectile.SpawnUpSpeed), projectile.Type, 0, 0);
         }
         else if (objectToSpawn is ModItem item)
         {
             SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/ItemSpawn") { Volume = 0.4f });
-            int spawnedItem = Item.NewItem(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), entity.Position.ToWorldCoordinates() + new Vector2(8, 24 * (spawnFromBottom ? 1 : -1)), new Item(item.Type), noGrabDelay: true);
+            int spawnedItem = Item.NewItem(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), center - item.Item.Size * 0.5f + new Vector2(0, data.Height * 16 * (spawnFromBottom ? -1 : 1)), new Item(item.Type), noGrabDelay: true);
             Main.item[spawnedItem].noGrabDelay = 15;
             SpawnedItem? globalItem = Main.item[spawnedItem].GetGlobalItemOrNull<SpawnedItem>();
             globalItem?.objectSpawnerBlockEntity = entity.Position;
@@ -677,7 +686,7 @@ internal class CapEffectsPlayer : ModPlayer
         else if (objectToSpawn is DefaultSpawnableObject)
         {
             SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/Coin") { Volume = 4f });
-            int spawnedItem = Item.NewItem(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), entity.Position.ToWorldCoordinates() + new Vector2(8, 24 * (spawnFromBottom ? 1 : -1)), new Item(ItemID.GoldCoin), noGrabDelay: true);
+            int spawnedItem = Item.NewItem(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), center - new Vector2(6, 8) + new Vector2(0, data.Height * 16 * (spawnFromBottom ? -1 : 1)), new Item(ItemID.GoldCoin), noGrabDelay: true);
             Main.item[spawnedItem].noGrabDelay = 15;
             SpawnedItem? globalItem = Main.item[spawnedItem].GetGlobalItemOrNull<SpawnedItem>();
             globalItem?.objectSpawnerBlockEntity = entity.Position;

@@ -7,18 +7,11 @@ using TerrariaXMario.Content.Caps;
 using TerrariaXMario.Content.PowerupProjectiles;
 
 namespace TerrariaXMario.Content.Powerups;
-internal class BoomerangFlowerData : Powerup
+internal class BoomerangFlowerData : FireFlowerData
 {
     public override string Name => "BoomerangFlower";
 
     internal override ForceArmMovementType RightClickArmMovementType => ForceArmMovementType.Extend;
-
-    internal override int RightClickActionCooldown => 8;
-
-    internal override void UpdateWorld(Projectile projectile, int updateCount)
-    {
-        projectile.velocity.Y += 0.4f;
-    }
 
     internal override void OnRightClick(Player player)
     {

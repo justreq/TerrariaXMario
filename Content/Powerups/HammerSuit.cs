@@ -1,23 +1,15 @@
 ﻿using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
-using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Content.Caps;
 using TerrariaXMario.Content.PowerupProjectiles;
 
 namespace TerrariaXMario.Content.Powerups;
-internal class HammerSuitData : Powerup
+internal class HammerSuitData : FireFlowerData
 {
     public override string Name => "HammerSuit";
 
-    internal override ForceArmMovementType RightClickArmMovementType => ForceArmMovementType.Swing;
-
     internal override int RightClickActionCooldown => 8;
-
-    internal override void UpdateWorld(Projectile projectile, int updateCount)
-    {
-        projectile.velocity.Y += 0.4f;
-    }
 
     internal override void OnRightClick(Player player)
     {

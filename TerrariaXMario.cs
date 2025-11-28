@@ -7,6 +7,7 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ModLoader;
+using Terraria.ObjectData;
 using TerrariaXMario.Content.Blocks;
 using TerrariaXMario.Core;
 
@@ -59,12 +60,12 @@ internal class TerrariaXMario : Mod
         spawnableObjects = null;
     }
 
-    public static bool SolidTile(int i, int j)
+    internal static bool SolidTile(int i, int j)
     {
         return WorldGen.InWorld(i, j) && SolidTile(Main.tile[i, j]);
     }
 
-    public static bool SolidTile(Tile t)
+    internal static bool SolidTile(Tile t)
     {
         if (!t.HasTile || t.IsActuated)
         {
@@ -74,12 +75,12 @@ internal class TerrariaXMario : Mod
         return Main.tileSolid[t.TileType] && !Main.tileSolidTop[t.TileType];
     }
 
-    public static bool SolidOrSolidTopTile(int i, int j)
+    internal static bool SolidOrSolidTopTile(int i, int j)
     {
         return WorldGen.InWorld(i, j) && SolidOrSolidTopTile(Main.tile[i, j]);
     }
 
-    public static bool SolidOrSolidTopTile(Tile t)
+    internal static bool SolidOrSolidTopTile(Tile t)
     {
         if (!t.HasTile || t.IsActuated)
         {
@@ -87,5 +88,12 @@ internal class TerrariaXMario : Mod
         }
 
         return Main.tileSolid[t.TileType] || Main.tileSolidTop[t.TileType];
+    }
+
+    internal static Vector2 CenterOfMultitileInWorld(Point point)
+    {
+        Tile tile = Framing.GetTileSafely(point.X, point.Y);
+        TileObjectData data = TileObjectData.GetTileData(tile);
+        return TileObjectData.TopLeft(point.X, point.Y).ToWorldCoordinates() + new Vector2(data.Width, data.Height) * 4;
     }
 }

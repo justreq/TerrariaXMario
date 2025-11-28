@@ -2,9 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ModLoader;
-using TerrariaXMario.Common.ShowdownSystem;
 using TerrariaXMario.Utilities;
-using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Core.Effects;
 internal class Outline : ILoadable // credits to math2 for all this shader stuff
@@ -58,10 +56,7 @@ internal class Outline : ILoadable // credits to math2 for all this shader stuff
 
         for (int i = 0; i < Main.npc.Length; i++)
         {
-            NPC NPC = Main.npc[i];
-            ShowdownNPC? globalNPC = NPC.GetGlobalNPCOrNull<ShowdownNPC>();
-
-            if (NPC.active && globalNPC != null && globalNPC.showdownState != NPCShowdownState.None && !globalNPC.isCopyOfShowdownNPC) Main.instance.DrawNPC(i, false);
+            if (Main.npc[i].active) Main.instance.DrawNPC(i, false);
         }
 
         spriteBatch.End();

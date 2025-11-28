@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
@@ -34,9 +33,8 @@ internal class CapeFeatherData : SuperLeafData
         DoJumpHold(player, 2);
     }
 
-    protected static void DoJumpHold(Player player, int runtimeDecayFactor)
+    protected static new void DoJumpHold(Player player, int runtimeDecayFactor)
     {
-        return;
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
         if (player.IsOnGroundPrecise() || modPlayer == null) return;
 
@@ -47,16 +45,12 @@ internal class CapeFeatherData : SuperLeafData
                 else if (player.velocity.Y > 0) modPlayer.flightState = FlightState.Gliding;
                 break;
             case FlightState.Gliding:
-                modPlayer.currentHeadVariant = modPlayer.currentBodyVariant = modPlayer.currentLegsVariant = "Flying";
+                modPlayer.currentHeadVariant = modPlayer.currentBodyVariant = "Flying";
                 if (player.velocity.Y > 0) player.velocity.Y = 1;
-
-                if (!SoundEngine.TryGetActiveSound(modPlayer.glideFlySoundSlot, out var glideSound))
-                {
-                    modPlayer.glideFlySoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailGlide") { Volume = 0.4f });
-                }
                 break;
             case FlightState.Flying:
                 modPlayer.currentHeadVariant = modPlayer.currentBodyVariant = modPlayer.currentLegsVariant = "Flying";
+                break;
                 player.velocity.Y = -2;
 
                 if (Main.GameUpdateCount % runtimeDecayFactor == 0) modPlayer.runTime--;

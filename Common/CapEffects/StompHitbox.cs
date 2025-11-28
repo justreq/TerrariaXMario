@@ -4,7 +4,6 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.MiscEffects;
-using TerrariaXMario.Content.PowerupProjectiles;
 using TerrariaXMario.Content.Powerups;
 using TerrariaXMario.Utilities.Extensions;
 

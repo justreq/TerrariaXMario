@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using MonoMod.Cil;
 using System;
-using System.IO;
 using Terraria;
 using Terraria.ModLoader;
 using TerrariaXMario.Core;

@@ -1,8 +1,6 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
-using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Content.Caps;
-using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Powerups;
 internal class TanookiSuitData : SuperLeafData
@@ -25,4 +23,10 @@ internal class TanookiSuit : PowerupProjectile
     internal override int? PowerupType => ModContent.GetInstance<TanookiSuitData>().Type;
     internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
     internal override string[] Variations => ["Flying"];
+
+    public override void SetDefaults()
+    {
+        base.SetDefaults();
+        Projectile.width = 28;
+    }
 }

@@ -3,21 +3,13 @@ using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
-using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Content.Caps;
 using TerrariaXMario.Content.PowerupProjectiles;
 
 namespace TerrariaXMario.Content.Powerups;
-internal class IceFlowerData : Powerup
+internal class IceFlowerData : FireFlowerData
 {
     public override string Name => "IceFlower";
-
-    internal override ForceArmMovementType RightClickArmMovementType => ForceArmMovementType.Swing;
-
-    internal override void UpdateWorld(Projectile projectile, int updateCount)
-    {
-        projectile.velocity.Y += 0.4f;
-    }
 
     internal override void OnRightClick(Player player)
     {
