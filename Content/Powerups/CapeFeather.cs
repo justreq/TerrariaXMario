@@ -28,12 +28,10 @@ internal class CapeFeatherData : SuperLeafData
         Projectile.NewProjectile(player.GetSource_Misc("CapeSpin"), player.Center, Vector2.Zero, ModContent.ProjectileType<CapeSpin>(), 1, 7.5f, player.whoAmI);
     }
 
-    internal override void OnJumpHeldDown(Player player)
-    {
-        DoJumpHold(player, 2);
-    }
+    private readonly float[] fallSpeedMultipliers = [1, 3, 3, 3.5f, 3.5f, 4];
+    private readonly float[] gravityMultipliers = [1, 1, 3, 4, 5, 6];
 
-    protected static new void DoJumpHold(Player player, int runtimeDecayFactor)
+    internal override void OnJumpHeldDown(Player player)
     {
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
         if (player.IsOnGroundPrecise() || modPlayer == null) return;
@@ -41,8 +39,13 @@ internal class CapeFeatherData : SuperLeafData
         switch (modPlayer.flightState)
         {
             case FlightState.None:
-                if (modPlayer.hasPSpeed) modPlayer.flightState = FlightState.Flying;
+                if (modPlayer.hasPSpeed)
+                {
+                    modPlayer.flightState = FlightState.Flying;
+                    modPlayer.capeRiseToFlightTimer = 80;
+                }
                 else if (player.velocity.Y > 0) modPlayer.flightState = FlightState.Gliding;
+
                 break;
             case FlightState.Gliding:
                 modPlayer.currentHeadVariant = modPlayer.currentBodyVariant = "Flying";
@@ -50,20 +53,25 @@ internal class CapeFeatherData : SuperLeafData
                 break;
             case FlightState.Flying:
                 modPlayer.currentHeadVariant = modPlayer.currentBodyVariant = modPlayer.currentLegsVariant = "Flying";
-                break;
-                player.velocity.Y = -2;
 
-                if (Main.GameUpdateCount % runtimeDecayFactor == 0) modPlayer.runTime--;
+                if (modPlayer.capeRiseToFlightTimer > 0)
+                {
+                    modPlayer.capeRiseToFlightTimer--;
+                    player.velocity.Y = -8;
+                }
+                else if (!modPlayer.doCapeFlight && player.velocity.Y > 0) modPlayer.doCapeFlight = true;
+                else if (modPlayer.doCapeFlight)
+                {
+                    player.velocity.X = 4 * player.direction * fallSpeedMultipliers[modPlayer.CapeFrame] + 1;
+                    player.maxFallSpeed = 2 * fallSpeedMultipliers[modPlayer.CapeFrame] + 1;
+                    player.gravity = 0.05f * fallSpeedMultipliers[modPlayer.CapeFrame] + 1;
+                }
+
                 if (modPlayer.runTime <= 0)
                 {
                     modPlayer.hasPSpeed = false;
                     modPlayer.flightState = FlightState.None;
                     modPlayer.currentHeadVariant = modPlayer.currentBodyVariant = modPlayer.currentLegsVariant = null;
-                }
-
-                if (!SoundEngine.TryGetActiveSound(modPlayer.glideFlySoundSlot, out var flySound))
-                {
-                    modPlayer.glideFlySoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailFly") { Volume = 0.4f });
                 }
                 break;
         }

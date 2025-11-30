@@ -11,6 +11,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
+using TerrariaXMario.Common.CapeFlight;
 using TerrariaXMario.Common.GearSlots;
 using TerrariaXMario.Common.MiscEffects;
 using TerrariaXMario.Common.StatueForm;
@@ -92,6 +93,25 @@ internal class CapEffectsPlayer : ModPlayer
     internal bool statueForm;
     private int statueFormCooldown;
     private int directionWhenTurnedToStatue = 1;
+
+    internal int capeRiseToFlightTimer = 0;
+    internal bool doCapeFlight;
+    internal int capeFrameTimer;
+    internal int CapeFrame
+    {
+        get => field;
+        set
+        {
+            if (doCapeFlight && field != value)
+            {
+                int offset = value - field;
+
+                if ((PlayerInput.Triggers.Current.Left && Player.direction == 1 || PlayerInput.Triggers.Current.Right && Player.direction == -1) && offset == -1) Player.velocity.Y = MathHelper.Clamp(Player.velocity.Y - 6 * field, -16, Player.maxFallSpeed);
+            }
+
+            field = value;
+        }
+    }
 
     public override void ResetEffects()
     {
@@ -249,6 +269,7 @@ internal class CapEffectsPlayer : ModPlayer
         GrabEffectCompositeArms();
         ObjectSpawnerBlockHitEffect();
         DoPowerupRightClick();
+        CapeFlightEffect();
 
         if (currentJump is Jump.Double or Jump.Triple && !PlayerInput.Triggers.Current.Down && !Player.IsOnGroundPrecise() && flightState == FlightState.None) Player.bodyFrame.Y = 56 * 10;
 
@@ -302,12 +323,13 @@ internal class CapEffectsPlayer : ModPlayer
                 {
                     glideFlySoundSlot = SlotId.Invalid;
                     flightState = FlightState.None;
+                    doCapeFlight = false;
                     currentHeadVariant = currentBodyVariant = currentLegsVariant = null;
                 }
             }
         }
 
-        if (PlayerInput.Triggers.JustPressed.Down && stompHitbox != null)
+        if (PlayerInput.Triggers.JustPressed.Down && !doCapeFlight && stompHitbox != null)
         {
             StompHitbox stompHitboxProjectile = (StompHitbox)Main.projectile[(int)stompHitbox].ModProjectile;
 
@@ -334,7 +356,28 @@ internal class CapEffectsPlayer : ModPlayer
             }
         }
 
-        if (Player.wet && PlayerInput.Triggers.JustPressed.Jump) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(Player.wet ? "Swim" : "Jump")}") { Volume = 0.4f });
+        if (PlayerInput.Triggers.JustPressed.Jump) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(Player.wet ? "Swim" : "Jump")}") { Volume = 0.4f });
+
+        if (doCapeFlight && !Player.IsOnGroundPrecise())
+        {
+            if (PlayerInput.Triggers.Current.Right)
+            {
+                if (capeFrameTimer == 1) CapeFrame = (int)MathHelper.Clamp(CapeFrame + Math.Sign(Player.velocity.X), 0, 5);
+                else if (capeFrameTimer == 0) capeFrameTimer = 3;
+            }
+
+            if (PlayerInput.Triggers.Current.Left)
+            {
+                if (capeFrameTimer == 1) CapeFrame = (int)MathHelper.Clamp(CapeFrame - Math.Sign(Player.velocity.X), 0, 5);
+                else if (capeFrameTimer == 0) capeFrameTimer = 3;
+            }
+
+            if (!PlayerInput.Triggers.Current.Right && !PlayerInput.Triggers.Current.Left)
+            {
+                if (CapeFrame != 2 && capeFrameTimer == 1) CapeFrame += (2 > CapeFrame).ToInt() - (2 < CapeFrame).ToInt();
+                else if (capeFrameTimer == 0) capeFrameTimer = 10;
+            }
+        }
     }
 
     public override void SetControls()
@@ -353,17 +396,25 @@ internal class CapEffectsPlayer : ModPlayer
             Player.controlUseItem = false;
             Player.controlJump = false;
         }
+
+        if (doCapeFlight)
+        {
+            Player.controlLeft = false;
+            Player.controlRight = false;
+            Player.controlUp = false;
+            Player.controlDown = false;
+        }
     }
 
     public override void HideDrawLayers(PlayerDrawSet drawInfo)
     {
         if (!CanDoCapEffects) return;
 
-        if (statueForm)
+        if (statueForm || doCapeFlight)
         {
             foreach (PlayerDrawLayer layer in PlayerDrawLayerLoader.Layers)
             {
-                if (layer != PlayerDrawLayers.Head && layer is not StatueDrawLayer)
+                if (layer != PlayerDrawLayers.Head && (statueForm && layer is not StatueDrawLayer) || (doCapeFlight && layer is not CapeFlightDrawLayer))
                 {
                     layer.Hide();
                 }
@@ -702,5 +753,25 @@ internal class CapEffectsPlayer : ModPlayer
     private void SpawnStatueSparkle()
     {
         Projectile.NewProjectile(Player.GetSource_Misc("Statue"), Player.Center, Vector2.Zero, ModContent.ProjectileType<StatueSparkle>(), 0, 0, Player.whoAmI);
+    }
+
+    private void CapeFlightEffect()
+    {
+        if (capeFrameTimer > 0) capeFrameTimer--;
+
+        if (!doCapeFlight) CapeFrame = capeFrameTimer = 0;
+        else
+        {
+            if (Player.IsOnGroundPrecise())
+            {
+                if (Player.velocity.X != 0)
+                {
+                    Dust dust = Dust.NewDustPerfect(Math.Sign(Player.velocity.X) == -1 ? Player.BottomLeft : Player.BottomRight, ModContent.DustType<StatueDust>(), new Vector2(-Player.velocity.X * 0.5f, 0));
+                    dust.noGravity = false;
+                    dust.scale = 0.75f;
+                }
+                else doCapeFlight = false;
+            }
+        }
     }
 }
