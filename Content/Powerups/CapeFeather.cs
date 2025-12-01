@@ -64,7 +64,7 @@ internal class CapeFeatherData : SuperLeafData
                 {
                     player.velocity.X = 4 * player.direction * fallSpeedMultipliers[modPlayer.CapeFrame] + 1;
                     player.maxFallSpeed = 2 * fallSpeedMultipliers[modPlayer.CapeFrame] + 1;
-                    player.gravity = 0.05f * fallSpeedMultipliers[modPlayer.CapeFrame] + 1;
+                    player.gravity = modPlayer.CapeFrame == 0 && modPlayer.capeBoostTimer > 0 ? -0.1f : 0.05f * gravityMultipliers[modPlayer.CapeFrame] + 1;
                 }
 
                 if (modPlayer.runTime <= 0)

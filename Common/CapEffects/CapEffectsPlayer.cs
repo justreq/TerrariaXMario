@@ -96,6 +96,8 @@ internal class CapEffectsPlayer : ModPlayer
 
     internal int capeRiseToFlightTimer = 0;
     internal bool doCapeFlight;
+    internal int capeBoostFactor;
+    internal int capeBoostTimer;
     internal int capeFrameTimer;
     internal int CapeFrame
     {
@@ -106,7 +108,17 @@ internal class CapEffectsPlayer : ModPlayer
             {
                 int offset = value - field;
 
-                if ((PlayerInput.Triggers.Current.Left && Player.direction == 1 || PlayerInput.Triggers.Current.Right && Player.direction == -1) && offset == -1) Player.velocity.Y = MathHelper.Clamp(Player.velocity.Y - 6 * field, -16, Player.maxFallSpeed);
+                if (((PlayerInput.Triggers.Current.Left && Player.direction == 1) || (PlayerInput.Triggers.Current.Right && Player.direction == -1)) && offset == -1 && field > 2 && capeBoostFactor == 0)
+                {
+                    capeBoostFactor = field - 2;
+                    SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/CapeRise") { Volume = 0.4f });
+                }
+
+                if (value == 0 && capeBoostFactor != 0)
+                {
+                    Player.velocity.Y = -3 * capeBoostFactor;
+                    capeBoostTimer = 30;
+                }
             }
 
             field = value;
@@ -260,6 +272,7 @@ internal class CapEffectsPlayer : ModPlayer
             runTime = 0;
             hasPSpeed = false;
             statueForm = false;
+            doCapeFlight = false;
 
             return;
         }
@@ -356,7 +369,7 @@ internal class CapEffectsPlayer : ModPlayer
             }
         }
 
-        if (PlayerInput.Triggers.JustPressed.Jump) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(Player.wet ? "Swim" : "Jump")}") { Volume = 0.4f });
+        if (PlayerInput.Triggers.JustPressed.Jump && (Player.IsOnGroundPrecise() || Player.wet)) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(Player.wet ? "Swim" : "Jump")}") { Volume = 0.4f });
 
         if (doCapeFlight && !Player.IsOnGroundPrecise())
         {
@@ -758,6 +771,11 @@ internal class CapEffectsPlayer : ModPlayer
     private void CapeFlightEffect()
     {
         if (capeFrameTimer > 0) capeFrameTimer--;
+        if (capeBoostTimer > 0)
+        {
+            capeBoostTimer--;
+            if (capeBoostTimer == 1) capeBoostFactor = 0;
+        }
 
         if (!doCapeFlight) CapeFrame = capeFrameTimer = 0;
         else
