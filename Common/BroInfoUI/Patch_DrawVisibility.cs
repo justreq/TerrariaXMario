@@ -8,10 +8,10 @@ using Terraria.ModLoader;
 using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 
-namespace TerrariaXMario.Common.GearSlots;
+namespace TerrariaXMario.Common.BroInfoUI;
 internal sealed class Patch_DrawVisibility : BasePatch
 {
-    private static bool ShowGearSlots => Main.LocalPlayer.GetModPlayerOrNull<GearSlotPlayer>()?.ShowGearSlots ?? false;
+    private static bool ShowGearSlots => Main.LocalPlayer.GetModPlayerOrNull<BroInfoPlayer>()?.ShowBroInfo ?? false;
 
     internal override void Patch(Mod mod)
     {

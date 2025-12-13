@@ -6,7 +6,8 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 using TerrariaXMario.Utilities.Extensions;
 
-namespace TerrariaXMario.Common.GearSlots;
+namespace TerrariaXMario.Common.BroInfoUI;
+
 internal enum GearType
 {
     None,
@@ -38,11 +39,13 @@ internal abstract class GearSlot : ModAccessorySlot
 
     public override string FunctionalTexture => GetType().FullName!.Replace(".", "/");
 
-    public override bool IsEnabled() => Player.GetModPlayerOrNull<GearSlotPlayer>()?.ShowGearSlots ?? false;
+    public override bool IsEnabled() => true;
 
-    public override bool IsHidden() => Main.EquipPage != 0;
+    public override bool IsHidden() => (!Player.GetModPlayerOrNull<BroInfoPlayer>()?.ShowBroInfo ?? true) || Main.EquipPage != 0;
 
     public override bool IsVisibleWhenNotEnabled() => false;
+
+    public override bool HasEquipmentLoadoutSupport => false;
 
     public override bool ModifyDefaultSwapSlot(Item item, int accSlotToSwapTo) => item.GetGlobalItemOrNull<GearSlotGlobalItem>()?.gearType == GearType;
 

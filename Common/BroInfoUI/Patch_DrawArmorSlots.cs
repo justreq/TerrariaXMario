@@ -4,11 +4,10 @@ using Terraria.ModLoader;
 using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 
-namespace TerrariaXMario.Common.GearSlots;
+namespace TerrariaXMario.Common.BroInfoUI;
+
 internal sealed class Patch_DrawArmorSlots : BasePatch
 {
-    private static bool ShowGearSlots => Main.LocalPlayer.GetModPlayerOrNull<GearSlotPlayer>()?.ShowGearSlots ?? false;
-
     internal override void Patch(Mod mod)
     {
         // Prevents vanilla armor slots, the loadout buttons, and the defense counter from drawing when gear slots are enabled
@@ -23,6 +22,6 @@ internal sealed class Patch_DrawArmorSlots : BasePatch
 
         c.Index++;
 
-        c.EmitDelegate((int EquipPage) => EquipPage == 0 && ShowGearSlots);
+        c.EmitDelegate((int EquipPage) => EquipPage == 0 && (Main.LocalPlayer.GetModPlayerOrNull<BroInfoPlayer>()?.ShowBroInfo ?? false));
     }
 }

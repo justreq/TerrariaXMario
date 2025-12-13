@@ -2,7 +2,8 @@
 using Terraria.ModLoader;
 using TerrariaXMario.Utilities.Extensions;
 
-namespace TerrariaXMario.Common.GearSlots;
+namespace TerrariaXMario.Common.BroInfoUI;
+
 internal class GearSlotGlobalItem : GlobalItem
 {
     internal GearType gearType;
@@ -11,7 +12,7 @@ internal class GearSlotGlobalItem : GlobalItem
 
     public override bool CanEquipAccessory(Item item, Player player, int slot, bool modded)
     {
-        if (gearType == GearType.None && (player.GetModPlayerOrNull<GearSlotPlayer>()?.ShowGearSlots ?? false)) return false;
+        if (gearType == GearType.None && (player.GetModPlayerOrNull<BroInfoPlayer>()?.ShowBroInfo ?? false)) return false;
 
         return base.CanEquipAccessory(item, player, slot, modded);
     }

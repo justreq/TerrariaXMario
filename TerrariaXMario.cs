@@ -12,6 +12,7 @@ using TerrariaXMario.Content.Blocks;
 using TerrariaXMario.Core;
 
 namespace TerrariaXMario;
+
 internal class TerrariaXMario : Mod
 {
     internal static TerrariaXMario Instance => ModContent.GetInstance<TerrariaXMario>();
@@ -36,6 +37,8 @@ internal class TerrariaXMario : Mod
         { "Mario", new Color(217, 22, 22) },
         { "Luigi", new Color(27, 149, 4) }
     };
+
+    internal static Vector2 BroInfoPageButtonPosition;
 
     public override void Load()
     {

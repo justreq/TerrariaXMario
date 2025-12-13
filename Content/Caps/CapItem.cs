@@ -2,12 +2,13 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.Utilities;
+using TerrariaXMario.Common.BroInfoUI;
 using TerrariaXMario.Common.CapEffects;
-using TerrariaXMario.Common.GearSlots;
 using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Caps;
+
 internal abstract class CapItem : ModItem, ISpawnableObject
 {
     private void LoadEquipTextures(string variation = "", bool head = true, bool body = true, bool legs = true)
@@ -73,7 +74,7 @@ internal abstract class CapItem : ModItem, ISpawnableObject
 
     public override bool? PrefixChance(int pre, UnifiedRandom rand) => !(pre == -1 || pre == -3);
 
-    public override bool CanEquipAccessory(Player player, int slot, bool modded) => player.GetModPlayerOrNull<GearSlotPlayer>()?.ShowGearSlots ?? false && modded;
+    public override bool CanEquipAccessory(Player player, int slot, bool modded) => modded;
 
     public override void UpdateAccessory(Player player, bool hideVisual)
     {

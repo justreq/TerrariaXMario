@@ -11,8 +11,8 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
+using TerrariaXMario.Common.BroInfoUI;
 using TerrariaXMario.Common.CapeFlight;
-using TerrariaXMario.Common.GearSlots;
 using TerrariaXMario.Common.MiscEffects;
 using TerrariaXMario.Common.StatueForm;
 using TerrariaXMario.Content.Blocks;
@@ -22,12 +22,13 @@ using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.CapEffects;
+
 internal enum Jump { None, Single, Double, Triple }
 internal enum ForceArmMovementType { None, Swing, Extend }
 internal enum FlightState { None, Gliding, Flying }
 internal class CapEffectsPlayer : ModPlayer
 {
-    private GearSlotPlayer? GearSlotPlayer => Player.GetModPlayerOrNull<GearSlotPlayer>();
+    internal BroInfoPlayer? BroInfoPlayer => Player.GetModPlayerOrNull<BroInfoPlayer>();
 
     private string? oldCap;
     internal string? currentCap;
@@ -39,7 +40,7 @@ internal class CapEffectsPlayer : ModPlayer
     internal int? currentPowerupType;
     internal Powerup? CurrentPowerup => currentPowerupType == null ? null : PowerupLoader.Powerups[(int)currentPowerupType];
 
-    internal bool CanDoCapEffects => currentCap != null && (GearSlotPlayer?.ShowGearSlots ?? false);
+    internal bool CanDoCapEffects => currentCap != null && (BroInfoPlayer?.ShowBroInfo ?? false);
 
     private bool requestedPowerupRightClick;
     internal int forceDirection;
@@ -176,6 +177,8 @@ internal class CapEffectsPlayer : ModPlayer
             if (currentPowerupType != null) currentPowerupType = null;
             return;
         }
+
+        if (Main.gameMenu && (!BroInfoPlayer?.ShowBroInfo ?? true)) return;
 
         if (statueForm) currentHeadVariant = "Statue";
         else if (currentHeadVariant == "Statue") currentHeadVariant = null;
@@ -459,9 +462,10 @@ internal class CapEffectsPlayer : ModPlayer
 
     private void CapEffect()
     {
-        if ((GearSlotPlayer?.ShowGearSlots ?? false) && oldCap != currentCap)
+        if (oldCap != currentCap)
         {
             SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{currentCap ?? oldCap}{(currentCap == null ? "Unequip" : "Equip")}") { Volume = 0.4f });
+            if (!BroInfoPlayer?.ShowBroInfo ?? false) BroInfoPlayer?.ShowBroInfo = true;
             oldCap = currentCap;
         }
 
@@ -577,6 +581,7 @@ internal class CapEffectsPlayer : ModPlayer
         {
             Main.projectile[(int)stompHitbox].Kill();
             stompHitbox = null;
+            GroundPounding = false;
         }
     }
 

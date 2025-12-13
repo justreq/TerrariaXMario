@@ -5,7 +5,7 @@ using Terraria.ModLoader;
 using Terraria.UI;
 using TerrariaXMario.Utilities.Extensions;
 
-namespace TerrariaXMario.Common.KeybindSystem;
+namespace TerrariaXMario.Common.KeybindIndicator;
 internal class UIKeypressIndicator : UIElement
 {
     private UIImageFramed? KeyboardButton { get; set; }
