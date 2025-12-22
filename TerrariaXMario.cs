@@ -6,6 +6,7 @@ using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 using TerrariaXMario.Content.Blocks;
@@ -22,6 +23,7 @@ internal class TerrariaXMario : Mod
     internal static string BrickBlockTile => $"{nameof(TerrariaXMario)}/Content/Blocks/BrickBlockTile";
     internal static string QuestionBlockTile => $"{nameof(TerrariaXMario)}/Content/Blocks/QuestionBlockTile";
 
+    private Asset<Texture2D>? oldMushroomTexture;
     private Asset<Texture2D>[]? oldCursors;
     internal int CursorGrabIndex = -1;
     internal int CursorThrowIndex = -1;
@@ -42,6 +44,9 @@ internal class TerrariaXMario : Mod
 
     public override void Load()
     {
+        oldMushroomTexture = TextureAssets.Item[ItemID.Mushroom];
+        TextureAssets.Item[ItemID.Mushroom] = ModContent.Request<Texture2D>($"{nameof(TerrariaXMario)}/Content/Consumables/Mushroom");
+
         oldCursors = [.. TextureAssets.Cursors];
         TextureAssets.Cursors = [.. TextureAssets.Cursors, ModContent.Request<Texture2D>($"{Textures}/CursorGrab")];
         CursorGrabIndex = TextureAssets.Cursors.Length - 1;
@@ -55,6 +60,8 @@ internal class TerrariaXMario : Mod
 
     public override void Unload()
     {
+        TextureAssets.Item[ItemID.Mushroom] = oldMushroomTexture;
+        oldMushroomTexture = null;
         TextureAssets.Cursors = oldCursors;
         oldCursors = null;
         CursorGrabIndex = -1;

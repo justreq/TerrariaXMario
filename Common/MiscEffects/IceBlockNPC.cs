@@ -11,6 +11,7 @@ using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.MiscEffects;
+
 public class IceBlockNPC : GlobalNPC
 {
     public override bool InstancePerEntity => true;
@@ -27,7 +28,7 @@ public class IceBlockNPC : GlobalNPC
 
     internal void KillIceBlock(NPC npc)
     {
-        SoundEngine.PlaySound(SoundID.Item27);
+        SoundEngine.PlaySound(SoundID.Item27, npc.Center);
 
         frozen = false;
         thrown = false;

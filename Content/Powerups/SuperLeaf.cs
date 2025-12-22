@@ -9,6 +9,7 @@ using TerrariaXMario.Content.PowerupProjectiles;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Powerups;
+
 internal class SuperLeafData : Powerup
 {
     public override string Name => "SuperLeaf";
@@ -40,7 +41,7 @@ internal class SuperLeafData : Powerup
 
         if ((!modPlayer?.CanShowTail ?? true) || player.fullRotation != 0) return;
         modPlayer?.forceSwitchDirectionCount = 2;
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailSwipe") { Volume = 0.4f });
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailSwipe") { Volume = 0.4f }, player.Center);
         modPlayer?.SetForceDirection(10, ForceArmMovementType.None, -player.direction);
         Projectile.NewProjectile(player.GetSource_Misc("TailSwipe"), player.Center, Vector2.Zero, ModContent.ProjectileType<TailSwipe>(), 1, 7.5f, player.whoAmI);
     }
@@ -67,7 +68,7 @@ internal class SuperLeafData : Powerup
 
                 if (!SoundEngine.TryGetActiveSound(modPlayer.glideFlySoundSlot, out var glideSound))
                 {
-                    modPlayer.glideFlySoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailGlide") { Volume = 0.4f });
+                    modPlayer.glideFlySoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailGlide") { Volume = 0.4f }, player.Center);
                 }
                 break;
             case FlightState.Flying:
@@ -84,7 +85,7 @@ internal class SuperLeafData : Powerup
 
                 if (!SoundEngine.TryGetActiveSound(modPlayer.glideFlySoundSlot, out var flySound))
                 {
-                    modPlayer.glideFlySoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailFly") { Volume = 0.4f });
+                    modPlayer.glideFlySoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailFly") { Volume = 0.4f }, player.Center);
                 }
                 break;
         }

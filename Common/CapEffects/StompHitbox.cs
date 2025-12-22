@@ -8,6 +8,7 @@ using TerrariaXMario.Content.Powerups;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.CapEffects;
+
 internal class StompHitbox : ModProjectile
 {
     private int stompCount;
@@ -25,7 +26,7 @@ internal class StompHitbox : ModProjectile
 
         stompCooldown = 5;
         stompCount++;
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(stompCount > 7 ? "Heal" : $"Stomp{stompCount}")}") { Volume = 0.4f });
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(stompCount > 7 ? "Heal" : $"Stomp{stompCount}")}") { Volume = 0.4f }, player.Center);
 
         if (stompCount > 7) player.Heal(1);
     }
@@ -147,7 +148,7 @@ internal class StompHitbox : ModProjectile
 
         if (!groundPound) return;
 
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPound") { Volume = 0.4f });
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPound") { Volume = 0.4f }, player.Center);
         for (int i = -2; i < 3; i++)
         {
             if (i == 0) continue;

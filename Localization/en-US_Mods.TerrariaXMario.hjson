@@ -52,6 +52,143 @@ Items: {
 		DisplayName: Mario Statue
 		Tooltip: "'Some say there are voices trapped within these stones'"
 	}
+
+	MaxMushroom: {
+		DisplayName: Max Mushroom
+		Tooltip: ""
+	}
+
+	OneUpDeluxe: {
+		DisplayName: One Up Deluxe
+		Tooltip:
+			'''
+			Prevents a bro from dying if kept in inventory
+			Grants full HP upon consumption
+			'''
+	}
+
+	OneUpMushroom: {
+		DisplayName: One Up Mushroom
+		Tooltip:
+			'''
+			Prevents a bro from dying if kept in inventory
+			Grants 50% of max HP upon consumption
+			'''
+	}
+
+	PoisonMushroom: {
+		DisplayName: Poison Mushroom
+		Tooltip: "'Why would anyone voluntarily eat this?'"
+	}
+
+	SuperMushroom: {
+		DisplayName: Super Mushroom
+		Tooltip: ""
+	}
+
+	UltraMushroom: {
+		DisplayName: Ultra Mushroom
+		Tooltip: ""
+	}
+
+	Pipe: {
+		DisplayName: Pipe
+		Tooltip: ""
+	}
+
+	FamilyPhoto: {
+		DisplayName: Family Photo
+		Tooltip:
+			'''
+			'S. Dominick'
+			Adapted by M. Lob
+			'''
+	}
+
+	GarlicPower: {
+		DisplayName: Garlic Power
+		Tooltip:
+			'''
+			'S. Dominick'
+			Adapted by M. Lob
+			'''
+	}
+
+	Madpax: {
+		DisplayName: Madpax
+		Tooltip:
+			'''
+			'S. Dominick'
+			Adapted by M. Lob
+			'''
+	}
+
+	MischievousActivities: {
+		DisplayName: Mischievous Activities
+		Tooltip:
+			'''
+			'S. Dominick'
+			Adapted by M. Lob
+			'''
+	}
+
+	Talluigi: {
+		DisplayName: Talluigi
+		Tooltip:
+			'''
+			'S. Dominick'
+			Adapted by M. Lob
+			'''
+	}
+
+	MaxSyrupJar: {
+		DisplayName: Max Syrup Jar
+		Tooltip: ""
+	}
+
+	SuperSyrupJar: {
+		DisplayName: Supersyrup Jar
+		Tooltip: ""
+	}
+
+	SyrupJar: {
+		DisplayName: Syrup Jar
+		Tooltip: ""
+	}
+
+	UltraSyrupJar: {
+		DisplayName: Ultrasyrup Jar
+		Tooltip: ""
+	}
+
+	MaxStarCandy: {
+		DisplayName: Max Star Candy
+		Tooltip: ""
+	}
+
+	StarCandy: {
+		DisplayName: Star Candy
+		Tooltip: ""
+	}
+
+	SuperStarCandy: {
+		DisplayName: Superstar Candy
+		Tooltip: ""
+	}
+
+	UltraStarCandy: {
+		DisplayName: Ultrastar Candy
+		Tooltip: ""
+	}
+
+	RefreshingHerb: {
+		DisplayName: Refreshing Herb
+		Tooltip:
+			'''
+			Clears all debuffs
+			'It's just what the doctor ordered!'
+			'''
+	}
 }
 
 Projectiles: {
@@ -80,13 +217,3 @@ Projectiles: {
 }
 
 NPCs.Goomba.DisplayName: Goomba
-Keybinds.EnterShowdown.DisplayName: Enter Showdown
-
-Showdown: {
-	DisplayName: Showdown
-
-	UI: {
-		Cancel: Cancel
-		TargetSelect: Move mouse to select target
-	}
-}

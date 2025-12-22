@@ -12,7 +12,6 @@ internal class Patch_ApplyEquip : BasePatch
     internal override void Patch(Mod mod)
     {
         // removes armor / accessory functionality and visuals when gear slots are enabled
-        IL_Player.Update += IL_Player_Update;
         On_Player.ApplyEquipFunctional += On_Player_ApplyEquipFunctional;
         On_Player.ApplyEquipVanity_int_Item += On_Player_ApplyEquipVanity_int_Item;
         On_Player.ApplyEquipVanity_Item += On_Player_ApplyEquipVanity_Item;
@@ -22,22 +21,6 @@ internal class Patch_ApplyEquip : BasePatch
         On_Player.GrantArmorBenefits += On_Player_GrantArmorBenefits;
         On_Player.UpdateArmorSets += On_Player_UpdateArmorSets;
         On_Player.ApplyArmorSoundAndDustChanges += On_Player_ApplyArmorSoundAndDustChanges;
-    }
-
-    private void IL_Player_Update(ILContext il)
-    {
-        ILCursor c = new(il);
-        ILLabel label = c.DefineLabel();
-
-        if (!c.TryGotoNext(MoveType.After, i => i.MatchStfld<Player>("setSolar"))) ThrowError("stfld");
-
-        c.Emit(OpCodes.Ldarg_0);
-        c.EmitDelegate((Player player) => player.GetModPlayerOrNull<BroInfoPlayer>()?.ShowBroInfo ?? false);
-        c.Emit(OpCodes.Brtrue, label);
-
-        if (!c.TryGotoNext(MoveType.After, i => i.MatchStfld<Player>("legs"))) ThrowError("stfld");
-
-        c.MarkLabel(label);
     }
 
     private void On_Player_ApplyEquipFunctional(On_Player.orig_ApplyEquipFunctional orig, Player self, Item currentItem, bool hideVisual)

@@ -11,6 +11,7 @@ using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.PowerupProjectiles;
+
 internal class Boomerang : InteractiveWithObjectSpawnerTileProjectile
 {
     private enum State { Travelling, Waiting, Returning }
@@ -52,7 +53,7 @@ internal class Boomerang : InteractiveWithObjectSpawnerTileProjectile
 
         if (!SoundEngine.TryGetActiveSound(spinSoundSlot, out var spinSound))
         {
-            spinSoundSlot = SoundEngine.PlaySound(new($"{GetType().FullName!.Replace(".", "/")}Spin") { Volume = 0.4f });
+            spinSoundSlot = SoundEngine.PlaySound(new($"{GetType().FullName!.Replace(".", "/")}Spin") { Volume = 0.4f }, Main.player[Projectile.owner].Center);
         }
 
         switch (state)

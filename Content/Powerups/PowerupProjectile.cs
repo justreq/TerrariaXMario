@@ -9,6 +9,7 @@ using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Powerups;
+
 internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
 {
     internal virtual int? PowerupType => null;
@@ -128,7 +129,7 @@ internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
 
             Projectile.Kill();
 
-            SoundEngine.PlaySound(new(Powerup!.EquipSound) { Volume = 0.4f });
+            SoundEngine.PlaySound(new(Powerup!.EquipSound) { Volume = 0.4f }, player.Center);
             player.GetModPlayerOrNull<CapEffectsPlayer>()?.currentPowerupType = PowerupType;
             Powerup!.OnConsume(player);
         }

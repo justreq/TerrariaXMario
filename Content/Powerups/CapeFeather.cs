@@ -8,6 +8,7 @@ using TerrariaXMario.Content.PowerupProjectiles;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Powerups;
+
 internal class CapeFeatherData : SuperLeafData
 {
     public override string Name => "CapeFeather";
@@ -23,7 +24,7 @@ internal class CapeFeatherData : SuperLeafData
 
         if ((!modPlayer?.CanShowCape ?? true) || player.fullRotation != 0) return;
         modPlayer?.forceSwitchDirectionCount = 2;
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/CapeSpin") { Volume = 0.4f });
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/CapeSpin") { Volume = 0.4f }, player.Center);
         modPlayer?.SetForceDirection(10, ForceArmMovementType.None, -player.direction);
         Projectile.NewProjectile(player.GetSource_Misc("CapeSpin"), player.Center, Vector2.Zero, ModContent.ProjectileType<CapeSpin>(), 1, 7.5f, player.whoAmI);
     }

@@ -112,7 +112,7 @@ internal class CapEffectsPlayer : ModPlayer
                 if (((PlayerInput.Triggers.Current.Left && Player.direction == 1) || (PlayerInput.Triggers.Current.Right && Player.direction == -1)) && offset == -1 && field > 2 && capeBoostFactor == 0)
                 {
                     capeBoostFactor = field - 2;
-                    SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/CapeRise") { Volume = 0.4f });
+                    SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/CapeRise") { Volume = 0.4f }, Player.Center);
                 }
 
                 if (value == 0 && capeBoostFactor != 0)
@@ -126,6 +126,20 @@ internal class CapEffectsPlayer : ModPlayer
         }
     }
 
+    internal int maxSP = 20;
+
+    internal int statPower = 1;
+    internal int statDefense = 0;
+    internal int statHP = 0;
+    internal int StatSP
+    {
+        get => field;
+        set
+        {
+            field = Math.Clamp(value, 0, maxSP);
+        }
+    } = 20;
+
     public override void ResetEffects()
     {
         currentCap = null;
@@ -135,11 +149,21 @@ internal class CapEffectsPlayer : ModPlayer
     public override void SaveData(TagCompound tag)
     {
         if (currentPowerupType != null) tag[nameof(currentPowerupType)] = currentPowerupType;
+        tag[nameof(maxSP)] = maxSP;
+        tag[nameof(statPower)] = statPower;
+        tag[nameof(statDefense)] = statDefense;
+        tag[nameof(statHP)] = statHP;
+        tag[nameof(StatSP)] = StatSP;
     }
 
     public override void LoadData(TagCompound tag)
     {
         if (tag.ContainsKey(nameof(currentPowerupType))) currentPowerupType = tag.GetInt(nameof(currentPowerupType));
+        if (tag.ContainsKey(nameof(maxSP))) maxSP = tag.GetInt(nameof(maxSP));
+        if (tag.ContainsKey(nameof(statPower))) statPower = tag.GetInt(nameof(statPower));
+        if (tag.ContainsKey(nameof(statDefense))) statDefense = tag.GetInt(nameof(statDefense));
+        if (tag.ContainsKey(nameof(statHP))) statHP = tag.GetInt(nameof(statHP));
+        if (tag.ContainsKey(nameof(StatSP))) StatSP = tag.GetInt(nameof(StatSP));
     }
 
     public override bool CanUseItem(Item item)
@@ -163,14 +187,19 @@ internal class CapEffectsPlayer : ModPlayer
         if (currentPowerupType != null)
         {
             currentPowerupType = null;
-            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/PowerDown") { Volume = 0.4f });
+            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/PowerDown") { Volume = 0.4f }, Player.Center);
         }
 
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PlayerOverrides/{currentCap}Hurt{Main.rand.Next(1, 5)}") { Volume = 0.4f });
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PlayerOverrides/{currentCap}Hurt{Main.rand.Next(1, 5)}") { Volume = 0.4f }, Player.Center);
     }
 
     public override void FrameEffects()
     {
+        if (currentCap == null && (BroInfoPlayer?.ShowBroInfo ?? false))
+        {
+            Player.head = Player.body = Player.legs = -1;
+        }
+
         if (!CanDoCapEffects && !Main.gameMenu)
         {
             currentHeadVariant = currentBodyVariant = currentLegsVariant = null;
@@ -351,7 +380,7 @@ internal class CapEffectsPlayer : ModPlayer
 
             if (!stompHitboxProjectile.groundPound)
             {
-                SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPoundStart") { Volume = 0.4f });
+                SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPoundStart") { Volume = 0.4f }, Player.Center);
                 Player.fullRotation = 0;
                 stompHitboxProjectile.groundPound = true;
             }
@@ -372,7 +401,7 @@ internal class CapEffectsPlayer : ModPlayer
             }
         }
 
-        if (PlayerInput.Triggers.JustPressed.Jump && (Player.IsOnGroundPrecise() || Player.wet)) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(Player.wet ? "Swim" : "Jump")}") { Volume = 0.4f });
+        if (PlayerInput.Triggers.JustPressed.Jump && (Player.IsOnGroundPrecise() || Player.wet)) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(Player.wet ? "Swim" : "Jump")}") { Volume = 0.4f }, Player.Center);
 
         if (doCapeFlight && !Player.IsOnGroundPrecise())
         {
@@ -464,7 +493,7 @@ internal class CapEffectsPlayer : ModPlayer
     {
         if (oldCap != currentCap)
         {
-            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{currentCap ?? oldCap}{(currentCap == null ? "Unequip" : "Equip")}") { Volume = 0.4f });
+            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{currentCap ?? oldCap}{(currentCap == null ? "Unequip" : "Equip")}") { Volume = 0.4f }, Player.Center);
             if (!BroInfoPlayer?.ShowBroInfo ?? false) BroInfoPlayer?.ShowBroInfo = true;
             oldCap = currentCap;
         }
@@ -562,7 +591,7 @@ internal class CapEffectsPlayer : ModPlayer
                 backflip = false;
             }
 
-            if (currentJump is not (Jump.None or Jump.Single) && (int)currentJump < Enum.GetNames(typeof(Jump)).Length) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{currentCap}{currentJump}Jump") { Volume = 0.4f });
+            if (currentJump is not (Jump.None or Jump.Single) && (int)currentJump < Enum.GetNames(typeof(Jump)).Length) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{currentCap}{currentJump}Jump") { Volume = 0.4f }, Player.Center);
         }
     }
 
@@ -597,7 +626,7 @@ internal class CapEffectsPlayer : ModPlayer
             if (!hasPSpeed)
             {
                 hasPSpeed = true;
-                SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/FastRunStart") { Volume = 0.4f });
+                SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/FastRunStart") { Volume = 0.4f }, Player.Center);
 
                 for (int i = 0; i < 8; i++)
                 {
@@ -608,7 +637,7 @@ internal class CapEffectsPlayer : ModPlayer
             Player.accRunSpeed *= currentCap == "Luigi" ? 1.5f : 1.25f;
             if (!SoundEngine.TryGetActiveSound(pSpeedSoundSlot, out var pSpeedSound))
             {
-                pSpeedSoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/PSpeed") { Volume = 0.2f });
+                pSpeedSoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/PSpeed") { Volume = 0.2f }, Player.Center);
             }
         }
         else if (hasPSpeed)
@@ -723,7 +752,7 @@ internal class CapEffectsPlayer : ModPlayer
     {
         if (point == null) return;
 
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/BlockHit") { Volume = 8 });
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/BlockHit") { Volume = 8 }, Player.Center);
 
         ObjectSpawnerBlockEntity? entity = TerrariaXMario.GetTileEntityOrNull((Point)point);
         if (entity == null || entity.justStruck || entity.wasPreviouslyStruck) return;
@@ -740,12 +769,12 @@ internal class CapEffectsPlayer : ModPlayer
 
         if (objectToSpawn is PowerupProjectile projectile)
         {
-            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/PowerupSpawn"));
+            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/PowerupSpawn"), center);
             Projectile.NewProjectile(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), center + new Vector2(0, spawnFromBottom ? 4 : -4), new Vector2(0, spawnFromBottom ? projectile.SpawnDownSpeed : projectile.SpawnUpSpeed), projectile.Type, 0, 0);
         }
         else if (objectToSpawn is ModItem item)
         {
-            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/ItemSpawn") { Volume = 0.4f });
+            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/ItemSpawn") { Volume = 0.4f }, center);
             int spawnedItem = Item.NewItem(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), center - item.Item.Size * 0.5f + new Vector2(0, data.Height * 16 * (spawnFromBottom ? -1 : 1)), new Item(item.Type), noGrabDelay: true);
             Main.item[spawnedItem].noGrabDelay = 15;
             SpawnedItem? globalItem = Main.item[spawnedItem].GetGlobalItemOrNull<SpawnedItem>();
@@ -754,7 +783,7 @@ internal class CapEffectsPlayer : ModPlayer
         }
         else if (objectToSpawn is DefaultSpawnableObject)
         {
-            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/Coin") { Volume = 4f });
+            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/Coin") { Volume = 4f }, center);
             int spawnedItem = Item.NewItem(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), center - new Vector2(6, 8) + new Vector2(0, data.Height * 16 * (spawnFromBottom ? -1 : 1)), new Item(ItemID.GoldCoin), noGrabDelay: true);
             Main.item[spawnedItem].noGrabDelay = 15;
             SpawnedItem? globalItem = Main.item[spawnedItem].GetGlobalItemOrNull<SpawnedItem>();

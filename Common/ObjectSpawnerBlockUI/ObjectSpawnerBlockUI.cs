@@ -15,6 +15,7 @@ using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.ObjectSpawnerBlockUI;
+
 internal class ObjectSpawnerBlockUI : UIState
 {
     private bool isLoaded;
@@ -189,7 +190,7 @@ internal class ObjectSpawnerBlockUI : UIState
                     }
                     else if (obj is ModItem modItem)
                     {
-                        e.AddElement(new UIImage(ModContent.Request<Texture2D>(modItem.Texture)).With(f =>
+                        e.AddElement(new UIImageFramed(ModContent.Request<Texture2D>(modItem.Texture), new Rectangle(0, 0, modItem.Item.width, modItem.Item.height)).With(f =>
                         {
                             f.HAlign = 0.5f;
                             f.VAlign = 0.5f;
