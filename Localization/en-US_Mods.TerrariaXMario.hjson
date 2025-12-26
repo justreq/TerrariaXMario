@@ -1,31 +1,12 @@
-UI: {
-	GearType: {
-		Cap: Cap
-		Overalls: Overalls
-		Socks: Socks
-		Boots: Boots
-		Gloves: Gloves
-		Badge: Badge
-	}
-
-	ObjectSpawnerBlock: {
-		HowTo: Select an object from the left panel. Edit any properties or reorder the list from this panel.\n\nStrike the block to get its contents in listed order (from top to bottom).
-		Exit: Exit (WILL NOT SAVE!)
-		Save: Save
-	}
-
-	BroInfoUI.PageButton: Bro Gear
-}
-
 Items: {
-	Mario: {
-		DisplayName: Mario's Cap
-		Tooltip: Transforms its wearer into Super Mario
+	BrickBlock: {
+		DisplayName: Brick Block
+		Tooltip: Can contain certain special objects
 	}
 
-	Luigi: {
-		DisplayName: Luigi's Cap
-		Tooltip: Transforms its wearer into Super Luigi
+	Pipe: {
+		DisplayName: Pipe
+		Tooltip: ""
 	}
 
 	QuestionBlock: {
@@ -33,33 +14,56 @@ Items: {
 		Tooltip: Can contain certain special objects
 	}
 
-	BrickBlock: {
-		DisplayName: Brick Block
-		Tooltip: Can contain certain special objects
+	Luigi: {
+		DisplayName: Luigi's Cap
+		Tooltip: Transforms its wearer into Super Luigi
 	}
 
-	Hammer: {
-		DisplayName: Hammer
-		Tooltip: Useful on certain special blocks
+	Mario: {
+		DisplayName: Mario's Cap
+		Tooltip: Transforms its wearer into Super Mario
 	}
 
-	LuigiStatue: {
-		DisplayName: Luigi Statue
-		Tooltip: "'Some say there are voices trapped within these stones'"
+	EdibleMushroom2: {
+		DisplayName: Super Mushroom
+		Tooltip: ""
 	}
 
-	MarioStatue: {
-		DisplayName: Mario Statue
-		Tooltip: "'Some say there are voices trapped within these stones'"
+	EdibleMushroom3: {
+		DisplayName: Ultra Mushroom
+		Tooltip: ""
 	}
 
-	MaxMushroom: {
+	EdibleMushroom4: {
 		DisplayName: Max Mushroom
 		Tooltip: ""
 	}
 
-	OneUpDeluxe: {
-		DisplayName: One Up Deluxe
+	EdibleMushroomBad: {
+		DisplayName: Poison Mushroom
+		Tooltip: Why would anyone voluntarily eat this?
+	}
+
+	RefreshingHerb: {
+		DisplayName: Refreshing Herb
+		Tooltip:
+			'''
+			Clears all debuffs
+			'It's just what the doctor ordered!'
+			'''
+	}
+
+	RevivingMushroom1: {
+		DisplayName: 1UP Mushroom
+		Tooltip:
+			'''
+			Prevents a bro from dying if kept in inventory
+			Grants half HP upon consumption
+			'''
+	}
+
+	RevivingMushroom2: {
+		DisplayName: 1UP Deluxe
 		Tooltip:
 			'''
 			Prevents a bro from dying if kept in inventory
@@ -67,32 +71,43 @@ Items: {
 			'''
 	}
 
-	OneUpMushroom: {
-		DisplayName: One Up Mushroom
-		Tooltip:
-			'''
-			Prevents a bro from dying if kept in inventory
-			Grants 50% of max HP upon consumption
-			'''
-	}
-
-	PoisonMushroom: {
-		DisplayName: Poison Mushroom
-		Tooltip: "'Why would anyone voluntarily eat this?'"
-	}
-
-	SuperMushroom: {
-		DisplayName: Super Mushroom
+	StarCandy1: {
+		DisplayName: Star Candy
 		Tooltip: ""
 	}
 
-	UltraMushroom: {
-		DisplayName: Ultra Mushroom
+	StarCandy2: {
+		DisplayName: Super Star Candy
 		Tooltip: ""
 	}
 
-	Pipe: {
-		DisplayName: Pipe
+	StarCandy3: {
+		DisplayName: Ultra Star Candy
+		Tooltip: ""
+	}
+
+	StarCandy4: {
+		DisplayName: Max Star Candy
+		Tooltip: ""
+	}
+
+	SyrupJar1: {
+		DisplayName: Syrup Jar
+		Tooltip: ""
+	}
+
+	SyrupJar2: {
+		DisplayName: Super Syrup Jar
+		Tooltip: ""
+	}
+
+	SyrupJar3: {
+		DisplayName: Ultra Syrup Jar
+		Tooltip: ""
+	}
+
+	SyrupJar4: {
+		DisplayName: Max Syrup Jar
 		Tooltip: ""
 	}
 
@@ -114,6 +129,11 @@ Items: {
 			'''
 	}
 
+	LuigiStatue: {
+		DisplayName: Luigi Statue
+		Tooltip: Some say there are voices trapped within these stones
+	}
+
 	Madpax: {
 		DisplayName: Madpax
 		Tooltip:
@@ -121,6 +141,11 @@ Items: {
 			'S. Dominick'
 			Adapted by M. Lob
 			'''
+	}
+
+	MarioStatue: {
+		DisplayName: Mario Statue
+		Tooltip: Some say there are voices trapped within these stones
 	}
 
 	MischievousActivities: {
@@ -141,79 +166,67 @@ Items: {
 			'''
 	}
 
-	MaxSyrupJar: {
-		DisplayName: Max Syrup Jar
-		Tooltip: ""
+	Hammer: {
+		DisplayName: Hammer
+		Tooltip: Useful on certain special blocks
 	}
 
-	SuperSyrupJar: {
-		DisplayName: Supersyrup Jar
-		Tooltip: ""
+	Nut1: {
+		DisplayName: Nut
+		Tooltip: Restores HP of you and nearby teammates
 	}
 
-	SyrupJar: {
-		DisplayName: Syrup Jar
-		Tooltip: ""
+	Nut2: {
+		DisplayName: Super Nut
+		Tooltip: Restores HP of you and nearby teammates
 	}
 
-	UltraSyrupJar: {
-		DisplayName: Ultrasyrup Jar
-		Tooltip: ""
+	Nut3: {
+		DisplayName: Ultra Nut
+		Tooltip: Restores HP of you and nearby teammates
 	}
 
-	MaxStarCandy: {
-		DisplayName: Max Star Candy
-		Tooltip: ""
+	Nut4: {
+		DisplayName: Max Nut
+		Tooltip: Restores HP of you and nearby teammates
 	}
-
-	StarCandy: {
-		DisplayName: Star Candy
-		Tooltip: ""
-	}
-
-	SuperStarCandy: {
-		DisplayName: Superstar Candy
-		Tooltip: ""
-	}
-
-	UltraStarCandy: {
-		DisplayName: Ultrastar Candy
-		Tooltip: ""
-	}
-
-	RefreshingHerb: {
-		DisplayName: Refreshing Herb
-		Tooltip:
-			'''
-			Clears all debuffs
-			'It's just what the doctor ordered!'
-			'''
-	}
-}
-
-Projectiles: {
-	StompHitbox.DisplayName: Stomp Hitbox
-	FireFlower.DisplayName: Fire Flower
-	IceFlower.DisplayName: Ice Flower
-	FireFlowerFireball.DisplayName: Fire Flower Fireball
-	IceFlowerIceball.DisplayName: Ice Flower Iceball
-	IceBlock.DisplayName: Ice Block
-	SuperLeaf.DisplayName: Super Leaf
-	TanookiSuit.DisplayName: Tanooki Suit
-	ActionBoxFlee.DisplayName: Action Box Flee
-	ActionBoxItem.DisplayName: Action Box Item
-	ActionBoxJump.DisplayName: Action Box Jump
-	ActionBoxSpecial.DisplayName: Action Box Special
-	ActionRing.DisplayName: Action Ring
-	TailSwipe.DisplayName: Tail Swipe
-	HammerSuitHammer.DisplayName: Hammer Suit Hammer
-	HammerSuit.DisplayName: Hammer Suit
-	BoomerangFlowerBoomerang.DisplayName: Boomerang Flower Boomerang
-	BoomerangFlower.DisplayName: Boomerang Flower
-	Boomerang.DisplayName: Boomerang
-	StatueSparkle.DisplayName: Statue Sparkle
-	CapeSpin.DisplayName: Cape Spin
-	CapeFeather.DisplayName: Cape Feather
 }
 
 NPCs.Goomba.DisplayName: Goomba
+
+Projectiles: {
+	StompHitbox.DisplayName: Stomp Hitbox
+	StatueSparkle.DisplayName: Statue Sparkle
+	Boomerang.DisplayName: Boomerang
+	CapeSpin.DisplayName: Cape Spin
+	FireFlowerFireball.DisplayName: Fire Flower Fireball
+	FireFlower.DisplayName: Fire Flower
+	HammerSuitHammer.DisplayName: Hammer Suit Hammer
+	HammerSuit.DisplayName: Hammer Suit
+	IceFlowerIceball.DisplayName: Ice Flower Iceball
+	IceFlower.DisplayName: Ice Flower
+	TailSwipe.DisplayName: Tail Swipe
+	BoomerangFlower.DisplayName: Boomerang Flower
+	CapeFeather.DisplayName: Cape Feather
+	SuperLeaf.DisplayName: Super Leaf
+	TanookiSuit.DisplayName: Tanooki Suit
+}
+
+UI: {
+	GearType: {
+		Cap: Cap
+		Overalls: Overalls
+		Socks: Socks
+		Boots: Boots
+		Gloves: Gloves
+		Badge: Badge
+	}
+
+	ObjectSpawnerBlock: {
+		HowTo: Select an object from the left panel. Edit any properties or reorder the list from this panel.\n\nStrike the block to get its contents in listed order (from top to bottom).
+		Exit: Exit (WILL NOT SAVE!)
+		Save: Save
+	}
+
+	BroInfoUI.PageButton: Bro Gear
+}

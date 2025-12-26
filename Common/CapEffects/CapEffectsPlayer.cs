@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Media;
+using Newtonsoft.Json.Linq;
 using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;
@@ -51,7 +53,7 @@ internal class CapEffectsPlayer : ModPlayer
 
     internal bool GroundPounding
     {
-        get => field;
+        get;
         set
         {
             field = value;
@@ -102,7 +104,7 @@ internal class CapEffectsPlayer : ModPlayer
     internal int capeFrameTimer;
     internal int CapeFrame
     {
-        get => field;
+        get;
         set
         {
             if (doCapeFlight && field != value)
@@ -133,12 +135,19 @@ internal class CapEffectsPlayer : ModPlayer
     internal int statHP = 0;
     internal int StatSP
     {
-        get => field;
+        get;
         set
         {
             field = Math.Clamp(value, 0, maxSP);
         }
     } = 20;
+
+    internal static void RestoreSP(Player player, int amount, bool effectOnly = false)
+    {
+        if (!effectOnly) player.GetModPlayerOrNull<CapEffectsPlayer>()?.StatSP += amount;
+        CombatText.NewText(player.getRect(), Color.Orange, amount);
+        //SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/SPHeal") { Volume = 0.4f }, player.Center);
+    }
 
     public override void ResetEffects()
     {
@@ -467,6 +476,18 @@ internal class CapEffectsPlayer : ModPlayer
         }
     }
 
+    public override bool CanBeHitByNPC(NPC npc, ref int cooldownSlot)
+    {
+        if (!statueForm) return base.CanBeHitByNPC(npc, ref cooldownSlot);
+        return false;
+    }
+
+    public override bool CanBeHitByProjectile(Projectile proj)
+    {
+        if (!statueForm) return base.CanBeHitByProjectile(proj);
+        return false;
+    }
+
     internal void SetForceDirection(int duration, ForceArmMovementType type, int direction)
     {
         if (duration <= 0 || Math.Abs(direction) != 1) return;
@@ -599,7 +620,7 @@ internal class CapEffectsPlayer : ModPlayer
     {
         if (!Player.IsOnGroundPrecise())
         {
-            stompHitbox ??= Projectile.NewProjectile(Player.GetSource_FromThis(), Player.BottomLeft, Vector2.Zero, ModContent.ProjectileType<StompHitbox>(), 1, 4f, Player.whoAmI);
+            stompHitbox ??= Projectile.NewProjectile(Player.GetSource_FromThis(), Player.BottomLeft, Vector2.Zero, ModContent.ProjectileType<StompHitbox>(), statPower, 4f, Player.whoAmI);
         }
         else KillStompHitbox();
     }

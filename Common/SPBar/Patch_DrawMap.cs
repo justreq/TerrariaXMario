@@ -22,7 +22,7 @@ internal class Patch_DrawMap : BasePatch
 
         if (!c.TryGotoNext(e => e.MatchSub(), e => e.MatchStsfld<Main>("miniMapX"))) ThrowError("stsfld");
 
-        c.EmitDelegate(() => Main.LocalPlayer.GetModPlayerOrNull<CapEffectsPlayer>()?.CanDoCapEffects ?? false ? -48 : 0);
+        c.EmitDelegate(() => (Main.LocalPlayer.GetModPlayerOrNull<CapEffectsPlayer>()?.CanDoCapEffects ?? false) && !TerrariaXMario.ResourceBarStyle.Contains("Bars") ? -48 : 0);
         c.Emit(OpCodes.Sub);
     }
 }

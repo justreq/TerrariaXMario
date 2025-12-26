@@ -3,8 +3,10 @@ using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
+using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Content.Caps;
 using TerrariaXMario.Content.PowerupProjectiles;
+using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Powerups;
 
@@ -16,7 +18,7 @@ internal class IceFlowerData : FireFlowerData
     {
         if (Main.projectile.Any(e => e.type == ModContent.ProjectileType<IceFlowerIceball>() && e.active && e.owner == player.whoAmI)) return;
         SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/IceFlowerShoot") { Volume = 0.4f }, player.Center);
-        Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, new Vector2(player.direction * 2.5f, 0f), ModContent.ProjectileType<IceFlowerIceball>(), 1, 0f, player.whoAmI);
+        Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, new Vector2(player.direction * 2.5f, 0f), ModContent.ProjectileType<IceFlowerIceball>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.statPower ?? 1, 0f, player.whoAmI);
     }
 }
 

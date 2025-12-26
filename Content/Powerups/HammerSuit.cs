@@ -1,10 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
+using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Content.Caps;
 using TerrariaXMario.Content.PowerupProjectiles;
+using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Powerups;
+
 internal class HammerSuitData : FireFlowerData
 {
     public override string Name => "HammerSuit";
@@ -13,7 +16,7 @@ internal class HammerSuitData : FireFlowerData
 
     internal override void OnRightClick(Player player)
     {
-        Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, new Vector2((Main.MouseWorld.X - player.Center.X) / 50, -8f), ModContent.ProjectileType<HammerSuitHammer>(), 1, 0f, player.whoAmI);
+        Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, new Vector2((Main.MouseWorld.X - player.Center.X) / 50, -8f), ModContent.ProjectileType<HammerSuitHammer>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.statPower ?? 1, 0f, player.whoAmI);
     }
 }
 

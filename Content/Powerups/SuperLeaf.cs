@@ -43,7 +43,7 @@ internal class SuperLeafData : Powerup
         modPlayer?.forceSwitchDirectionCount = 2;
         SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailSwipe") { Volume = 0.4f }, player.Center);
         modPlayer?.SetForceDirection(10, ForceArmMovementType.None, -player.direction);
-        Projectile.NewProjectile(player.GetSource_Misc("TailSwipe"), player.Center, Vector2.Zero, ModContent.ProjectileType<TailSwipe>(), 1, 7.5f, player.whoAmI);
+        Projectile.NewProjectile(player.GetSource_Misc("TailSwipe"), player.Center, Vector2.Zero, ModContent.ProjectileType<TailSwipe>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.statPower ?? 1, 7.5f, player.whoAmI);
     }
 
     internal override void OnJumpHeldDown(Player player)

@@ -8,8 +8,8 @@ internal class RevivingMushroomPlayer : ModPlayer
 {
     public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genDust, ref PlayerDeathReason damageSource)
     {
-        bool hasOneUp = Player.HasItemInInventoryOrOpenVoidBag(ModContent.ItemType<OneUpMushroom>());
-        bool hasOneUpDeluxe = Player.HasItemInInventoryOrOpenVoidBag(ModContent.ItemType<OneUpDeluxe>());
+        bool hasOneUp = Player.HasItemInInventoryOrOpenVoidBag(ModContent.ItemType<RevivingMushroom1>());
+        bool hasOneUpDeluxe = Player.HasItemInInventoryOrOpenVoidBag(ModContent.ItemType<RevivingMushroom2>());
 
         if (!hasOneUp && !hasOneUpDeluxe) return base.PreKill(damage, hitDirection, pvp, ref playSound, ref genDust, ref damageSource);
 
@@ -21,7 +21,7 @@ internal class RevivingMushroomPlayer : ModPlayer
 
         for (int i = 0; i < Player.inventory.Length; i++)
         {
-            if (Player.inventory[i].type == ModContent.ItemType<OneUpMushroom>() || Player.inventory[i].type == ModContent.ItemType<OneUpDeluxe>())
+            if (Player.inventory[i].type == ModContent.ItemType<RevivingMushroom1>() || Player.inventory[i].type == ModContent.ItemType<RevivingMushroom2>())
             {
                 item = Player.inventory[i].type;
                 inventorySlot = i;
@@ -35,7 +35,7 @@ internal class RevivingMushroomPlayer : ModPlayer
 
             for (int i = 0; i < Player.bank4.item.Length; i++)
             {
-                if (Player.bank4.item[i].type == ModContent.ItemType<OneUpMushroom>() || Player.bank4.item[i].type == ModContent.ItemType<OneUpDeluxe>())
+                if (Player.bank4.item[i].type == ModContent.ItemType<RevivingMushroom1>() || Player.bank4.item[i].type == ModContent.ItemType<RevivingMushroom2>())
                 {
                     item = Player.bank4.item[i].type;
                     inventorySlot = i;
@@ -44,7 +44,7 @@ internal class RevivingMushroomPlayer : ModPlayer
             }
         }
 
-        int healAmount = Player.statLifeMax2 / (item == ModContent.ItemType<OneUpMushroom>() ? 2 : 1);
+        int healAmount = Player.statLifeMax2 / (item == ModContent.ItemType<RevivingMushroom1>() ? 2 : 1);
         Player.Heal(healAmount);
 
         if (inVoidBag) Player.bank4.item[inventorySlot].stack--;

@@ -19,6 +19,6 @@ internal abstract class RevivingMushroom : ModItem, ISpawnableObject
     }
 }
 
-internal class OneUpMushroom : RevivingMushroom { }
+internal class RevivingMushroom1 : RevivingMushroom { }
 
-internal class OneUpDeluxe : RevivingMushroom { }
+internal class RevivingMushroom2 : RevivingMushroom { }

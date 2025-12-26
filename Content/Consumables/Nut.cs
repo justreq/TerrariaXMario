@@ -2,13 +2,12 @@
 using Terraria.ModLoader;
 using Terraria;
 using Terraria.DataStructures;
-using System.Collections.Generic;
 using TerrariaXMario.Core;
 using Terraria.Audio;
 
 namespace TerrariaXMario.Content.Consumables;
 
-internal abstract class EdibleMushroom : ModItem, ISpawnableObject
+internal class Nut1 : ModItem, ISpawnableObject
 {
     public override void SetStaticDefaults()
     {
@@ -16,6 +15,7 @@ internal abstract class EdibleMushroom : ModItem, ISpawnableObject
 
         Main.RegisterItemAnimation(Type, new DrawAnimationVertical(int.MaxValue, 3));
         ItemID.Sets.IsFood[Type] = true;
+        ItemID.Sets.FoodParticleColors[Item.type] = [new(255, 215, 0), new(204, 153, 0), new(102, 51, 0)];
     }
 
     public override void SetDefaults()
@@ -29,20 +29,33 @@ internal abstract class EdibleMushroom : ModItem, ISpawnableObject
         Item.useTime = 17;
         Item.useAnimation = 17;
         Item.consumable = true;
+        Item.healLife = 15;
     }
 
     public override void OnConsumeItem(Player player)
     {
         SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/Heal") { Volume = 0.4f }, player.Center);
+
+        foreach (Player p in Main.ActivePlayers)
+        {
+            if (p == player) continue;
+
+            if (p.team == player.team && p.Center.DistanceSQ(player.Center) <= 500000)
+            {
+                p.Heal(Item.healLife);
+                SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/Heal") { Volume = 0.4f }, p.Center);
+            }
+
+        }
     }
 }
 
-internal class EdibleMushroom2 : EdibleMushroom
+internal class Nut2 : Nut1
 {
     public override void SetStaticDefaults()
     {
         base.SetStaticDefaults();
-        ItemID.Sets.FoodParticleColors[Item.type] = [new(234, 249, 255), new(234, 49, 32), new(255, 188, 140)];
+        ItemID.Sets.FoodParticleColors[Item.type] = [new(218, 165, 32), new(0, 255, 0), new(255, 191, 0)];
     }
 
     public override void SetDefaults()
@@ -52,12 +65,12 @@ internal class EdibleMushroom2 : EdibleMushroom
     }
 }
 
-internal class EdibleMushroom3 : EdibleMushroom
+internal class Nut3 : Nut1
 {
     public override void SetStaticDefaults()
     {
         base.SetStaticDefaults();
-        ItemID.Sets.FoodParticleColors[Item.type] = [new(234, 249, 255), new(234, 176, 34), new(255, 188, 140)];
+        ItemID.Sets.FoodParticleColors[Item.type] = [new(255, 221, 85), new(85, 255, 85), new(255, 170, 0)];
     }
 
     public override void SetDefaults()
@@ -67,43 +80,17 @@ internal class EdibleMushroom3 : EdibleMushroom
     }
 }
 
-internal class EdibleMushroom4 : EdibleMushroom
+internal class Nut4 : Nut1
 {
     public override void SetStaticDefaults()
     {
         base.SetStaticDefaults();
-        ItemID.Sets.FoodParticleColors[Item.type] = [new(234, 51, 34), new(234, 176, 34), new(255, 188, 140)];
+        ItemID.Sets.FoodParticleColors[Item.type] = [new(255, 204, 0), new(255, 255, 15), new(153, 102, 0)];
     }
 
     public override void SetDefaults()
     {
         base.SetDefaults();
         Item.healLife = 300;
-    }
-}
-
-internal class EdibleMushroomBad : EdibleMushroom
-{
-    public override void SetStaticDefaults()
-    {
-        base.SetStaticDefaults();
-        ItemID.Sets.FoodParticleColors[Item.type] = [new(251, 195, 230), new(65, 31, 78), new(147, 63, 164)];
-    }
-
-    public override void SetDefaults()
-    {
-        base.SetDefaults();
-        Item.buffType = BuffID.Venom;
-        Item.buffTime = 300;
-    }
-
-    public override void OnConsumeItem(Player player)
-    {
-        // play disgusted sound
-    }
-
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        tooltips.RemoveAt(tooltips.FindIndex(e => e.Name == "BuffTime"));
     }
 }

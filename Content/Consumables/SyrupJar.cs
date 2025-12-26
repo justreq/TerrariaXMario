@@ -1,14 +1,15 @@
-﻿using Terraria.ID;
-using Terraria.ModLoader;
-using Terraria;
+﻿using Terraria;
 using Terraria.DataStructures;
+using Terraria.ID;
+using Terraria.ModLoader;
+using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Core;
-using System.Collections.Generic;
 
 namespace TerrariaXMario.Content.Consumables;
 
-internal class SyrupJar : ModItem, ISpawnableObject
+internal class SyrupJar1 : ModItem, ISpawnableObject
 {
+    internal virtual int SPReplenishAmount => 25;
     public override void SetStaticDefaults()
     {
         Item.ResearchUnlockCount = 30;
@@ -30,39 +31,27 @@ internal class SyrupJar : ModItem, ISpawnableObject
         Item.useTime = 17;
         Item.useAnimation = 17;
         Item.consumable = true;
-        Item.healMana = 15;
     }
 
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
+    public override bool? UseItem(Player player)
     {
-        TooltipLine? line = tooltips.Find(e => e.Name == "HealMana");
-        line?.Text = line?.Text.Replace("mana", "special points");
+        CapEffectsPlayer.RestoreSP(player, SPReplenishAmount);
+        return true;
     }
 }
 
-internal class SuperSyrupJar : SyrupJar
+internal class SyrupJar2 : SyrupJar1
 {
-    public override void SetDefaults()
-    {
-        base.SetDefaults();
-        Item.healMana = 30;
-    }
+    internal override int SPReplenishAmount => 50;
 }
 
-internal class UltraSyrupJar : SyrupJar
+internal class SyrupJar3 : SyrupJar1
 {
-    public override void SetDefaults()
-    {
-        base.SetDefaults();
-        Item.healMana = 60;
-    }
+    internal override int SPReplenishAmount => 75;
 }
 
-internal class MaxSyrupJar : SyrupJar
+internal class SyrupJar4 : SyrupJar1
 {
-    public override void SetDefaults()
-    {
-        base.SetDefaults();
-        Item.healMana = 120;
-    }
+
+    internal override int SPReplenishAmount => 100;
 }

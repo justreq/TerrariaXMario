@@ -42,10 +42,12 @@ internal class TerrariaXMario : Mod
 
     internal static Vector2 BroInfoPageButtonPosition;
 
+    internal static string ResourceBarStyle => Main.ResourceSetsManager.ActiveSet.DisplayedName;
+
     public override void Load()
     {
         oldMushroomTexture = TextureAssets.Item[ItemID.Mushroom];
-        TextureAssets.Item[ItemID.Mushroom] = ModContent.Request<Texture2D>($"{nameof(TerrariaXMario)}/Content/Consumables/Mushroom");
+        TextureAssets.Item[ItemID.Mushroom] = ModContent.Request<Texture2D>($"{nameof(TerrariaXMario)}/Content/Consumables/EdibleMushroom1");
 
         oldCursors = [.. TextureAssets.Cursors];
         TextureAssets.Cursors = [.. TextureAssets.Cursors, ModContent.Request<Texture2D>($"{Textures}/CursorGrab")];

@@ -1,15 +1,18 @@
-﻿using System.Collections.Generic;
-using Terraria;
+﻿using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Core;
+using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Consumables;
 
-internal class StarCandy : ModItem, ISpawnableObject
+internal class StarCandy1 : ModItem, ISpawnableObject
 {
+    internal virtual int SPReplenishAmount => 25;
+
     public override void SetStaticDefaults()
     {
         Item.ResearchUnlockCount = 30;
@@ -30,34 +33,31 @@ internal class StarCandy : ModItem, ISpawnableObject
         Item.useTime = 17;
         Item.useAnimation = 17;
         Item.consumable = true;
-        Item.healLife = 15;
-        Item.healMana = 15;
-    }
-
-    public override void ModifyTooltips(List<TooltipLine> tooltips)
-    {
-        TooltipLine? line = tooltips.Find(e => e.Name == "HealMana");
-        line?.Text = line?.Text.Replace("mana", "special points");
+        Item.healLife = 50;
     }
 
     public override void OnConsumeItem(Player player)
     {
         SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/Heal") { Volume = 0.4f }, player.Center);
+        CapEffectsPlayer.RestoreSP(player, SPReplenishAmount);
     }
 }
 
-internal class SuperStarCandy : StarCandy
+internal class StarCandy2 : StarCandy1
 {
+    internal override int SPReplenishAmount => 50;
+
     public override void SetDefaults()
     {
         base.SetDefaults();
-        Item.healLife = 30;
-        Item.healMana = 30;
+        Item.healLife = 100;
     }
 }
 
-internal class UltraStarCandy : StarCandy
+internal class StarCandy3 : StarCandy1
 {
+    internal override int SPReplenishAmount => 75;
+
     public override void SetStaticDefaults()
     {
         base.SetStaticDefaults();
@@ -67,13 +67,14 @@ internal class UltraStarCandy : StarCandy
     public override void SetDefaults()
     {
         base.SetDefaults();
-        Item.healLife = 60;
-        Item.healMana = 60;
+        Item.healLife = 200;
     }
 }
 
-internal class MaxStarCandy : StarCandy
+internal class StarCandy4 : StarCandy1
 {
+    internal override int SPReplenishAmount => 100;
+
     public override void SetStaticDefaults()
     {
         base.SetStaticDefaults();
@@ -83,7 +84,6 @@ internal class MaxStarCandy : StarCandy
     public override void SetDefaults()
     {
         base.SetDefaults();
-        Item.healLife = 120;
-        Item.healMana = 120;
+        Item.healLife = 300;
     }
 }
