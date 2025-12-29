@@ -3,10 +3,16 @@ using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TerrariaXMario.Content.MetaballContent;
 
 namespace TerrariaXMario.Content.PowerupProjectiles;
-public class FireFlowerFireball : ModProjectile
+
+internal class FireFlowerFireball : MetaballProjectile
 {
+    internal override Color OutlineColor => new(249, 28, 26);
+    internal override Color FillColor => new(246, 225, 21);
+    internal override float Radius => 10;
+
     internal float gravity = 0.4f;
     internal float bounceSpeed = -5;
     internal int dustType = DustID.Torch;
@@ -17,11 +23,10 @@ public class FireFlowerFireball : ModProjectile
     public override void SetDefaults()
     {
         Projectile.width = 16;
-        Projectile.height = 14;
+        Projectile.height = 16;
         Projectile.friendly = true;
         Projectile.penetrate = 1;
         Projectile.timeLeft = 150;
-        Projectile.scale = 0.75f;
     }
 
     public override bool OnTileCollide(Vector2 oldVelocity)
@@ -30,6 +35,13 @@ public class FireFlowerFireball : ModProjectile
         {
             Projectile.velocity.Y = bounceSpeed;
             tileCollideCount++;
+
+            for (int i = 0; i < 5; i++)
+            {
+                Dust dust = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, ModContent.DustType<FireFlowerFireballDust>());
+                dust.velocity = Vector2.Zero;
+                dust.scale = Main.rand.NextFloat(0.7f, 0.8f);
+            }
         }
 
         return false;
@@ -38,13 +50,16 @@ public class FireFlowerFireball : ModProjectile
     public override void AI()
     {
         Projectile.velocity.Y += gravity;
-        Projectile.rotation += Math.Sign(Projectile.velocity.X) * 0.35f;
 
         if (Main.rand.NextBool(dustChance))
         {
-            Dust dust = Dust.NewDustDirect(Projectile.Center, Projectile.width / 2, Projectile.height / 2, dustType, Scale: 2f);
-            dust.noGravity = true;
-            dust.velocity *= 4f;
+            //Dust dust = Dust.NewDustDirect(Projectile.Center, Projectile.width / 2, Projectile.height / 2, dustType, Scale: 2f);
+            //dust.noGravity = true;
+            //dust.velocity *= 4f;
+
+            Dust dust2 = Dust.NewDustDirect(Projectile.Center, Projectile.width / 2, Projectile.height / 2, ModContent.DustType<FireFlowerFireballDust>());
+            dust2.velocity = Vector2.Zero;
+            dust2.scale = Main.rand.NextFloat(0.5f, 0.6f);
         }
 
         if (Projectile.velocity.X == 0f) Projectile.Kill();
@@ -60,6 +75,10 @@ public class FireFlowerFireball : ModProjectile
             Dust dust2 = Dust.NewDustDirect(Projectile.Center, Projectile.width / 2, Projectile.height / 2, DustID.Smoke, 0f, 0f);
             dust2.noGravity = true;
             dust2.velocity *= 4f;
+
+            Dust dust3 = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, ModContent.DustType<FireFlowerFireballDust>());
+            dust3.velocity = Vector2.Zero;
+            dust3.scale = Main.rand.NextFloat(0.7f, 0.8f);
         }
     }
 }

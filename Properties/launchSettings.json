@@ -4,7 +4,10 @@
 			"commandName": "Executable",
 			"executablePath": "dotnet",
 			"commandLineArgs": "\"$(tMLPath)\" -skipselect \"Mod Testing:Mod Testing\"",
-			"workingDirectory": "$(tMLSteamPath)"
+			"workingDirectory": "$(tMLSteamPath)",
+			"environmentVariables": {
+				"TXM_MODSOURCEPATH": "$(ProjectDir)"
+			}
 		},
 		"TerrariaServer": {
 			"commandName": "Executable",
@@ -15,6 +18,6 @@
 		"Terraria (hot reload+ watcher)": {
 			"commandName": "Project",
 			"commandLineArgs": "\"$(TerrariaSteamPath)$(tMLPath)\" -skipselect \"Mod Testing:Mod Testing\""
-		}
+		},
 	}
 }

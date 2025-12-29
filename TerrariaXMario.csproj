@@ -24,9 +24,15 @@
 	</Target>
 
 	<ItemGroup>
-	  <Reference Include="SubworldLibrary">
-	    <HintPath>lib\SubworldLibrary.dll</HintPath>
-	  </Reference>
+		<Reference Include="SubworldLibrary">
+			<HintPath>lib\SubworldLibrary.dll</HintPath>
+		</Reference>
+		<Reference Include="Daybreak">
+			<HintPath>lib\Daybreak.dll</HintPath>
+		</Reference>
+		<Reference Include="KBOFXCTask">
+			<HintPath>lib\KBOFXCTask.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 </Project>
