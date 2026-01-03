@@ -30,11 +30,12 @@ internal class VanillaMushroomFoodItem : GlobalItem
         entity.useAnimation = 17;
         entity.consumable = true;
         entity.healLife = 15;
+        entity.potion = true;
     }
 
     public override void OnConsumeItem(Item item, Player player)
     {
-        if (item.type == ItemID.Mushroom) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/Heal") { Volume = 0.4f }, player.Center);
+        if (item.type == ItemID.Mushroom) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/Heal") { Volume = 0.4f }, player.MountedCenter);
         else base.OnConsumeItem(item, player);
     }
 }

@@ -28,6 +28,7 @@ internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
     internal virtual bool Head => true;
     internal virtual bool Body => true;
     internal virtual bool Legs => true;
+    internal virtual bool GroundPound => true;
 
     private int updateCount;
 
@@ -70,7 +71,7 @@ internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
             string cap = Caps[i];
 
             LoadEquipTextures(cap, head: Head, body: Body, legs: Legs);
-            if (Legs) LoadEquipTextures(cap, "GroundPound", false, false);
+            if (GroundPound && Legs) LoadEquipTextures(cap, "GroundPound", false, false);
 
             for (int j = 0; j < Variations.Length; j++)
             {
@@ -88,7 +89,7 @@ internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
             string cap = Caps[i];
 
             SetupEquipTextures(cap);
-            if (Legs) SetupEquipTextures(cap, "GroundPound", false, false);
+            if (GroundPound && Legs) SetupEquipTextures(cap, "GroundPound", false, false);
 
             for (int j = 0; j < Variations.Length; j++)
             {
@@ -129,7 +130,7 @@ internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
 
             Projectile.Kill();
 
-            SoundEngine.PlaySound(new(Powerup!.EquipSound) { Volume = 0.4f }, player.Center);
+            SoundEngine.PlaySound(new(Powerup!.EquipSound) { Volume = 0.4f }, player.MountedCenter);
             player.GetModPlayerOrNull<CapEffectsPlayer>()?.currentPowerupType = PowerupType;
             Powerup!.OnConsume(player);
         }

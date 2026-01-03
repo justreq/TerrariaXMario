@@ -4,6 +4,7 @@ using Terraria.ModLoader;
 using Terraria.Utilities;
 using TerrariaXMario.Common.BroInfoUI;
 using TerrariaXMario.Common.CapEffects;
+using TerrariaXMario.Content.Powerups;
 using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 
@@ -89,7 +90,11 @@ internal abstract class CapItem : ModItem, ISpawnableObject
 
         player.GetModPlayerOrNull<CapEffectsPlayer>()?.currentCap = Name;
 
-        if (!capEffectsPlayer?.GroundPounding ?? false) player.spikedBoots = 1;
+        if (capEffectsPlayer == null) return;
+
+        if (!capEffectsPlayer.GroundPounding && capEffectsPlayer.currentPowerupType != ModContent.GetInstance<FrogSuitData>().Type) player.spikedBoots = 1;
+
+        capEffectsPlayer.CurrentPowerup?.UpdateConsumed(player);
     }
 
     public override void UpdateVisibleAccessory(Player player, bool hideVisual)

@@ -43,7 +43,7 @@ internal class BroInfoUI : UIState
         if (switchToPage && finalValue) Main.EquipPageSelected = 0;
 
         CapEffectsPlayer? modPlayer = Main.LocalPlayer.GetModPlayerOrNull<CapEffectsPlayer>();
-        if (modPlayer?.currentCap != null) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{modPlayer?.currentCap}{(finalValue ? "Equip" : "Unequip")}") { Volume = 0.4f }, Main.LocalPlayer.Center);
+        if (modPlayer?.currentCap != null) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{modPlayer?.currentCap}{(finalValue ? "Equip" : "Unequip")}") { Volume = 0.4f }, Main.LocalPlayer.MountedCenter);
         modPlayer?.BroInfoPlayer?.ShowBroInfo = finalValue;
     }
 

@@ -29,11 +29,12 @@ internal abstract class EdibleMushroom : ModItem, ISpawnableObject
         Item.useTime = 17;
         Item.useAnimation = 17;
         Item.consumable = true;
+        Item.potion = true;
     }
 
     public override void OnConsumeItem(Player player)
     {
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/Heal") { Volume = 0.4f }, player.Center);
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/Heal") { Volume = 0.4f }, player.MountedCenter);
     }
 }
 
@@ -95,6 +96,7 @@ internal class EdibleMushroomBad : EdibleMushroom
         base.SetDefaults();
         Item.buffType = BuffID.Venom;
         Item.buffTime = 300;
+        Item.potion = false;
     }
 
     public override void OnConsumeItem(Player player)

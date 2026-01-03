@@ -17,7 +17,6 @@ internal class SuperLeafData : Powerup
     internal override string EquipSound => $"{TerrariaXMario.Sounds}/PowerupEffects/TailPowerUp";
 
     internal override bool LookTowardRightClick => false;
-    internal override bool ShowTail => true;
 
     internal override void UpdateWorld(Projectile projectile, int updateCount)
     {
@@ -41,9 +40,9 @@ internal class SuperLeafData : Powerup
 
         if ((!modPlayer?.CanShowTail ?? true) || player.fullRotation != 0) return;
         modPlayer?.forceSwitchDirectionCount = 2;
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailSwipe") { Volume = 0.4f }, player.Center);
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailSwipe") { Volume = 0.4f }, player.MountedCenter);
         modPlayer?.SetForceDirection(10, ForceArmMovementType.None, -player.direction);
-        Projectile.NewProjectile(player.GetSource_Misc("TailSwipe"), player.Center, Vector2.Zero, ModContent.ProjectileType<TailSwipe>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.statPower ?? 1, 7.5f, player.whoAmI);
+        Projectile.NewProjectile(player.GetSource_Misc("TailSwipe"), player.MountedCenter, Vector2.Zero, ModContent.ProjectileType<TailSwipe>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.statPower ?? 1, 7.5f, player.whoAmI);
     }
 
     internal override void OnJumpHeldDown(Player player)
@@ -68,7 +67,7 @@ internal class SuperLeafData : Powerup
 
                 if (!SoundEngine.TryGetActiveSound(modPlayer.glideFlySoundSlot, out var glideSound))
                 {
-                    modPlayer.glideFlySoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailGlide") { Volume = 0.4f }, player.Center);
+                    modPlayer.glideFlySoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailGlide") { Volume = 0.4f }, player.MountedCenter);
                 }
                 break;
             case FlightState.Flying:
@@ -85,7 +84,7 @@ internal class SuperLeafData : Powerup
 
                 if (!SoundEngine.TryGetActiveSound(modPlayer.glideFlySoundSlot, out var flySound))
                 {
-                    modPlayer.glideFlySoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailFly") { Volume = 0.4f }, player.Center);
+                    modPlayer.glideFlySoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailFly") { Volume = 0.4f }, player.MountedCenter);
                 }
                 break;
         }

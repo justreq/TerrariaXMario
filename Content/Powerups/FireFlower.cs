@@ -28,8 +28,8 @@ internal class FireFlowerData : Powerup
 
         modPlayer?.fireFlowerFireballsCast += 1;
         if (modPlayer?.fireFlowerCooldown == 0) modPlayer?.fireFlowerCooldown = 30;
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/FireFlowerShoot") { Volume = 0.4f }, player.Center);
-        Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, new Vector2(player.direction * 5, 0f), ModContent.ProjectileType<FireFlowerFireball>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.statPower ?? 1, 0f, player.whoAmI);
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/FireFlowerShoot") { Volume = 0.4f }, player.MountedCenter);
+        Projectile.NewProjectile(player.GetSource_FromThis(), player.MountedCenter, new Vector2(player.direction * 5, 0f), ModContent.ProjectileType<FireFlowerFireball>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.statPower ?? 1, 0f, player.whoAmI);
     }
 }
 

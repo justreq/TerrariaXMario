@@ -14,9 +14,7 @@ internal class CapeFeatherData : SuperLeafData
     public override string Name => "CapeFeather";
 
     internal override string EquipSound => $"{TerrariaXMario.Sounds}/PowerupEffects/CapePowerUp";
-
-    internal override bool ShowTail => false;
-    internal override bool ShowCape => true;
+    internal override bool LookTowardRightClick => false;
 
     internal override void OnRightClick(Player player)
     {
@@ -24,9 +22,9 @@ internal class CapeFeatherData : SuperLeafData
 
         if ((!modPlayer?.CanShowCape ?? true) || player.fullRotation != 0) return;
         modPlayer?.forceSwitchDirectionCount = 2;
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/CapeSpin") { Volume = 0.4f }, player.Center);
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/CapeSpin") { Volume = 0.4f }, player.MountedCenter);
         modPlayer?.SetForceDirection(10, ForceArmMovementType.None, -player.direction);
-        Projectile.NewProjectile(player.GetSource_Misc("CapeSpin"), player.Center, Vector2.Zero, ModContent.ProjectileType<CapeSpin>(), 1, 7.5f, player.whoAmI);
+        Projectile.NewProjectile(player.GetSource_Misc("CapeSpin"), player.MountedCenter, Vector2.Zero, ModContent.ProjectileType<CapeSpin>(), 1, 7.5f, player.whoAmI);
     }
 
     private readonly float[] fallSpeedMultipliers = [1, 3, 3, 3.5f, 3.5f, 4];

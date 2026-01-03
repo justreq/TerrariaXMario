@@ -6,6 +6,7 @@ using Terraria.WorldBuilding;
 using TerrariaXMario.Content.Furniture;
 
 namespace TerrariaXMario.Common.WorldGeneration;
+
 internal class StatueGeneration : ModSystem
 {
     public override void Load()

@@ -18,7 +18,7 @@ internal class StatueDrawLayer : PlayerDrawLayer
         Player player = drawInfo.drawPlayer;
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
 
-        Vector2 position = player.Center - new Vector2(20, 31) - Main.screenPosition;
+        Vector2 position = player.MountedCenter - new Vector2(20, 31) - Main.screenPosition;
         position = new((int)position.X, (int)position.Y);
 
         drawInfo.DrawDataCache.Add(new(ModContent.Request<Texture2D>($"{GetType().Namespace!.Replace(".", "/")}/Statue{modPlayer?.currentCap ?? "Mario"}").Value, position, null, Color.White));

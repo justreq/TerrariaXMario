@@ -13,7 +13,7 @@ internal class RevivingMushroomPlayer : ModPlayer
 
         if (!hasOneUp && !hasOneUpDeluxe) return base.PreKill(damage, hitDirection, pvp, ref playSound, ref genDust, ref damageSource);
 
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/OneUp") { Volume = 0.4f }, Player.Center);
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/OneUp") { Volume = 0.4f }, Player.MountedCenter);
 
         int item = -1;
         bool inVoidBag = false;

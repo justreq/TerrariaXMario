@@ -73,7 +73,7 @@ internal class Boomerang : InteractiveWithObjectSpawnerTileProjectile
                 break;
             case State.Returning:
                 Player player = Main.player[Projectile.owner];
-                Projectile.velocity = Projectile.Center.DirectionTo(player.Center) * 8;
+                Projectile.velocity = Projectile.Center.DirectionTo(player.MountedCenter) * 8;
                 if (Projectile.getRect().Intersects(player.getRect())) Projectile.Kill();
                 break;
         }

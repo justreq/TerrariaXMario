@@ -1,6 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Media;
-using Newtonsoft.Json.Linq;
 using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;
@@ -15,6 +13,7 @@ using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 using TerrariaXMario.Common.BroInfoUI;
 using TerrariaXMario.Common.CapeFlight;
+using TerrariaXMario.Common.FrogSwim;
 using TerrariaXMario.Common.MiscEffects;
 using TerrariaXMario.Common.StatueForm;
 using TerrariaXMario.Content.Blocks;
@@ -39,6 +38,8 @@ internal class CapEffectsPlayer : ModPlayer
     internal string? currentBodyVariant;
     internal string? currentLegsVariant;
 
+    internal string?[] CurrentVariants => [.. new string?[] { currentHeadVariant, currentBodyVariant, currentLegsVariant }.Where(e => e != null).Distinct()];
+
     internal int? currentPowerupType;
     internal Powerup? CurrentPowerup => currentPowerupType == null ? null : PowerupLoader.Powerups[(int)currentPowerupType];
 
@@ -57,7 +58,7 @@ internal class CapEffectsPlayer : ModPlayer
         set
         {
             field = value;
-            currentLegsVariant = value ? "GroundPound" : null;
+            currentLegsVariant = value ? "GroundPound" : currentLegsVariant;
         }
     }
 
@@ -114,7 +115,7 @@ internal class CapEffectsPlayer : ModPlayer
                 if (((PlayerInput.Triggers.Current.Left && Player.direction == 1) || (PlayerInput.Triggers.Current.Right && Player.direction == -1)) && offset == -1 && field > 2 && capeBoostFactor == 0)
                 {
                     capeBoostFactor = field - 2;
-                    SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/CapeRise") { Volume = 0.4f }, Player.Center);
+                    SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/CapeRise") { Volume = 0.4f }, Player.MountedCenter);
                 }
 
                 if (value == 0 && capeBoostFactor != 0)
@@ -142,11 +143,16 @@ internal class CapEffectsPlayer : ModPlayer
         }
     } = 20;
 
+    internal bool frogSwimming;
+    internal int frogSwimFrame;
+
+    internal float forceFullRotation;
+
     internal static void RestoreSP(Player player, int amount, bool effectOnly = false)
     {
         if (!effectOnly) player.GetModPlayerOrNull<CapEffectsPlayer>()?.StatSP += amount;
         CombatText.NewText(player.getRect(), Color.Orange, amount);
-        //SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/SPHeal") { Volume = 0.4f }, player.Center);
+        //SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/SPHeal") { Volume = 0.4f }, player.MountedCenter);
     }
 
     public override void ResetEffects()
@@ -196,10 +202,10 @@ internal class CapEffectsPlayer : ModPlayer
         if (currentPowerupType != null)
         {
             currentPowerupType = null;
-            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/PowerDown") { Volume = 0.4f }, Player.Center);
+            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/PowerDown") { Volume = 0.4f }, Player.MountedCenter);
         }
 
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PlayerOverrides/{currentCap}Hurt{Main.rand.Next(1, 5)}") { Volume = 0.4f }, Player.Center);
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PlayerOverrides/{currentCap}Hurt{Main.rand.Next(1, 5)}") { Volume = 0.4f }, Player.MountedCenter);
     }
 
     public override void FrameEffects()
@@ -232,7 +238,7 @@ internal class CapEffectsPlayer : ModPlayer
         int legs = EquipLoader.GetEquipSlot(Mod, $"{CurrentPowerup?.Name}{currentCapToDraw}{currentLegsVariant ?? ""}", EquipType.Legs);
         Player.legs = legs == -1 ? EquipLoader.GetEquipSlot(Mod, $"{currentCapToDraw}{currentLegsVariant ?? ""}", EquipType.Legs) : legs;
 
-        if ((CurrentPowerup?.ShowTail ?? false) && CanShowTail)
+        if (CurrentPowerup != null && PowerupID.Sets.ShowTail[CurrentPowerup.Type] && CanShowTail)
         {
             Player.waist = EquipLoader.GetEquipSlot(Mod, $"{currentCapToDraw}Tail{(flightState == FlightState.Flying ? "Flying" : "")}", EquipType.Waist);
         }
@@ -286,6 +292,12 @@ internal class CapEffectsPlayer : ModPlayer
 
         if (currentCap == "Luigi") Player.maxRunSpeed *= 1.05f;
 
+        if (currentPowerupType == ModContent.GetInstance<FrogSuitData>().Type && !frogSwimming && !CurrentVariants.Contains("Running") && new int[] { 12, 18 }.Contains(Player.legFrame.Y / 56))
+        {
+            Player.maxRunSpeed *= 0.25f;
+            Player.velocity.X = 0.4f * Player.direction;
+        }
+
         PSpeedEffect();
     }
 
@@ -299,8 +311,6 @@ internal class CapEffectsPlayer : ModPlayer
 
         if (currentJump == Jump.Double) Player.jumpSpeedBoost += 1.25f;
         else if (currentJump == Jump.Triple) Player.jumpSpeedBoost += 2.5f;
-
-        CurrentPowerup?.UpdateConsumed(Player);
     }
 
     public override void PostUpdate()
@@ -314,6 +324,7 @@ internal class CapEffectsPlayer : ModPlayer
             hasPSpeed = false;
             statueForm = false;
             doCapeFlight = false;
+            frogSwimming = false;
 
             return;
         }
@@ -347,6 +358,19 @@ internal class CapEffectsPlayer : ModPlayer
         }
 
         if (statueForm && CurrentPowerup is not TanookiSuitData) statueForm = false;
+
+        if (frogSwimming)
+        {
+            if (Player.velocity != Vector2.Zero)
+            {
+                if (Player.velocity.X != 0) Player.direction = Math.Sign(Player.velocity.X);
+                Player.fullRotationOrigin = Player.Hitbox.Size() * 0.5f;
+                forceFullRotation = Utils.AngleLerp(forceFullRotation, MathHelper.ToRadians((40 * (Player.velocity.X != 0 ? 0.5f : 1)) * Math.Sign(Player.velocity.Y) * Player.direction), 0.15f);
+            }
+        }
+        else forceFullRotation = 0;
+
+        Player.fullRotation = forceFullRotation;
     }
 
     public override void ProcessTriggers(TriggersSet triggersSet)
@@ -385,32 +409,35 @@ internal class CapEffectsPlayer : ModPlayer
 
         if (PlayerInput.Triggers.JustPressed.Down && !doCapeFlight && stompHitbox != null)
         {
-            StompHitbox stompHitboxProjectile = (StompHitbox)Main.projectile[(int)stompHitbox].ModProjectile;
-
-            if (!stompHitboxProjectile.groundPound)
+            if (currentPowerupType == null || !PowerupID.Sets.DisableGroundPound[(int)currentPowerupType])
             {
-                SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPoundStart") { Volume = 0.4f }, Player.Center);
-                Player.fullRotation = 0;
-                stompHitboxProjectile.groundPound = true;
-            }
+                StompHitbox stompHitboxProjectile = (StompHitbox)Main.projectile[(int)stompHitbox].ModProjectile;
 
-            if (CurrentPowerup is TanookiSuitData && !statueForm)
-            {
-                foreach (Projectile projectile in Main.ActiveProjectiles)
+                if (!stompHitboxProjectile.groundPound)
                 {
-                    if (projectile.owner == Player.whoAmI && projectile.type == ModContent.ProjectileType<TailSwipe>()) projectile.Kill();
+                    SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPoundStart") { Volume = 0.4f }, Player.MountedCenter);
+                    Player.fullRotation = 0;
+                    stompHitboxProjectile.groundPound = true;
                 }
 
-                SpawnStatueSparkle();
-                forceDirection = 0;
-                directionWhenTurnedToStatue = Player.direction;
-                Player.direction = 1;
-                statueForm = true;
-                statueFormCooldown = 15;
+                if (CurrentPowerup is TanookiSuitData && !statueForm)
+                {
+                    foreach (Projectile projectile in Main.ActiveProjectiles)
+                    {
+                        if (projectile.owner == Player.whoAmI && projectile.type == ModContent.ProjectileType<TailSwipe>()) projectile.Kill();
+                    }
+
+                    SpawnStatueSparkle();
+                    forceDirection = 0;
+                    directionWhenTurnedToStatue = Player.direction;
+                    Player.direction = 1;
+                    statueForm = true;
+                    statueFormCooldown = 15;
+                }
             }
         }
 
-        if (PlayerInput.Triggers.JustPressed.Jump && (Player.IsOnGroundPrecise() || Player.wet)) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(Player.wet ? "Swim" : "Jump")}") { Volume = 0.4f }, Player.Center);
+        if (PlayerInput.Triggers.JustPressed.Jump && (Player.IsOnGroundPrecise() || Player.wet)) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(Player.wet ? "Swim" : "Jump")}") { Volume = 0.4f }, Player.MountedCenter);
 
         if (doCapeFlight && !Player.IsOnGroundPrecise())
         {
@@ -430,6 +457,14 @@ internal class CapEffectsPlayer : ModPlayer
             {
                 if (CapeFrame != 2 && capeFrameTimer == 1) CapeFrame += (2 > CapeFrame).ToInt() - (2 < CapeFrame).ToInt();
                 else if (capeFrameTimer == 0) capeFrameTimer = 10;
+            }
+        }
+
+        if (frogSwimming)
+        {
+            if ((PlayerInput.Triggers.Current.Right || PlayerInput.Triggers.Current.Left || PlayerInput.Triggers.Current.Up || PlayerInput.Triggers.Current.Down) && Main.GameUpdateCount % 10 == 0)
+            {
+                frogSwimFrame = frogSwimFrame == 2 ? 0 : frogSwimFrame + 1;
             }
         }
     }
@@ -458,17 +493,22 @@ internal class CapEffectsPlayer : ModPlayer
             Player.controlUp = false;
             Player.controlDown = false;
         }
+
+        if (frogSwimming)
+        {
+            Player.controlJump = false;
+        }
     }
 
     public override void HideDrawLayers(PlayerDrawSet drawInfo)
     {
         if (!CanDoCapEffects) return;
 
-        if (statueForm || doCapeFlight)
+        if (statueForm || doCapeFlight || frogSwimming)
         {
             foreach (PlayerDrawLayer layer in PlayerDrawLayerLoader.Layers)
             {
-                if (layer != PlayerDrawLayers.Head && (statueForm && layer is not StatueDrawLayer) || (doCapeFlight && layer is not CapeFlightDrawLayer))
+                if (layer != PlayerDrawLayers.Head && (statueForm && layer is not StatueDrawLayer) || (doCapeFlight && layer is not CapeFlightDrawLayer) || (frogSwimming && layer is not FrogSwimDrawLayer))
                 {
                     layer.Hide();
                 }
@@ -478,13 +518,13 @@ internal class CapEffectsPlayer : ModPlayer
 
     public override bool CanBeHitByNPC(NPC npc, ref int cooldownSlot)
     {
-        if (!statueForm) return base.CanBeHitByNPC(npc, ref cooldownSlot);
+        if (!statueForm && !GroundPounding) return base.CanBeHitByNPC(npc, ref cooldownSlot);
         return false;
     }
 
     public override bool CanBeHitByProjectile(Projectile proj)
     {
-        if (!statueForm) return base.CanBeHitByProjectile(proj);
+        if (!statueForm && !GroundPounding) return base.CanBeHitByProjectile(proj);
         return false;
     }
 
@@ -514,7 +554,7 @@ internal class CapEffectsPlayer : ModPlayer
     {
         if (oldCap != currentCap)
         {
-            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{currentCap ?? oldCap}{(currentCap == null ? "Unequip" : "Equip")}") { Volume = 0.4f }, Player.Center);
+            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{currentCap ?? oldCap}{(currentCap == null ? "Unequip" : "Equip")}") { Volume = 0.4f }, Player.MountedCenter);
             if (!BroInfoPlayer?.ShowBroInfo ?? false) BroInfoPlayer?.ShowBroInfo = true;
             oldCap = currentCap;
         }
@@ -538,7 +578,7 @@ internal class CapEffectsPlayer : ModPlayer
                 int i = Math.Clamp(Math.Max(1, 4 - (int)Math.Floor((double)forceArmMovementTimer / forceArmMovementDuration * 4)), 1, 4);
 
                 if (forceArmMovementType == ForceArmMovementType.Swing) Player.bodyFrame.Y = 56 * i;
-                else if (forceArmMovementType == ForceArmMovementType.Extend) Player.SetCompositeArmFront(true, (Player.CompositeArmStretchAmount)(i == 4 ? 0 : i), Player.Center.DirectionTo(Main.MouseWorld).ToRotation() - MathHelper.PiOver2);
+                else if (forceArmMovementType == ForceArmMovementType.Extend) Player.SetCompositeArmFront(true, (Player.CompositeArmStretchAmount)(i == 4 ? 0 : i), Player.MountedCenter.DirectionTo(Main.MouseWorld).ToRotation() - MathHelper.PiOver2);
             }
 
             forceArmMovementTimer--;
@@ -561,7 +601,7 @@ internal class CapEffectsPlayer : ModPlayer
     {
         if (jumpInputBuffer > 0 && !Player.IsOnGroundPrecise()) jumpInputBuffer = 0;
 
-        if (jumpInputBuffer > 10 || Player.sliding)
+        if (jumpInputBuffer > 10 || Player.sliding || frogSwimming)
         {
             currentJump = Jump.None;
             jumpInputBuffer = 0;
@@ -604,6 +644,7 @@ internal class CapEffectsPlayer : ModPlayer
 
         if (Player.justJumped)
         {
+            if (currentPowerupType == ModContent.GetInstance<FrogSuitData>().Type && !CurrentVariants.Contains("Running")) return;
             currentJump = currentJump == Jump.Triple ? Jump.Single : currentJump + 1;
 
             if (currentJump == Jump.Triple)
@@ -612,13 +653,13 @@ internal class CapEffectsPlayer : ModPlayer
                 backflip = false;
             }
 
-            if (currentJump is not (Jump.None or Jump.Single) && (int)currentJump < Enum.GetNames(typeof(Jump)).Length) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{currentCap}{currentJump}Jump") { Volume = 0.4f }, Player.Center);
+            if (currentJump is not (Jump.None or Jump.Single) && (int)currentJump < Enum.GetNames(typeof(Jump)).Length) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{currentCap}{currentJump}Jump") { Volume = 0.4f }, Player.MountedCenter);
         }
     }
 
     private void StompEffect()
     {
-        if (!Player.IsOnGroundPrecise())
+        if (!Player.IsOnGroundPrecise() && !frogSwimming)
         {
             stompHitbox ??= Projectile.NewProjectile(Player.GetSource_FromThis(), Player.BottomLeft, Vector2.Zero, ModContent.ProjectileType<StompHitbox>(), statPower, 4f, Player.whoAmI);
         }
@@ -637,9 +678,13 @@ internal class CapEffectsPlayer : ModPlayer
 
     private void PSpeedEffect()
     {
-        if (flightState == FlightState.Flying) return;
+        if (flightState == FlightState.Flying || frogSwimming) return;
 
-        if ((runTime != 0 && !Player.controlLeft && !Player.controlRight)) runTime = 0;
+        if ((!Player.controlLeft && !Player.controlRight) || Math.Abs(Player.velocity.X) <= 2.5f)
+        {
+            if (runTime != 0) runTime = 0;
+            if (CurrentVariants.Contains("Running") && !Player.mount.Active) currentHeadVariant = currentBodyVariant = currentLegsVariant = null;
+        }
         if (Player.IsOnGroundPrecise() && (Player.controlLeft || Player.controlRight) && Math.Abs(Player.velocity.X) > 2.5f && runTime < runTimeRequiredForPSpeed) runTime++;
 
         if (runTime >= runTimeRequiredForPSpeed)
@@ -647,18 +692,18 @@ internal class CapEffectsPlayer : ModPlayer
             if (!hasPSpeed)
             {
                 hasPSpeed = true;
-                SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/FastRunStart") { Volume = 0.4f }, Player.Center);
+                SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/FastRunStart") { Volume = 0.4f }, Player.MountedCenter);
 
                 for (int i = 0; i < 8; i++)
                 {
-                    Dust.NewDustPerfect(Player.Center, DustID.Cloud, Scale: 1.5f);
+                    Dust.NewDustPerfect(Player.MountedCenter, DustID.Cloud, Scale: 1.5f);
                 }
             }
 
             Player.accRunSpeed *= currentCap == "Luigi" ? 1.5f : 1.25f;
             if (!SoundEngine.TryGetActiveSound(pSpeedSoundSlot, out var pSpeedSound))
             {
-                pSpeedSoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/PSpeed") { Volume = 0.2f }, Player.Center);
+                pSpeedSoundSlot = SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/PSpeed") { Volume = 0.2f }, Player.MountedCenter);
             }
         }
         else if (hasPSpeed)
@@ -773,7 +818,7 @@ internal class CapEffectsPlayer : ModPlayer
     {
         if (point == null) return;
 
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/BlockHit") { Volume = 8 }, Player.Center);
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/BlockHit") { Volume = 8 }, Player.MountedCenter);
 
         ObjectSpawnerBlockEntity? entity = TerrariaXMario.GetTileEntityOrNull((Point)point);
         if (entity == null || entity.justStruck || entity.wasPreviouslyStruck) return;
@@ -820,7 +865,7 @@ internal class CapEffectsPlayer : ModPlayer
 
     private void SpawnStatueSparkle()
     {
-        Projectile.NewProjectile(Player.GetSource_Misc("Statue"), Player.Center, Vector2.Zero, ModContent.ProjectileType<StatueSparkle>(), 0, 0, Player.whoAmI);
+        Projectile.NewProjectile(Player.GetSource_Misc("Statue"), Player.MountedCenter, Vector2.Zero, ModContent.ProjectileType<StatueSparkle>(), 0, 0, Player.whoAmI);
     }
 
     private void CapeFlightEffect()

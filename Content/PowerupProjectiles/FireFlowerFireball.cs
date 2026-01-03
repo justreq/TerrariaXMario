@@ -12,6 +12,7 @@ internal class FireFlowerFireball : MetaballProjectile
     internal override Color OutlineColor => new(249, 28, 26);
     internal override Color FillColor => new(246, 225, 21);
     internal override float Radius => 10;
+    internal override int? PairedMetaballDust => ModContent.DustType<FireFlowerFireballDust>();
 
     internal float gravity = 0.4f;
     internal float bounceSpeed = -5;
@@ -36,11 +37,14 @@ internal class FireFlowerFireball : MetaballProjectile
             Projectile.velocity.Y = bounceSpeed;
             tileCollideCount++;
 
-            for (int i = 0; i < 5; i++)
+            if (PairedMetaballDust != null)
             {
-                Dust dust = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, ModContent.DustType<FireFlowerFireballDust>());
-                dust.velocity = Vector2.Zero;
-                dust.scale = Main.rand.NextFloat(0.7f, 0.8f);
+                for (int i = 0; i < 5; i++)
+                {
+                    Dust dust = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, (int)PairedMetaballDust);
+                    dust.velocity = Vector2.Zero;
+                    dust.scale = Main.rand.NextFloat(0.7f, 0.8f);
+                }
             }
         }
 
@@ -51,13 +55,9 @@ internal class FireFlowerFireball : MetaballProjectile
     {
         Projectile.velocity.Y += gravity;
 
-        if (Main.rand.NextBool(dustChance))
+        if (Main.rand.NextBool(dustChance) && PairedMetaballDust != null)
         {
-            //Dust dust = Dust.NewDustDirect(Projectile.Center, Projectile.width / 2, Projectile.height / 2, dustType, Scale: 2f);
-            //dust.noGravity = true;
-            //dust.velocity *= 4f;
-
-            Dust dust2 = Dust.NewDustDirect(Projectile.Center, Projectile.width / 2, Projectile.height / 2, ModContent.DustType<FireFlowerFireballDust>());
+            Dust dust2 = Dust.NewDustDirect(Projectile.Center, Projectile.width / 2, Projectile.height / 2, (int)PairedMetaballDust);
             dust2.velocity = Vector2.Zero;
             dust2.scale = Main.rand.NextFloat(0.5f, 0.6f);
         }
@@ -76,7 +76,9 @@ internal class FireFlowerFireball : MetaballProjectile
             dust2.noGravity = true;
             dust2.velocity *= 4f;
 
-            Dust dust3 = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, ModContent.DustType<FireFlowerFireballDust>());
+            if (PairedMetaballDust == null) continue;
+
+            Dust dust3 = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, (int)PairedMetaballDust);
             dust3.velocity = Vector2.Zero;
             dust3.scale = Main.rand.NextFloat(0.7f, 0.8f);
         }

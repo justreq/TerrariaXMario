@@ -56,13 +56,13 @@ internal class CapeSpin : InteractiveWithObjectSpawnerTileProjectile
 
         if (Projectile.spriteDirection == 1)
         {
-            if (Projectile.frame < 5) Projectile.Right = player.Center + offset;
-            else Projectile.Left = player.Center + offset;
+            if (Projectile.frame < 5) Projectile.Right = player.MountedCenter + offset;
+            else Projectile.Left = player.MountedCenter + offset;
         }
         else
         {
-            if (Projectile.frame < 5) Projectile.Left = player.Center + offset;
-            else Projectile.Right = player.Center + offset;
+            if (Projectile.frame < 5) Projectile.Left = player.MountedCenter + offset;
+            else Projectile.Right = player.MountedCenter + offset;
         }
     }
 

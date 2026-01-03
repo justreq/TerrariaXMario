@@ -26,7 +26,7 @@ internal class StompHitbox : ModProjectile
 
         stompCooldown = 5;
         stompCount++;
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(stompCount > 7 ? "Heal" : $"Stomp{stompCount}")}") { Volume = 0.4f }, player.Center);
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(stompCount > 7 ? "Heal" : $"Stomp{stompCount}")}") { Volume = 0.4f }, player.MountedCenter);
 
         if (stompCount > 7) player.Heal(1);
     }
@@ -62,12 +62,11 @@ internal class StompHitbox : ModProjectile
         }
 
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
-        if (modPlayer == null) return;
+        if (modPlayer == null || (modPlayer.currentPowerupType != null && PowerupID.Sets.DisableGroundPound[(int)modPlayer.currentPowerupType])) return;
         modPlayer.GroundPounding = groundPound;
 
         if (groundPound)
         {
-            player.creativeGodMode = true;
             player.bodyFrame.Y = 0;
             player.legFrame.Y = Math.Clamp(groundPoundCooldown / 8, 0, 3) * 56;
             player.itemTime = 0;
@@ -148,12 +147,11 @@ internal class StompHitbox : ModProjectile
 
         if (!groundPound) return;
 
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPound") { Volume = 0.4f }, player.Center);
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPound") { Volume = 0.4f }, player.MountedCenter);
         for (int i = -2; i < 3; i++)
         {
             if (i == 0) continue;
             Dust.NewDustPerfect(player.Bottom, ModContent.DustType<ImpactDust>(), new Vector2(1.5f * Math.Sign(i), Main.rand.NextFloat(-1f, -0.5f)));
         }
-
     }
 }

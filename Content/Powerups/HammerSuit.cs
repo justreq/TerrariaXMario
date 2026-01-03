@@ -16,7 +16,7 @@ internal class HammerSuitData : FireFlowerData
 
     internal override void OnRightClick(Player player)
     {
-        Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, new Vector2((Main.MouseWorld.X - player.Center.X) / 50, -8f), ModContent.ProjectileType<HammerSuitHammer>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.statPower ?? 1, 0f, player.whoAmI);
+        Projectile.NewProjectile(player.GetSource_FromThis(), player.MountedCenter, new Vector2((Main.MouseWorld.X - player.MountedCenter.X) / 50, -8f), ModContent.ProjectileType<HammerSuitHammer>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.statPower ?? 1, 0f, player.whoAmI);
     }
 }
 

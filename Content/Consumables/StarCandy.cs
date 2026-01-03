@@ -34,11 +34,12 @@ internal class StarCandy1 : ModItem, ISpawnableObject
         Item.useAnimation = 17;
         Item.consumable = true;
         Item.healLife = 50;
+        Item.potion = true;
     }
 
     public override void OnConsumeItem(Player player)
     {
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/Heal") { Volume = 0.4f }, player.Center);
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/Heal") { Volume = 0.4f }, player.MountedCenter);
         CapEffectsPlayer.RestoreSP(player, SPReplenishAmount);
     }
 }

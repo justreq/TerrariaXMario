@@ -17,8 +17,8 @@ internal class IceFlowerData : FireFlowerData
     internal override void OnRightClick(Player player)
     {
         if (Main.projectile.Any(e => e.type == ModContent.ProjectileType<IceFlowerIceball>() && e.active && e.owner == player.whoAmI)) return;
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/IceFlowerShoot") { Volume = 0.4f }, player.Center);
-        Projectile.NewProjectile(player.GetSource_FromThis(), player.Center, new Vector2(player.direction * 2.5f, 0f), ModContent.ProjectileType<IceFlowerIceball>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.statPower ?? 1, 0f, player.whoAmI);
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/IceFlowerShoot") { Volume = 0.4f }, player.MountedCenter);
+        Projectile.NewProjectile(player.GetSource_FromThis(), player.MountedCenter, new Vector2(player.direction * 2.5f, 0f), ModContent.ProjectileType<IceFlowerIceball>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.statPower ?? 1, 0f, player.whoAmI);
     }
 }
 

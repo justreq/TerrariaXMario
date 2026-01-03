@@ -18,7 +18,7 @@ internal class CapeFlightDrawLayer : PlayerDrawLayer
         Player player = drawInfo.drawPlayer;
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
 
-        Vector2 position = player.Center - new Vector2(16, 12) - Main.screenPosition;
+        Vector2 position = player.MountedCenter - new Vector2(16, 12) - Main.screenPosition;
         position = new((int)position.X, (int)position.Y);
 
         drawInfo.DrawDataCache.Add(new(ModContent.Request<Texture2D>($"{GetType().Namespace!.Replace(".", "/")}/CapeFlight{modPlayer?.currentCap ?? "Mario"}").Value, position, new Rectangle(0, 56 * (modPlayer?.CapeFrame ?? 0), 40, 56), Color.White, player.fullRotation, player.Size * 0.5f, 1, player.direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None));

@@ -2,12 +2,17 @@
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
+using Terraria.ModLoader;
 using TerrariaXMario.Common.MiscEffects;
 
 namespace TerrariaXMario.Content.PowerupProjectiles;
 
 internal class IceFlowerIceball : FireFlowerFireball
 {
+    internal override Color OutlineColor => new(0, 143, 254);
+    internal override Color FillColor => new(180, 254, 254);
+    internal override int? PairedMetaballDust => ModContent.DustType<IceFlowerIceballDust>();
+
     public override void SetDefaults()
     {
         base.SetDefaults();

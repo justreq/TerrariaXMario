@@ -30,17 +30,18 @@ internal class Nut1 : ModItem, ISpawnableObject
         Item.useAnimation = 17;
         Item.consumable = true;
         Item.healLife = 15;
+        Item.potion = true;
     }
 
     public override void OnConsumeItem(Player player)
     {
-        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/Heal") { Volume = 0.4f }, player.Center);
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/Heal") { Volume = 0.4f }, player.MountedCenter);
 
         foreach (Player p in Main.ActivePlayers)
         {
             if (p == player) continue;
 
-            if (p.team == player.team && p.Center.DistanceSQ(player.Center) <= 500000)
+            if (p.team == player.team && p.Center.DistanceSQ(player.MountedCenter) <= 500000)
             {
                 p.Heal(Item.healLife);
                 SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/Heal") { Volume = 0.4f }, p.Center);

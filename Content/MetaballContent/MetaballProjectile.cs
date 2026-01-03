@@ -11,6 +11,7 @@ internal abstract class MetaballProjectile : ModProjectile
     internal virtual Color OutlineColor => Color.Gray;
     internal virtual Color FillColor => Color.White;
     internal virtual float Radius => 8;
+    internal virtual int? PairedMetaballDust => null;
 
     public override void PostAI()
     {
