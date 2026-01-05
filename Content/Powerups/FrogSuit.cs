@@ -46,7 +46,9 @@ internal class FrogSuitData : Powerup
 
         if (modPlayer.frogSwimming)
         {
-            player.velocity = new Vector2((player.controlLeft ? -1 : 0) + (player.controlRight ? 1 : 0), (player.controlUp ? -1 : 0) + (player.controlDown ? 1 : 0)).SafeNormalize(Vector2.Zero) * 5f;
+            Vector2 velocity = new Vector2((player.controlLeft ? -1 : 0) + (player.controlRight ? 1 : 0), ((player.controlUp || player.controlJump ? -1 : 0) + (player.controlDown ? 1 : 0)) * player.gravDir).SafeNormalize(Vector2.Zero) * 5f;
+
+            player.velocity = velocity == Vector2.Zero ? Vector2.Lerp(player.velocity, velocity, 0.05f) : velocity;
             player.gravity = 0;
         }
 

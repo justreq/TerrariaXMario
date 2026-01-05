@@ -58,7 +58,7 @@ internal class CapEffectsPlayer : ModPlayer
         set
         {
             field = value;
-            currentLegsVariant = value ? "GroundPound" : currentLegsVariant;
+            currentLegsVariant = value ? "GroundPound" : currentLegsVariant == "GroundPound" ? null : currentLegsVariant;
         }
     }
 
@@ -152,7 +152,7 @@ internal class CapEffectsPlayer : ModPlayer
     {
         if (!effectOnly) player.GetModPlayerOrNull<CapEffectsPlayer>()?.StatSP += amount;
         CombatText.NewText(player.getRect(), Color.Orange, amount);
-        //SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/SPHeal") { Volume = 0.4f }, player.MountedCenter);
+        SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/HealSP") { Volume = 0.4f }, player.MountedCenter);
     }
 
     public override void ResetEffects()
@@ -370,7 +370,7 @@ internal class CapEffectsPlayer : ModPlayer
         }
         else forceFullRotation = 0;
 
-        Player.fullRotation = forceFullRotation;
+        if (forceFullRotation != 0) Player.fullRotation = forceFullRotation;
     }
 
     public override void ProcessTriggers(TriggersSet triggersSet)
@@ -492,11 +492,6 @@ internal class CapEffectsPlayer : ModPlayer
             Player.controlRight = false;
             Player.controlUp = false;
             Player.controlDown = false;
-        }
-
-        if (frogSwimming)
-        {
-            Player.controlJump = false;
         }
     }
 

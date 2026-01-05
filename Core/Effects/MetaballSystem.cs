@@ -77,6 +77,7 @@ internal class MetaballSystem : ModSystem
     {
         Projectile projectile = metaball.Projectile;
         Color color = new Color[] { metaball.OutlineColor, metaball.FillColor }[fill.ToInt()];
+        float scale = !fill ? 1 : 0.75f;
         Vector2 position = projectile.position.ToScreenPosition();
         Vector2 scaleFactor = projectile.velocity == Vector2.Zero ? Vector2.One : new((float)Math.Cbrt(projectile.velocity.X), (float)Math.Cbrt(projectile.velocity.Y));
 
@@ -87,17 +88,18 @@ internal class MetaballSystem : ModSystem
         //    new VertexPositionColorTexture(new Vector3(position + new Vector2(-metaball.Radius, metaball.Radius), 0), color, Vector2.UnitY), // bl
         //];
 
-        MetaballShader.Value.Parameters["worldViewProjection"].SetValue(Matrix.Identity/*.CreateTranslation(
+        MetaballShader.Value.Parameters["worldViewProjection"].SetValue(Matrix.CreateTranslation(
             new Vector3(-Main.screenPosition.X, -Main.screenPosition.Y, 0)) * // world
+            Main.GameViewMatrix.TransformationMatrix *
             Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1, 1) // projection
-            */);
+            );
         MetaballShader.Value.Parameters["color"].SetValue(color.ToVector4());
         MetaballShader.Value.Parameters["radius"].SetValue(metaball.Radius);
-        MetaballShader.Value.Parameters["scale"].SetValue(projectile.scale * (!fill ? 1 : 0.75f));
+        MetaballShader.Value.Parameters["scale"].SetValue(projectile.scale * scale);
         MetaballShader.Value.CurrentTechnique.Passes[0].Apply();
 
         Main.spriteBatch.Begin();
-        Main.spriteBatch.Draw(MetaballTexture.Value, new Rectangle((int)position.X, (int)position.Y, (int)(metaball.Radius * 2 * projectile.scale * scaleFactor.X), (int)(metaball.Radius * 2 * projectile.scale)), null, color, projectile.rotation, new Vector2(metaball.Radius) * 0.5f, SpriteEffects.None, 0);
+        Main.spriteBatch.Draw(MetaballTexture.Value, new Rectangle((int)position.X, (int)position.Y, (int)(metaball.Radius * 2 * projectile.scale * scaleFactor.X), (int)(metaball.Radius * 2 * projectile.scale * scaleFactor.Y)), null, color, projectile.rotation, new Vector2(metaball.Radius) * 0.5f, SpriteEffects.None, 0);
         Main.spriteBatch.End();
 
         //GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, 4, [0, 1, 2, 2, 3, 0], 0, 2);
@@ -108,6 +110,7 @@ internal class MetaballSystem : ModSystem
         if (ModContent.GetModDust(dust.type) is not MetaballDust metaball || !dust.active) return;
 
         Color color = new Color[] { metaball.OutlineColor, metaball.FillColor }[fill.ToInt()];
+        float scale = !fill ? 1 : 0.25f;
         Vector2 position = dust.position.ToScreenPosition() - new Vector2(metaball.Radius);
         Vector2 scaleFactor = dust.velocity == Vector2.Zero ? Vector2.One : new((float)Math.Cbrt(dust.velocity.X), (float)Math.Cbrt(dust.velocity.Y));
 
@@ -118,17 +121,18 @@ internal class MetaballSystem : ModSystem
         //    new VertexPositionColorTexture(new Vector3(position + new Vector2(-metaball.Radius, metaball.Radius), 0), color, Vector2.UnitY), // bl
         //];
 
-        MetaballShader.Value.Parameters["worldViewProjection"].SetValue(Matrix.Identity/*.CreateTranslation(
+        MetaballShader.Value.Parameters["worldViewProjection"].SetValue(Matrix.CreateTranslation(
             new Vector3(-Main.screenPosition.X, -Main.screenPosition.Y, 0)) * // world
+            Main.GameViewMatrix.TransformationMatrix *
             Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1, 1) // projection
-            */);
+            );
         MetaballShader.Value.Parameters["color"].SetValue(color.ToVector4());
         MetaballShader.Value.Parameters["radius"].SetValue(metaball.Radius);
-        MetaballShader.Value.Parameters["scale"].SetValue(dust.scale * (!fill ? 1 : 0.75f));
+        MetaballShader.Value.Parameters["scale"].SetValue(dust.scale * scale);
         MetaballShader.Value.CurrentTechnique.Passes[0].Apply();
 
         Main.spriteBatch.Begin();
-        Main.spriteBatch.Draw(MetaballTexture.Value, new Rectangle((int)position.X, (int)position.Y, (int)(metaball.Radius * 2 * dust.scale * scaleFactor.X), (int)(metaball.Radius * 2 * dust.scale)), null, color, dust.rotation, new Vector2(metaball.Radius) * 0.5f, SpriteEffects.None, 0);
+        Main.spriteBatch.Draw(MetaballTexture.Value, new Rectangle((int)position.X, (int)position.Y, (int)(metaball.Radius * 2 * dust.scale * scaleFactor.X), (int)(metaball.Radius * 2 * dust.scale * scaleFactor.Y)), null, color, dust.rotation, new Vector2(metaball.Radius) * 0.5f, SpriteEffects.None, 0);
         Main.spriteBatch.End();
 
         //GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, 4, [0, 1, 2, 2, 3, 0], 0, 2);
