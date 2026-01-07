@@ -15,7 +15,7 @@ internal class CapeFeatherData : SuperLeafData
 
     internal override string EquipSound => $"{TerrariaXMario.Sounds}/PowerupEffects/CapePowerUp";
     internal override bool LookTowardRightClick => false;
-
+    internal override Color Color => new(255, 148, 53);
     internal override void OnRightClick(Player player)
     {
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();

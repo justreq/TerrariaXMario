@@ -5,6 +5,7 @@ using ReLogic.Utilities;
 using System;
 using Terraria;
 using Terraria.Audio;
+using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.CapEffects;
@@ -69,7 +70,7 @@ internal class Boomerang : InteractiveWithObjectSpawnerTileProjectile
                 break;
             case State.Waiting:
                 stateTimer--;
-                if (stateTimer <= 0) state = State.Returning;
+                if (stateTimer <= 0 || PlayerInput.Triggers.JustReleased.MouseRight) state = State.Returning;
                 break;
             case State.Returning:
                 Player player = Main.player[Projectile.owner];

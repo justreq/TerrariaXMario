@@ -26,7 +26,11 @@ internal class SPBarSystem : ModSystem
 
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
     {
-        layers.Insert(0, new LegacyGameInterfaceLayer(
+        int index = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Inventory"));
+
+        if (index == -1) return;
+
+        layers.Insert(index, new LegacyGameInterfaceLayer(
             $"{nameof(TerrariaXMario)}: SP Bar",
             () =>
             {

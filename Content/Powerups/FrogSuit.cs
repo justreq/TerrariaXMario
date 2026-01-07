@@ -13,7 +13,7 @@ internal class FrogSuitData : Powerup
 {
     public override string Name => "FrogSuit";
     internal override bool LookTowardRightClick => false;
-
+    internal override Color Color => new(22, 176, 67);
     internal override void UpdateWorld(Projectile projectile, int updateCount)
     {
         projectile.velocity.Y += 0.4f;

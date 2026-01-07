@@ -148,6 +148,16 @@ internal class CapEffectsPlayer : ModPlayer
 
     internal float forceFullRotation;
 
+    internal int powerupOverchargeMax = 100;
+    internal int PowerupOvercharge
+    {
+        get;
+        set
+        {
+            field = Math.Clamp(value, 0, powerupOverchargeMax);
+        }
+    }
+
     internal static void RestoreSP(Player player, int amount, bool effectOnly = false)
     {
         if (!effectOnly) player.GetModPlayerOrNull<CapEffectsPlayer>()?.StatSP += amount;
@@ -199,12 +209,6 @@ internal class CapEffectsPlayer : ModPlayer
     {
         if (!CanDoCapEffects) return;
 
-        if (currentPowerupType != null)
-        {
-            currentPowerupType = null;
-            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/PowerDown") { Volume = 0.4f }, Player.MountedCenter);
-        }
-
         SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PlayerOverrides/{currentCap}Hurt{Main.rand.Next(1, 5)}") { Volume = 0.4f }, Player.MountedCenter);
     }
 
@@ -218,7 +222,6 @@ internal class CapEffectsPlayer : ModPlayer
         if (!CanDoCapEffects && !Main.gameMenu)
         {
             currentHeadVariant = currentBodyVariant = currentLegsVariant = null;
-            if (currentPowerupType != null) currentPowerupType = null;
             return;
         }
 
@@ -437,7 +440,7 @@ internal class CapEffectsPlayer : ModPlayer
             }
         }
 
-        if (PlayerInput.Triggers.JustPressed.Jump && (Player.IsOnGroundPrecise() || Player.wet)) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(Player.wet ? "Swim" : "Jump")}") { Volume = 0.4f }, Player.MountedCenter);
+        if (PlayerInput.Triggers.JustPressed.Jump && (Player.IsOnGroundPrecise() || Player.wet) && !statueForm) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/{(Player.wet ? "Swim" : "Jump")}") { Volume = 0.4f }, Player.MountedCenter);
 
         if (doCapeFlight && !Player.IsOnGroundPrecise())
         {
@@ -542,6 +545,15 @@ internal class CapEffectsPlayer : ModPlayer
             }
 
             requestedPowerupRightClick = false;
+        }
+    }
+
+    internal void RemovePowerup()
+    {
+        if (currentPowerupType != null)
+        {
+            currentPowerupType = null;
+            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/PowerDown") { Volume = 0.4f }, Player.MountedCenter);
         }
     }
 

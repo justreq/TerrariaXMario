@@ -17,7 +17,7 @@ internal class SuperLeafData : Powerup
     internal override string EquipSound => $"{TerrariaXMario.Sounds}/PowerupEffects/TailPowerUp";
 
     internal override bool LookTowardRightClick => false;
-
+    internal override Color Color => new(176, 86, 40);
     internal override void UpdateWorld(Projectile projectile, int updateCount)
     {
         projectile.velocity.X = (float)(Math.Sin(MathHelper.Pi / 60 * updateCount % 60) * (updateCount <= 60 ? 2f : 3f));
@@ -53,7 +53,7 @@ internal class SuperLeafData : Powerup
     protected static void DoJumpHold(Player player, int runtimeDecayFactor)
     {
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
-        if (player.IsOnGroundPrecise() || modPlayer == null) return;
+        if (player.IsOnGroundPrecise() || player.wet || modPlayer == null) return;
 
         switch (modPlayer.flightState)
         {

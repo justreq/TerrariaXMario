@@ -14,7 +14,7 @@ internal class BoomerangFlowerData : FireFlowerData
     public override string Name => "BoomerangFlower";
 
     internal override ForceArmMovementType RightClickArmMovementType => ForceArmMovementType.Extend;
-
+    internal override Color Color => new(24, 153, 230);
     internal override void OnRightClick(Player player)
     {
         if (Main.projectile.Any(e => e.type == ModContent.ProjectileType<Boomerang>() && e.active && e.owner == player.whoAmI)) return;

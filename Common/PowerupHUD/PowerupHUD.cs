@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
-using Terraria.GameContent.UI.Elements;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.UI;
 using TerrariaXMario.Common.CapEffects;
@@ -12,38 +12,60 @@ namespace TerrariaXMario.Common.PowerupHUD;
 
 internal class PowerupHUD : UIState
 {
-    private UIElement? Container { get; set; }
-    private UIImageFramed? ImageFrame { get; set; }
-    private UIImageFramed? ImageResource { get; set; }
+    private UIElement? OverchargeBarContainer { get; set; }
 
-    private Asset<Texture2D>? Texture;
-
-    private int resourceWidth;
-    private bool frameFlag;
-    private int frameRate;
+    private string? path;
+    private Asset<Texture2D>? OverchargeBarTexture => path == null ? null : ModContent.Request<Texture2D>($"{path}/OverchargeBar");
+    private Asset<Texture2D>? OverchargeFillTexture => path == null ? null : ModContent.Request<Texture2D>($"{path}/OverchargeBarFill");
 
     public override void OnInitialize()
     {
-        Texture = ModContent.Request<Texture2D>($"{GetType().FullName!.Replace(".", "/")}");
+        path = $"{GetType().Namespace!.Replace(".", "/")}";
 
-        Container = this.AddElement(new UIElement().With(e =>
+        OverchargeBarContainer = this.AddElement(new UIElement().With(e =>
         {
-            e.Width = StyleDimension.FromPixels(56);
-            e.Height = StyleDimension.FromPixels(16);
-        }));
-
-        ImageFrame = Container.AddElement(new UIImageFramed(Texture, new(0, 0, 56, 16)));
-
-        ImageResource = Container.AddElement(new UIImageFramed(Texture, new(0, 54, 0, 6)).With(e =>
-        {
-            e.Left = StyleDimension.FromPixels(2);
+            e.Width = StyleDimension.FromPixels(64);
+            e.Height = StyleDimension.FromPixels(52);
+            e.HAlign = 0.5f;
             e.Top = StyleDimension.FromPixels(8);
         }));
     }
 
     public override void Draw(SpriteBatch spriteBatch)
     {
-        if (Main.LocalPlayer.GetModPlayerOrNull<CapEffectsPlayer>()?.CanDoCapEffects ?? false) base.Draw(spriteBatch);
+        CapEffectsPlayer? modPlayer = Main.LocalPlayer.GetModPlayerOrNull<CapEffectsPlayer>();
+        if (modPlayer != null && modPlayer.CanDoCapEffects && modPlayer.currentPowerupType != null)
+        {
+            base.Draw(spriteBatch);
+
+            if (OverchargeBarTexture == null || OverchargeFillTexture == null || OverchargeBarContainer == null) return;
+
+            Vector2 position = OverchargeBarContainer.GetDimensions().Position();
+            Color color = modPlayer.CurrentPowerup!.Color;
+
+            spriteBatch.Draw(OverchargeBarTexture.Value, new Rectangle((int)position.X, (int)position.Y, 64, 52), new Rectangle(0, 0, 64, 52), Color.White);
+            spriteBatch.Draw(OverchargeBarTexture.Value, new Rectangle((int)position.X + 54, (int)position.Y, modPlayer.powerupOverchargeMax, 52), new Rectangle(66, 0, 2, 52), Color.White);
+            spriteBatch.Draw(OverchargeBarTexture.Value, new Rectangle((int)position.X + 54 + modPlayer.powerupOverchargeMax, (int)position.Y, 16, 52), new Rectangle(70, 0, 16, 52), Color.White);
+
+            spriteBatch.Draw(OverchargeBarTexture.Value, new Rectangle((int)position.X, (int)position.Y, 64, 52), new Rectangle(0, 54, 64, 52), color);
+            spriteBatch.Draw(OverchargeBarTexture.Value, new Rectangle((int)position.X + 54, (int)position.Y, modPlayer.powerupOverchargeMax, 52), new Rectangle(66, 54, 2, 52), color);
+            spriteBatch.Draw(OverchargeBarTexture.Value, new Rectangle((int)position.X + 54 + modPlayer.powerupOverchargeMax, (int)position.Y, 16, 52), new Rectangle(70, 54, 16, 52), color);
+
+            if (ModContent.TryFind(nameof(TerrariaXMario), modPlayer.CurrentPowerup.Name.Replace("Data", ""), out ModProjectile projectile))
+            {
+                if (OverchargeBarContainer.IsMouseHovering) Main.hoverItemName = $"{projectile.PrettyPrintName()}\n{Language.GetTextValue($"Mods.{nameof(TerrariaXMario)}.Projectiles.{projectile.Name}.Tooltip")}\nOvercharge: {modPlayer.PowerupOvercharge}/{modPlayer.powerupOverchargeMax}";
+
+                spriteBatch.Draw(ModContent.Request<Texture2D>(projectile.Texture).Value, new Rectangle((int)position.X + 18, (int)position.Y + 14, 24, 24), new Rectangle(0, 0, projectile.Projectile.width, projectile.Projectile.height), Color.White);
+
+                if (modPlayer.PowerupOvercharge > 0)
+                {
+                    spriteBatch.Draw(OverchargeFillTexture.Value, new Rectangle((int)position.X + 52, (int)position.Y + 20, 2, 12), new Rectangle(0, 0, 2, 12), color);
+                    spriteBatch.Draw(OverchargeFillTexture.Value, new Rectangle((int)position.X + 54, (int)position.Y + 20, modPlayer.PowerupOvercharge, 12), new Rectangle(2, 0, 2, 12), color);
+                    spriteBatch.Draw(OverchargeFillTexture.Value, new Rectangle((int)position.X + 54 + modPlayer.PowerupOvercharge, (int)position.Y + 20, 2, 12), new Rectangle(4, 0, 2, 12), color);
+                }
+            }
+
+        }
     }
 
     public override void Update(GameTime gameTime)
@@ -51,34 +73,18 @@ internal class PowerupHUD : UIState
         Player player = Main.LocalPlayer;
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
 
-        if (!modPlayer?.CanDoCapEffects ?? true) return;
-
-        Container?.Left = StyleDimension.FromPixels(player.Bottom.X - Main.screenPosition.X - 28);
-        Container?.Top = StyleDimension.FromPixels(player.Bottom.Y - Main.screenPosition.Y);
-        Container?.Recalculate();
-
-        resourceWidth = modPlayer!.runTime == 0 ? resourceWidth - 1 : (int)((float)modPlayer.runTime / modPlayer.runTimeRequiredForPSpeed * 36);
-        ImageResource?.SetFrame(new(0, 54, resourceWidth, 6));
-
-        ImageFrame?.Color = Color.Lerp(ImageFrame.Color, (modPlayer.flightState != FlightState.Flying && resourceWidth <= 18) ? Color.Transparent : Color.White, 0.075f);
-        ImageResource?.Color = ImageFrame?.Color ?? Color.Transparent;
-
-        if (modPlayer.hasPSpeed)
+        if (modPlayer == null || !modPlayer.CanDoCapEffects || modPlayer.currentPowerupType == null)
         {
-            ImageFrame?.SetFrame(new(0, 18 * (frameFlag.ToInt() + 1), 56, 16));
-            frameRate++;
+            modPlayer?.PowerupOvercharge = modPlayer?.powerupOverchargeMax ?? 0;
+            return;
+        }
 
-            if (frameRate >= 10)
-            {
-                frameFlag ^= true;
-                frameRate = 0;
-            }
-        }
-        else
-        {
-            frameFlag = false;
-            frameRate = 0;
-            ImageFrame?.SetFrame(new(0, 0, 56, 16));
-        }
+        modPlayer.PowerupOvercharge++;
+
+        if (modPlayer.PowerupOvercharge == 0) modPlayer.RemovePowerup();
+
+        if (OverchargeBarContainer == null) return;
+
+        OverchargeBarContainer.Width = StyleDimension.FromPixels(70 + modPlayer.powerupOverchargeMax);
     }
 }

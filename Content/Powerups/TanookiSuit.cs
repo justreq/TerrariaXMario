@@ -1,12 +1,14 @@
-﻿using Terraria;
+﻿using Microsoft.Xna.Framework;
+using Terraria;
 using Terraria.ModLoader;
 using TerrariaXMario.Content.Caps;
 
 namespace TerrariaXMario.Content.Powerups;
+
 internal class TanookiSuitData : SuperLeafData
 {
     public override string Name => "TanookiSuit";
-
+    internal override Color Color => new(255, 90, 9);
     internal override void UpdateWorld(Projectile projectile, int updateCount)
     {
         projectile.velocity.Y += 0.4f;

@@ -14,7 +14,6 @@ internal class PowerupHUDSystem : ModSystem
 
     public override void Load()
     {
-        return;
         PowerupHUD = new();
         PowerupHUDUserInterface = new();
         PowerupHUDUserInterface.SetState(PowerupHUD);

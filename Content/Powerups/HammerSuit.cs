@@ -13,10 +13,11 @@ internal class HammerSuitData : FireFlowerData
     public override string Name => "HammerSuit";
 
     internal override int RightClickActionCooldown => 8;
-
+    internal override Color Color => new(76, 76, 109);
     internal override void OnRightClick(Player player)
     {
-        Projectile.NewProjectile(player.GetSource_FromThis(), player.MountedCenter, new Vector2((Main.MouseWorld.X - player.MountedCenter.X) / 50, -8f), ModContent.ProjectileType<HammerSuitHammer>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.statPower ?? 1, 0f, player.whoAmI);
+        Vector2 magnitude = Main.MouseWorld - player.MountedCenter;
+        Projectile.NewProjectile(player.GetSource_FromThis(), player.MountedCenter, magnitude.SafeNormalize(Vector2.Zero) * new Vector2(15, 20), ModContent.ProjectileType<HammerSuitHammer>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.statPower ?? 1, 0f, player.whoAmI);
     }
 }
 

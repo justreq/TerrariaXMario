@@ -14,7 +14,7 @@ internal class FireFlowerData : Powerup
     public override string Name => "FireFlower";
 
     internal override ForceArmMovementType RightClickArmMovementType => ForceArmMovementType.Swing;
-
+    internal override Color Color => new(234, 51, 34);
     internal override void UpdateWorld(Projectile projectile, int updateCount)
     {
         projectile.velocity.Y += 0.4f;

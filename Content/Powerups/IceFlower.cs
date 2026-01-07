@@ -13,7 +13,7 @@ namespace TerrariaXMario.Content.Powerups;
 internal class IceFlowerData : FireFlowerData
 {
     public override string Name => "IceFlower";
-
+    internal override Color Color => new(55, 118, 242);
     internal override void OnRightClick(Player player)
     {
         if (Main.projectile.Any(e => e.type == ModContent.ProjectileType<IceFlowerIceball>() && e.active && e.owner == player.whoAmI)) return;
