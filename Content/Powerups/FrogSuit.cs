@@ -66,7 +66,7 @@ internal class FrogSuitData : Powerup
 internal class FrogSuit : PowerupProjectile
 {
     internal override int? PowerupType => ModContent.GetInstance<FrogSuitData>().Type;
-    internal override string[] Caps => [nameof(Mario)];
+    internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
     internal override string[] Variations => ["Running"];
     internal override bool CanSpawn(Player player) => player.ZoneBeach;
     internal override bool GroundPound => false;

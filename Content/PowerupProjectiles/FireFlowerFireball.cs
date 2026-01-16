@@ -1,25 +1,35 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Content.MetaballContent;
+using TerrariaXMario.Core.Effects;
 
 namespace TerrariaXMario.Content.PowerupProjectiles;
 
-internal class FireFlowerFireball : MetaballProjectile
+internal class FireFlowerFireball : MetaballProjectile, IDrawToDustMetaballsTarget
 {
     internal override Color OutlineColor => new(249, 28, 26);
     internal override Color FillColor => new(246, 225, 21);
-    internal override float Radius => 10;
+    internal override float Radius => 16;
     internal override int? PairedMetaballDust => ModContent.DustType<FireFlowerFireballDust>();
 
     internal float gravity = 0.4f;
     internal float bounceSpeed = -5;
     internal int dustType = DustID.Torch;
-    internal int dustChance = 3;
+    internal int dustChance = 1;
 
     internal int tileCollideCount = 0;
+
+    public void DrawToMetaballs(MetaballDust dustsThatWillBeDrawn, SpriteBatch sb, Texture2D metaballCircleTexture)
+    {
+        if (dustsThatWillBeDrawn.Type != PairedMetaballDust)
+            return;
+        Vector2 scale = new Vector2(20) / metaballCircleTexture.Size() * Projectile.scale;
+        sb.Draw(metaballCircleTexture, Projectile.Center - Main.screenPosition, null, Color.White, Projectile.rotation, metaballCircleTexture.Size() / 2, scale, SpriteEffects.None, 0);
+    }
 
     public override void SetDefaults()
     {
@@ -42,7 +52,6 @@ internal class FireFlowerFireball : MetaballProjectile
                 for (int i = 0; i < 5; i++)
                 {
                     Dust dust = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, (int)PairedMetaballDust);
-                    dust.velocity = Vector2.Zero;
                     dust.scale = Main.rand.NextFloat(0.7f, 0.8f);
                 }
             }
@@ -59,7 +68,6 @@ internal class FireFlowerFireball : MetaballProjectile
         {
             Dust dust2 = Dust.NewDustDirect(Projectile.Center, Projectile.width / 2, Projectile.height / 2, (int)PairedMetaballDust);
             dust2.velocity = Vector2.Zero;
-            dust2.scale = Main.rand.NextFloat(0.5f, 0.6f);
         }
 
         if (Projectile.velocity.X == 0f) Projectile.Kill();
@@ -79,7 +87,6 @@ internal class FireFlowerFireball : MetaballProjectile
             if (PairedMetaballDust == null) continue;
 
             Dust dust3 = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, (int)PairedMetaballDust);
-            dust3.velocity = Vector2.Zero;
             dust3.scale = Main.rand.NextFloat(0.7f, 0.8f);
         }
     }

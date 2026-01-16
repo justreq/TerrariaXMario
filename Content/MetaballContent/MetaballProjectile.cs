@@ -15,6 +15,6 @@ internal abstract class MetaballProjectile : ModProjectile
 
     public override void PostAI()
     {
-        Projectile.rotation = Projectile.velocity.ToRotation();
+        Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
     }
 }

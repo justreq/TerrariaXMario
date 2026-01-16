@@ -9,7 +9,7 @@ internal class FireFlowerFireballDust : MetaballDust
 {
     internal override Color OutlineColor => new(249, 28, 26);
     internal override Color FillColor => new(246, 225, 21);
-    internal override float Radius => 16;
+    internal override float Radius => 10;
 
     public override void OnSpawn(Dust dust)
     {
