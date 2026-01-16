@@ -27,8 +27,8 @@ internal class FireFlowerFireball : MetaballProjectile, IDrawToDustMetaballsTarg
     {
         if (dustsThatWillBeDrawn.Type != PairedMetaballDust)
             return;
-        Vector2 scale = new Vector2(20) / metaballCircleTexture.Size() * Projectile.scale;
-        sb.Draw(metaballCircleTexture, Projectile.Center - Main.screenPosition, null, Color.White, Projectile.rotation, metaballCircleTexture.Size() / 2, scale, SpriteEffects.None, 0);
+        Vector2 scale = new Vector2(20) / metaballCircleTexture.Size() * Projectile.scale * new Vector2(2, 1);
+        sb.Draw(metaballCircleTexture, Projectile.Center - Main.screenPosition, null, Color.White, Projectile.rotation + MathHelper.PiOver2, metaballCircleTexture.Size() / 2, scale, SpriteEffects.None, 0);
     }
 
     public override void SetDefaults()

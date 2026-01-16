@@ -24,7 +24,7 @@ internal class MetaballDust : ModDust
 
     public virtual void DrawMetaball(Dust dust, SpriteBatch sb, Texture2D circleTexture)
     {
-        Vector2 center = dust.position;
+        Vector2 center = dust.position - new Vector2(Radius * 0.5f);
 
         Color color = Color.White;
         Vector2 targetSize = new(Radius);
