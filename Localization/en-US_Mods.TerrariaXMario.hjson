@@ -200,48 +200,17 @@ Projectiles: {
 	Boomerang.DisplayName: Boomerang
 	CapeSpin.DisplayName: Cape Spin
 	FireFlowerFireball.DisplayName: Fire Flower Fireball
-	FireFlower: {
-		DisplayName: Fire Flower
-		Tooltip: '\'Burn foes with bouncing fireballs\''
-	}
-
+	FireFlower.DisplayName: Fire Flower
 	HammerSuitHammer.DisplayName: Hammer Suit Hammer
-	HammerSuit: {
-		DisplayName: Hammer Suit
-		Tooltip: '\'Hit foes with threatening hammers\''
-	}
-
+	HammerSuit.DisplayName: Hammer Suit
 	IceFlowerIceball.DisplayName: Ice Flower Iceball
-	IceFlower: {
-		DisplayName: Ice Flower
-		Tooltip: '\'Encase foes in freezing ice blocks\''
-	}
-
+	IceFlower.DisplayName: Ice Flower
 	TailSwipe.DisplayName: Tail Swipe
-	BoomerangFlower: {
-		DisplayName: Boomerang Flower
-		Tooltip: '\'Hit foes from the front and back with a swift boomerang\''
-	}
-
-	CapeFeather: {
-		DisplayName: Cape Feather
-		Tooltip: '\'Explore the world with ease\''
-	}
-
-	SuperLeaf: {
-		DisplayName: Super Leaf
-		Tooltip: '\'Swipe foes with a tail that aids in flight\''
-	}
-
-	TanookiSuit: {
-		DisplayName: Tanooki Suit
-		Tooltip: '\'Transform into a statue to keep foes at bay, and swipe foes with a tail that aids in flight\''
-	}
-
-	FrogSuit: {
-		DisplayName: Frog Suit
-		Tooltip: '\'Traverse underwater environments with ease\''
-	}
+	BoomerangFlower.DisplayName: Boomerang Flower
+	CapeFeather.DisplayName: Cape Feather
+	SuperLeaf.DisplayName: Super Leaf
+	TanookiSuit.DisplayName: Tanooki Suit
+	FrogSuit.DisplayName: Frog Suit
 }
 
 UI: {

@@ -17,11 +17,11 @@ internal sealed class Patch_DrawArmorSlots : BasePatch
     private void IL_Main_DrawInventory(ILContext il)
     {
         ILCursor c = new(il);
+        ILLabel label = c.DefineLabel();
 
-        if (!c.TryGotoNext(i => i.MatchLdsfld<Main>("EquipPage"), i => i.MatchBrtrue(out _))) ThrowError("Ldsfld, Brtrue");
+        if (!c.TryGotoNext(MoveType.After, i => i.MatchLdsfld<Main>("EquipPage"), i => i.MatchBrtrue(out label!))) ThrowError("Ldsfld, Brtrue");
 
-        c.Index++;
-
-        c.EmitDelegate((int EquipPage) => EquipPage == 0 && (Main.LocalPlayer.GetModPlayerOrNull<BroInfoPlayer>()?.ShowBroInfo ?? false));
+        c.EmitDelegate(() => Main.LocalPlayer.GetModPlayerOrNull<BroInfoPlayer>()?.ShowBroInfo ?? false);
+        c.EmitBrtrue(label);
     }
 }

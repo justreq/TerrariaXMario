@@ -5,136 +5,161 @@ using System;
 using Terraria;
 using Terraria.ModLoader;
 using TerrariaXMario.Content.MetaballContent;
+using TerrariaXMario.Core.Effects;
 
 namespace TerrariaXMario.Core.Effects;
 
-internal class MetaballSystem : ModSystem
+static class MathPlusTM
 {
-    internal static GraphicsDevice GraphicsDevice => Main.graphics.GraphicsDevice;
-
-    RenderTargetBinding[] oldRenderTargets = [];
-    internal static RenderTarget2D? outlineRenderTarget;
-    internal static RenderTarget2D? fillRenderTarget;
-    internal static RenderTarget2D? pixellationRenderTarget;
-    internal static Asset<Effect> MetaballShader => ModContent.Request<Effect>($"{nameof(TerrariaXMario)}/Core/Effects/MetaballShader", AssetRequestMode.ImmediateLoad);
-    internal static Asset<Texture2D> MetaballTexture => ModContent.Request<Texture2D>($"{nameof(TerrariaXMario)}/Core/Effects/Metaball", AssetRequestMode.ImmediateLoad);
-
-    internal static float PixellationFactor => 2;
-    internal static Vector2 AdjustedScreenSize => Main.ScreenSize.ToVector2() / PixellationFactor;
-
+    extension(Point)
+    {
+        public static Point operator /(Point left, int right) => new(left.X / right, left.Y / right);
+    }
+}
+internal class MetaballSystem : ModSystem // credits Lolxd87
+{
     public override void Load()
     {
         Main.QueueMainThreadAction(() =>
         {
-            outlineRenderTarget = new(GraphicsDevice, Main.screenWidth, Main.screenHeight);
-            fillRenderTarget = new(GraphicsDevice, Main.screenWidth, Main.screenHeight);
-            pixellationRenderTarget = new(GraphicsDevice, (int)AdjustedScreenSize.X, (int)AdjustedScreenSize.Y);
+            Main.OnPreDraw += Main_OnPreDraw;
         });
-
-        Main.OnPreDraw += Main_OnPreDraw;
     }
 
     private void Main_OnPreDraw(GameTime obj)
     {
-        oldRenderTargets = [.. GraphicsDevice.GetRenderTargets()];
+        PaintTargets(Main.ScreenSize);
+    }
 
-        for (int i = 0; i < 2; i++)
+    public override void Unload()
+    {
+        Main.QueueMainThreadAction(() =>
         {
-            GraphicsDevice.SetRenderTarget(i == 0 ? outlineRenderTarget : fillRenderTarget);
-            GraphicsDevice.Clear(Color.Transparent);
-            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+            Main.OnPreDraw -= Main_OnPreDraw;
+            target.Dispose();
+            pixellationTargetInner.Dispose();
+        });
+    }
 
-            foreach (Projectile proj in Main.ActiveProjectiles)
+    private RenderTarget2D target = null!;
+    private readonly RenderTarget2D unused2 = null!;
+    private readonly RenderTarget2D unused1 = null!;
+    private RenderTarget2D pixellationTargetInner = null!;
+
+    private static void Resize(ref RenderTarget2D target, Point screenSize)
+    {
+        if (target == null || target.Width != screenSize.X || target.Height != screenSize.Y)
+        {
+            target?.Dispose();
+            target = new RenderTarget2D(Main.instance.GraphicsDevice, screenSize.X, screenSize.Y, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PlatformContents);
+        }
+    }
+    private void PaintTargets(Point screenSize)
+    {
+        previousScreenPosition = Main.screenPosition;
+        var gd = Main.instance.GraphicsDevice;
+        var sb = Main.spriteBatch;
+
+        Resize(ref target, screenSize);
+        Resize(ref pixellationTargetInner, screenSize / 2);
+
+        var oldrt = gd.GetRenderTargets();
+
+        Asset<Texture2D> inner = ModContent.Request<Texture2D>($"{GetType().Namespace!.Replace(".", "/")}/Metaball", AssetRequestMode.ImmediateLoad);
+        Asset<Texture2D> outer = inner;
+        Draw(isOuter: false);
+        void Draw(bool isOuter)
+        {
+            gd.SetRenderTarget(isOuter ? unused2 : target);
+            gd.Clear(Color.Transparent);
+            gd.BlendFactor = Color.Black;
+
+            sb.Begin(SpriteSortMode.Deferred, BlendState.Additive, SamplerState.PointClamp, DepthStencilState.None, Main.Rasterizer);
+
+            for (int i = 0; i < Main.dust.Length; i++)
             {
-                if (proj.ModProjectile is not MetaballProjectile metaballProjectile) continue;
+                if (Main.dust[i] is { active: true, } dust && DustLoader.GetDust(dust.type) is MetaballDust metaballDust)
+                {
+                    Texture2D tex = isOuter ? outer.Value : inner.Value;
+                    Color color = isOuter ? metaballDust.OutlineColor : metaballDust.FillColor;
 
-                DrawMetaballProjectile(metaballProjectile, i != 0);
+                    float scaleFactor = isOuter ? 1.3f : 1f;
+                    Vector2 center = dust.position;
+
+                    Vector2 targetSize = new(metaballDust.Radius);
+                    Vector2 scale = targetSize / tex.Size() * scaleFactor;
+
+                    Vector2 velocityScaleFactor = dust.velocity.SafeNormalize(Vector2.One);
+                    velocityScaleFactor.X += MathF.Sign(velocityScaleFactor.X);
+                    velocityScaleFactor.Y += MathF.Sign(velocityScaleFactor.Y);
+                    velocityScaleFactor.X = MathF.Abs(velocityScaleFactor.X);
+                    velocityScaleFactor.Y = MathF.Abs(velocityScaleFactor.Y);
+                    scale *= (velocityScaleFactor);
+                    float rotation = dust.velocity.ToRotation() + MathHelper.PiOver2;
+
+                    sb.Draw(tex, center - Main.screenPosition, null, color, rotation, tex.Size() / 2, scale, SpriteEffects.None, 0);
+                }
             }
 
-            foreach (Dust dust in Main.dust)
+            foreach (var projectile in Main.ActiveProjectiles)
             {
-                DrawMetaballDust(dust, i != 0);
+                if (projectile.ModProjectile is MetaballProjectile metaballProjectile)
+                {
+                    Texture2D tex = isOuter ? outer.Value : inner.Value;
+                    Color color = isOuter ? metaballProjectile.OutlineColor : metaballProjectile.FillColor;
+
+                    float scaleFactor = isOuter ? 1.3f : 1f;
+                    Vector2 center = projectile.position;
+
+                    Vector2 targetSize = new(metaballProjectile.Radius);
+                    Vector2 scale = targetSize / tex.Size() * scaleFactor;
+
+                    Vector2 velocityScaleFactor = projectile.velocity.SafeNormalize(Vector2.One);
+                    velocityScaleFactor.X += MathF.Sign(velocityScaleFactor.X);
+                    velocityScaleFactor.Y += MathF.Sign(velocityScaleFactor.Y);
+                    velocityScaleFactor.X = MathF.Abs(velocityScaleFactor.X);
+                    velocityScaleFactor.Y = MathF.Abs(velocityScaleFactor.Y);
+                    scale *= (velocityScaleFactor);
+                    float rotation = projectile.velocity.ToRotation() + MathHelper.PiOver2;
+
+                    sb.Draw(tex, center - Main.screenPosition, null, color, rotation, tex.Size() / 2, scale, SpriteEffects.None, 0);
+                }
             }
+
+            sb.End();
         }
 
-        GraphicsDevice.SetRenderTarget(pixellationRenderTarget);
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, null, RasterizerState.CullNone);
-        Main.spriteBatch.Draw(outlineRenderTarget, new Rectangle(0, 0, (int)AdjustedScreenSize.X, (int)AdjustedScreenSize.Y), Color.White);
-        Main.spriteBatch.Draw(fillRenderTarget, new Rectangle(0, 0, (int)AdjustedScreenSize.X, (int)AdjustedScreenSize.Y), Color.White);
-        Main.spriteBatch.End();
-        GraphicsDevice.SetRenderTargets(oldRenderTargets);
-        oldRenderTargets = [];
+        DrawPixellated(false);
+        void DrawPixellated(bool isOuter)
+        {
+            RenderTarget2D current = isOuter ? unused1 : pixellationTargetInner;
+            gd.SetRenderTarget(current);
+            gd.Clear(Color.Transparent);
+            sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, Main.Rasterizer);
+            sb.Draw(isOuter ? unused2 : target, current.Bounds, Color.White);
+            sb.End();
+        }
+
+        gd.SetRenderTargets(oldrt);
     }
 
+    Vector2 previousScreenPosition;
     public override void PostDrawTiles()
     {
-        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, SamplerState.PointClamp, null, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
-        Main.spriteBatch.Draw(pixellationRenderTarget, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.White);
-        Main.spriteBatch.End();
-    }
+        Asset<Effect> shader = ModContent.Request<Effect>($"{GetType().Namespace!.Replace(".", "/")}/MetaballShader", AssetRequestMode.ImmediateLoad);
+        Effect effect = shader.Value;
+        effect.Parameters["uInnerThreshold"].SetValue(0.3f);
+        //effect.Parameters["uInnerColor"].SetValue(Color.Orange.ToVector4());
+        effect.Parameters["uOuterThreshold"].SetValue(0.15f);
+        //effect.Parameters["uOuterColor"].SetValue(Color.Red.ToVector4());
 
-    private static void DrawMetaballProjectile(MetaballProjectile metaball, bool fill)
-    {
-        Projectile projectile = metaball.Projectile;
-        Color color = new Color[] { metaball.OutlineColor, metaball.FillColor }[fill.ToInt()];
-        float scale = !fill ? 1 : 0.75f;
-        Vector2 position = projectile.position.ToScreenPosition();
-        Vector2 scaleFactor = projectile.velocity == Vector2.Zero ? Vector2.One : new((float)Math.Cbrt(projectile.velocity.X), (float)Math.Cbrt(projectile.velocity.Y));
+        var sb = Main.spriteBatch;
+        sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, Main.Rasterizer, effect, Main.GameViewMatrix.TransformationMatrix);
 
-        //VertexPositionColorTexture[] vertices = [
-        //    new VertexPositionColorTexture(new Vector3(position + new Vector2(-metaball.Radius), 0), color, Vector2.Zero), // tl
-        //    new VertexPositionColorTexture(new Vector3(position + new Vector2(metaball.Radius, -metaball.Radius), 0), color, Vector2.UnitX), // tr
-        //    new VertexPositionColorTexture(new Vector3(position + new Vector2(metaball.Radius), 0), color, Vector2.One), // br
-        //    new VertexPositionColorTexture(new Vector3(position + new Vector2(-metaball.Radius, metaball.Radius), 0), color, Vector2.UnitY), // bl
-        //];
-
-        MetaballShader.Value.Parameters["worldViewProjection"].SetValue(Matrix.CreateTranslation(
-            new Vector3(-Main.screenPosition.X, -Main.screenPosition.Y, 0)) * // world
-            Main.GameViewMatrix.TransformationMatrix *
-            Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1, 1) // projection
-            );
-        MetaballShader.Value.Parameters["color"].SetValue(color.ToVector4());
-        MetaballShader.Value.Parameters["radius"].SetValue(metaball.Radius);
-        MetaballShader.Value.Parameters["scale"].SetValue(projectile.scale * scale);
-        MetaballShader.Value.CurrentTechnique.Passes[0].Apply();
-
-        Main.spriteBatch.Begin();
-        Main.spriteBatch.Draw(MetaballTexture.Value, new Rectangle((int)position.X, (int)position.Y, (int)(metaball.Radius * 2 * projectile.scale * scaleFactor.X), (int)(metaball.Radius * 2 * projectile.scale * scaleFactor.Y)), null, color, projectile.rotation, new Vector2(metaball.Radius) * 0.5f, SpriteEffects.None, 0);
-        Main.spriteBatch.End();
-
-        //GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, 4, [0, 1, 2, 2, 3, 0], 0, 2);
-    }
-
-    private static void DrawMetaballDust(Dust dust, bool fill)
-    {
-        if (ModContent.GetModDust(dust.type) is not MetaballDust metaball || !dust.active) return;
-
-        Color color = new Color[] { metaball.OutlineColor, metaball.FillColor }[fill.ToInt()];
-        float scale = !fill ? 1 : 0.25f;
-        Vector2 position = dust.position.ToScreenPosition() - new Vector2(metaball.Radius);
-        Vector2 scaleFactor = dust.velocity == Vector2.Zero ? Vector2.One : new((float)Math.Cbrt(dust.velocity.X), (float)Math.Cbrt(dust.velocity.Y));
-
-        //VertexPositionColorTexture[] vertices = [
-        //    new VertexPositionColorTexture(new Vector3(position + new Vector2(-metaball.Radius), 0), color, Vector2.Zero), // tl
-        //    new VertexPositionColorTexture(new Vector3(position + new Vector2(metaball.Radius, -metaball.Radius), 0), color, Vector2.UnitX), // tr
-        //    new VertexPositionColorTexture(new Vector3(position + new Vector2(metaball.Radius), 0), color, Vector2.One), // br
-        //    new VertexPositionColorTexture(new Vector3(position + new Vector2(-metaball.Radius, metaball.Radius), 0), color, Vector2.UnitY), // bl
-        //];
-
-        MetaballShader.Value.Parameters["worldViewProjection"].SetValue(Matrix.CreateTranslation(
-            new Vector3(-Main.screenPosition.X, -Main.screenPosition.Y, 0)) * // world
-            Main.GameViewMatrix.TransformationMatrix *
-            Matrix.CreateOrthographicOffCenter(0, Main.screenWidth, Main.screenHeight, 0, -1, 1) // projection
-            );
-        MetaballShader.Value.Parameters["color"].SetValue(color.ToVector4());
-        MetaballShader.Value.Parameters["radius"].SetValue(metaball.Radius);
-        MetaballShader.Value.Parameters["scale"].SetValue(dust.scale * scale);
-        MetaballShader.Value.CurrentTechnique.Passes[0].Apply();
-
-        Main.spriteBatch.Begin();
-        Main.spriteBatch.Draw(MetaballTexture.Value, new Rectangle((int)position.X, (int)position.Y, (int)(metaball.Radius * 2 * dust.scale * scaleFactor.X), (int)(metaball.Radius * 2 * dust.scale * scaleFactor.Y)), null, color, dust.rotation, new Vector2(metaball.Radius) * 0.5f, SpriteEffects.None, 0);
-        Main.spriteBatch.End();
-
-        //GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, 4, [0, 1, 2, 2, 3, 0], 0, 2);
+        Vector2 position = Main.screenPosition - previousScreenPosition;
+        Vector2 scale = Main.ScreenSize.ToVector2() / pixellationTargetInner.Size();
+        sb.Draw(pixellationTargetInner, -position, null, Color.White, 0, default, scale, SpriteEffects.None, 0);
+        //sb.Draw(pixellationTargetInner, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), null, Color.White);
+        sb.End();
     }
 }

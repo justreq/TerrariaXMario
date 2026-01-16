@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
@@ -15,6 +16,7 @@ internal class FireFlowerData : Powerup
 
     internal override ForceArmMovementType RightClickArmMovementType => ForceArmMovementType.Swing;
     internal override Color Color => new(234, 51, 34);
+    internal override Dictionary<PowerupAbility, string> Abilities => new() { { PowerupAbility.Ranged, "Right click to throw out bouncing fireballs" } };
     internal override void UpdateWorld(Projectile projectile, int updateCount)
     {
         projectile.velocity.Y += 0.4f;
@@ -37,4 +39,5 @@ internal class FireFlower : PowerupProjectile
 {
     internal override int? PowerupType => ModContent.GetInstance<FireFlowerData>().Type;
     internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
+    internal override bool CanSpawn(Player player) => player.ZoneDesert || player.ZoneUndergroundDesert || player.ZoneUnderworldHeight;
 }

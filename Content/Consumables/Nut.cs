@@ -1,14 +1,17 @@
-﻿using Terraria.ID;
-using Terraria.ModLoader;
-using Terraria;
-using Terraria.DataStructures;
-using TerrariaXMario.Core;
+﻿using Terraria;
 using Terraria.Audio;
+using Terraria.DataStructures;
+using Terraria.ID;
+using Terraria.ModLoader;
+using TerrariaXMario.Common.SpawnableObject;
 
 namespace TerrariaXMario.Content.Consumables;
 
 internal class Nut1 : ModItem, ISpawnableObject
 {
+    internal virtual SpawnRarity SpawnRarity { get; set; }
+    SpawnRarity ISpawnableObject.SpawnRarity { get => SpawnRarity; set => SpawnRarity = value; }
+
     public override void SetStaticDefaults()
     {
         Item.ResearchUnlockCount = 30;
@@ -63,6 +66,7 @@ internal class Nut2 : Nut1
     {
         base.SetDefaults();
         Item.healLife = 100;
+        SpawnRarity = SpawnRarity.Uncommon;
     }
 }
 
@@ -78,6 +82,7 @@ internal class Nut3 : Nut1
     {
         base.SetDefaults();
         Item.healLife = 200;
+        SpawnRarity = SpawnRarity.Rare;
     }
 }
 
@@ -93,5 +98,6 @@ internal class Nut4 : Nut1
     {
         base.SetDefaults();
         Item.healLife = 300;
+        SpawnRarity = SpawnRarity.Epic;
     }
 }

@@ -10,7 +10,7 @@ using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Caps;
 
-internal abstract class CapItem : ModItem, ISpawnableObject
+internal abstract class CapItem : ModItem
 {
     private void LoadEquipTextures(string variation = "", bool head = true, bool body = true, bool legs = true)
     {

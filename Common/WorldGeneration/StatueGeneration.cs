@@ -4,12 +4,13 @@ using Terraria.DataStructures;
 using Terraria.ModLoader;
 using Terraria.WorldBuilding;
 using TerrariaXMario.Content.Furniture;
+using TerrariaXMario.Core;
 
 namespace TerrariaXMario.Common.WorldGeneration;
 
-internal class StatueGeneration : ModSystem
+internal class StatueGeneration : BasePatch
 {
-    public override void Load()
+    internal override void Patch(Mod mod)
     {
         On_WorldGen.SetupStatueList += On_WorldGen_SetupStatueList;
     }

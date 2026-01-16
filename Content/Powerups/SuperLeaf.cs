@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
@@ -18,6 +19,7 @@ internal class SuperLeafData : Powerup
 
     internal override bool LookTowardRightClick => false;
     internal override Color Color => new(176, 86, 40);
+    internal override Dictionary<PowerupAbility, string> Abilities => new() { { PowerupAbility.Melee, "Right click to swipe your tail at enemies" }, { PowerupAbility.Glide, "Hold jump midair to glide down slowly" }, { PowerupAbility.Flight, "Hold jump with full P-Speed to start flying upwards" } };
     internal override void UpdateWorld(Projectile projectile, int updateCount)
     {
         projectile.velocity.X = (float)(Math.Sin(MathHelper.Pi / 60 * updateCount % 60) * (updateCount <= 60 ? 2f : 3f));
@@ -95,6 +97,7 @@ internal class SuperLeaf : PowerupProjectile
 {
     internal override int? PowerupType => ModContent.GetInstance<SuperLeafData>().Type;
     internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
+    internal override bool CanSpawn(Player player) => (player.ZoneForest || player.ZoneJungle) && Main.dayTime;
     internal override float SpawnUpSpeed => -5f;
     internal override float SpawnDownSpeed => 2f;
     internal override int TimeBeforePickable => 20;

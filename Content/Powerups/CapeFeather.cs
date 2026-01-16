@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
@@ -16,6 +17,7 @@ internal class CapeFeatherData : SuperLeafData
     internal override string EquipSound => $"{TerrariaXMario.Sounds}/PowerupEffects/CapePowerUp";
     internal override bool LookTowardRightClick => false;
     internal override Color Color => new(255, 148, 53);
+    internal override Dictionary<PowerupAbility, string> Abilities => new() { { PowerupAbility.Melee, "Right click to swipe your cape at enemies" }, { PowerupAbility.Glide, "Hold jump midair to glide down slowly" }, { PowerupAbility.Flight, "Hold jump with full P-Speed to get a huge boost of flight" }, { PowerupAbility.FlightBoost, "Hold forward while flying to dive downwards, hold backwards to boost upwards" } };
     internal override void OnRightClick(Player player)
     {
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
@@ -81,6 +83,7 @@ internal class CapeFeather : PowerupProjectile
 {
     internal override int? PowerupType => ModContent.GetInstance<CapeFeatherData>().Type;
     internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
+    internal override bool CanSpawn(Player player) => player.ZoneSkyHeight;
     internal override float SpawnUpSpeed => -5f;
     internal override float SpawnDownSpeed => 2f;
     internal override int TimeBeforePickable => 20;

@@ -5,13 +5,14 @@ using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.CapEffects;
-using TerrariaXMario.Core;
+using TerrariaXMario.Common.SpawnableObject;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Powerups;
 
 internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
 {
+    SpawnRarity ISpawnableObject.SpawnRarity { get; set; }
     internal virtual int? PowerupType => null;
     internal Powerup? Powerup => PowerupType == null ? null : PowerupLoader.Powerups[(int)PowerupType];
     /// <summary>
@@ -22,6 +23,11 @@ internal abstract class PowerupProjectile : ModProjectile, ISpawnableObject
     /// A list of texture variations this PowerupData should use
     /// </summary>
     internal virtual string[] Variations => [];
+    /// <summary>
+    /// The conditions that must be met for this Powerup to be considered in the object spawner loot pool
+    /// </summary>
+    /// <param name="player">The player that hit the block</param>
+    internal virtual bool CanSpawn(Player player) => false;
     internal virtual float SpawnUpSpeed => -0.61f;
     internal virtual float SpawnDownSpeed => 0.61f;
     internal virtual int TimeBeforePickable => 45;

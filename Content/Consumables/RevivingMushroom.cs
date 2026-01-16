@@ -1,11 +1,14 @@
-﻿using Terraria.ModLoader;
-using Terraria;
-using TerrariaXMario.Core;
+﻿using Terraria;
+using Terraria.ModLoader;
+using TerrariaXMario.Common.SpawnableObject;
 
 namespace TerrariaXMario.Content.Consumables;
 
-internal abstract class RevivingMushroom : ModItem, ISpawnableObject
+internal class RevivingMushroom1 : ModItem, ISpawnableObject
 {
+    internal virtual SpawnRarity SpawnRarity { get; set; } = SpawnRarity.Epic;
+    SpawnRarity ISpawnableObject.SpawnRarity { get => SpawnRarity; set => SpawnRarity = value; }
+
     public override void SetStaticDefaults()
     {
         Item.ResearchUnlockCount = 30;
@@ -19,6 +22,11 @@ internal abstract class RevivingMushroom : ModItem, ISpawnableObject
     }
 }
 
-internal class RevivingMushroom1 : RevivingMushroom { }
-
-internal class RevivingMushroom2 : RevivingMushroom { }
+internal class RevivingMushroom2 : RevivingMushroom1
+{
+    public override void SetDefaults()
+    {
+        base.SetDefaults();
+        SpawnRarity = SpawnRarity.Legendary;
+    }
+}

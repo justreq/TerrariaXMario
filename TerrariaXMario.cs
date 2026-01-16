@@ -2,7 +2,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System.Collections.Generic;
-using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
@@ -10,7 +9,6 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 using TerrariaXMario.Content.Blocks;
-using TerrariaXMario.Core;
 
 namespace TerrariaXMario;
 
@@ -27,9 +25,6 @@ internal class TerrariaXMario : Mod
     private Asset<Texture2D>[]? oldCursors;
     internal int CursorGrabIndex = -1;
     internal int CursorThrowIndex = -1;
-    internal int CursorEditIndex = -1;
-
-    internal ISpawnableObject[]? spawnableObjects;
 
     internal static ObjectSpawnerBlockEntity? GetTileEntityOrNull(int i, int j) => TileEntity.TryGet(new(i, j), out ModTileEntity entity) ? entity as ObjectSpawnerBlockEntity : null;
     internal static ObjectSpawnerBlockEntity? GetTileEntityOrNull(Vector2 coords) => TileEntity.TryGet(new((int)coords.X, (int)coords.Y), out ModTileEntity entity) ? entity as ObjectSpawnerBlockEntity : null;
@@ -54,10 +49,6 @@ internal class TerrariaXMario : Mod
         CursorGrabIndex = TextureAssets.Cursors.Length - 1;
         TextureAssets.Cursors = [.. TextureAssets.Cursors, ModContent.Request<Texture2D>($"{Textures}/CursorThrow")];
         CursorThrowIndex = TextureAssets.Cursors.Length - 1;
-        TextureAssets.Cursors = [.. TextureAssets.Cursors, ModContent.Request<Texture2D>($"{Textures}/CursorEdit")];
-        CursorEditIndex = TextureAssets.Cursors.Length - 1;
-
-        spawnableObjects = [.. ModContent.GetContent<ISpawnableObject>().Where(e => e is not DefaultSpawnableObject).OrderBy(x => x.GetType().BaseType?.Name)];
     }
 
     public override void Unload()
@@ -68,8 +59,6 @@ internal class TerrariaXMario : Mod
         oldCursors = null;
         CursorGrabIndex = -1;
         CursorThrowIndex = -1;
-        CursorEditIndex = -1;
-        spawnableObjects = null;
     }
 
     internal static bool SolidTile(int i, int j)

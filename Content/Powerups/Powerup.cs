@@ -1,10 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.CapEffects;
 
 namespace TerrariaXMario.Content.Powerups;
 
+internal enum PowerupAbility { Ranged, Melee, Glide, Flight, GroundPound, FlightBoost, Dash, Swim }
 internal abstract class Powerup : ModType
 {
     internal int Type { get; set; }
@@ -25,12 +27,17 @@ internal abstract class Powerup : ModType
     internal virtual bool LookTowardRightClick => true;
     internal virtual int RightClickActionCooldown => 5;
     internal virtual Color Color => Color.White;
+    /// <summary>
+    /// Populates this Powerup's HUD with ability icons using the value as their hover text
+    /// </summary>
+    internal virtual Dictionary<PowerupAbility, string> Abilities => [];
 
     /// <summary>
     /// The behavior of this PowerupData when it exists in the world, e.g. movement behavior. Similar in concept to ModItem.Update.
     /// </summary>
     /// <param name="projectile">The projectile that exists in the world and gets consumed by the playerIndex upon contact.</param>
-    internal virtual void UpdateWorld(Projectile projectile, int updateCount) { }
+    internal virtual void UpdateWorld(Projectile projectile, int updateCount)
+    { }
     /// <summary>
     /// Any special effects this PowerupData gives when consumed, e.g. dust or unrelated state changes.
     /// </summary>

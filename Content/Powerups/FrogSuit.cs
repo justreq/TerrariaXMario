@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.ID;
@@ -14,6 +15,8 @@ internal class FrogSuitData : Powerup
     public override string Name => "FrogSuit";
     internal override bool LookTowardRightClick => false;
     internal override Color Color => new(22, 176, 67);
+
+    internal override Dictionary<PowerupAbility, string> Abilities => new() { { PowerupAbility.Dash, "Double tap left or right to dash into a run" }, { PowerupAbility.Swim, "Swim with ease in all 4 directions" } };
     internal override void UpdateWorld(Projectile projectile, int updateCount)
     {
         projectile.velocity.Y += 0.4f;
@@ -65,5 +68,6 @@ internal class FrogSuit : PowerupProjectile
     internal override int? PowerupType => ModContent.GetInstance<FrogSuitData>().Type;
     internal override string[] Caps => [nameof(Mario)];
     internal override string[] Variations => ["Running"];
+    internal override bool CanSpawn(Player player) => player.ZoneBeach;
     internal override bool GroundPound => false;
 }

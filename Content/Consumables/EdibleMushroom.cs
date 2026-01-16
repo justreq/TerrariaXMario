@@ -3,13 +3,16 @@ using Terraria.ModLoader;
 using Terraria;
 using Terraria.DataStructures;
 using System.Collections.Generic;
-using TerrariaXMario.Core;
 using Terraria.Audio;
+using TerrariaXMario.Common.SpawnableObject;
 
 namespace TerrariaXMario.Content.Consumables;
 
 internal abstract class EdibleMushroom : ModItem, ISpawnableObject
 {
+    internal virtual SpawnRarity SpawnRarity { get; set; }
+    SpawnRarity ISpawnableObject.SpawnRarity { get => SpawnRarity; set => SpawnRarity = value; }
+
     public override void SetStaticDefaults()
     {
         Item.ResearchUnlockCount = 30;
@@ -50,6 +53,7 @@ internal class EdibleMushroom2 : EdibleMushroom
     {
         base.SetDefaults();
         Item.healLife = 100;
+        SpawnRarity = SpawnRarity.Uncommon;
     }
 }
 
@@ -65,6 +69,7 @@ internal class EdibleMushroom3 : EdibleMushroom
     {
         base.SetDefaults();
         Item.healLife = 200;
+        SpawnRarity = SpawnRarity.Rare;
     }
 }
 
@@ -80,6 +85,7 @@ internal class EdibleMushroom4 : EdibleMushroom
     {
         base.SetDefaults();
         Item.healLife = 300;
+        SpawnRarity = SpawnRarity.Epic;
     }
 }
 
@@ -97,6 +103,7 @@ internal class EdibleMushroomBad : EdibleMushroom
         Item.buffType = BuffID.Venom;
         Item.buffTime = 300;
         Item.potion = false;
+        SpawnRarity = SpawnRarity.Rare;
     }
 
     public override void OnConsumeItem(Player player)

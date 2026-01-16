@@ -5,7 +5,7 @@
 - Added Luigi's Cap
 - Added P-Speed Meter
 - Added Powerups
-- Added Powerup HUD and Overcharge Meter
+- Added Powerup HUD
 - Added Fire Flower
 - Added Ice Flower
 - Added Boomerang Flower
@@ -29,5 +29,4 @@
 - Added 5 paintings
 - Added ? Blocks
 - Added Brick Blocks
-- Added Pipe Blocks
 - Added Goomba

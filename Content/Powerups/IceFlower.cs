@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.Audio;
@@ -14,6 +15,7 @@ internal class IceFlowerData : FireFlowerData
 {
     public override string Name => "IceFlower";
     internal override Color Color => new(55, 118, 242);
+    internal override Dictionary<PowerupAbility, string> Abilities => new() { { PowerupAbility.Ranged, "Right click to throw bouncing iceballs that freeze enemies (frozen enemies can be picked up and thrown for extra damage)" } };
     internal override void OnRightClick(Player player)
     {
         if (Main.projectile.Any(e => e.type == ModContent.ProjectileType<IceFlowerIceball>() && e.active && e.owner == player.whoAmI)) return;
@@ -26,4 +28,5 @@ internal class IceFlower : PowerupProjectile
 {
     internal override int? PowerupType => ModContent.GetInstance<IceFlowerData>().Type;
     internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
+    internal override bool CanSpawn(Player player) => player.ZoneSnow;
 }

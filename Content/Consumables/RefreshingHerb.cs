@@ -1,13 +1,14 @@
-﻿using Terraria.ID;
-using Terraria.ModLoader;
-using Terraria;
+﻿using Terraria;
 using Terraria.DataStructures;
-using TerrariaXMario.Core;
+using Terraria.ID;
+using Terraria.ModLoader;
+using TerrariaXMario.Common.SpawnableObject;
 
 namespace TerrariaXMario.Content.Consumables;
 
 internal class RefreshingHerb : ModItem, ISpawnableObject
 {
+    SpawnRarity ISpawnableObject.SpawnRarity { get; set; } = SpawnRarity.Rare;
     public override void SetStaticDefaults()
     {
         Item.ResearchUnlockCount = 30;

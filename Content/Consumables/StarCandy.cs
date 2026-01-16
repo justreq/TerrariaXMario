@@ -4,13 +4,15 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.CapEffects;
-using TerrariaXMario.Core;
-using TerrariaXMario.Utilities.Extensions;
+using TerrariaXMario.Common.SpawnableObject;
 
 namespace TerrariaXMario.Content.Consumables;
 
 internal class StarCandy1 : ModItem, ISpawnableObject
 {
+    internal virtual SpawnRarity SpawnRarity { get; set; } = SpawnRarity.Uncommon;
+    SpawnRarity ISpawnableObject.SpawnRarity { get => SpawnRarity; set => SpawnRarity = value; }
+
     internal virtual int SPReplenishAmount => 25;
 
     public override void SetStaticDefaults()
@@ -52,6 +54,7 @@ internal class StarCandy2 : StarCandy1
     {
         base.SetDefaults();
         Item.healLife = 100;
+        SpawnRarity = SpawnRarity.Rare;
     }
 }
 
@@ -69,6 +72,7 @@ internal class StarCandy3 : StarCandy1
     {
         base.SetDefaults();
         Item.healLife = 200;
+        SpawnRarity = SpawnRarity.Epic;
     }
 }
 
@@ -86,5 +90,6 @@ internal class StarCandy4 : StarCandy1
     {
         base.SetDefaults();
         Item.healLife = 300;
+        SpawnRarity = SpawnRarity.Legendary;
     }
 }

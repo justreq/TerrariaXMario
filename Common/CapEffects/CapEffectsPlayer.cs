@@ -15,11 +15,11 @@ using TerrariaXMario.Common.BroInfoUI;
 using TerrariaXMario.Common.CapeFlight;
 using TerrariaXMario.Common.FrogSwim;
 using TerrariaXMario.Common.MiscEffects;
+using TerrariaXMario.Common.SpawnableObject;
 using TerrariaXMario.Common.StatueForm;
 using TerrariaXMario.Content.Blocks;
 using TerrariaXMario.Content.PowerupProjectiles;
 using TerrariaXMario.Content.Powerups;
-using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.CapEffects;
@@ -77,8 +77,6 @@ internal class CapEffectsPlayer : ModPlayer
 
     internal int? hoverNPCIndex;
     internal int? grabbedNPCIndex;
-
-    internal Vector2 currentObjectSpawnerBlockToEdit;
 
     internal int fireFlowerFireballsCast;
     internal int fireFlowerCooldown;
@@ -306,11 +304,7 @@ internal class CapEffectsPlayer : ModPlayer
 
     public override void PostUpdateEquips()
     {
-        if (!CanDoCapEffects)
-        {
-            if (currentObjectSpawnerBlockToEdit != Vector2.Zero) currentObjectSpawnerBlockToEdit = Vector2.Zero;
-            return;
-        }
+        if (!CanDoCapEffects) return;
 
         if (currentJump == Jump.Double) Player.jumpSpeedBoost += 1.25f;
         else if (currentJump == Jump.Triple) Player.jumpSpeedBoost += 2.5f;
@@ -319,6 +313,8 @@ internal class CapEffectsPlayer : ModPlayer
     public override void PostUpdate()
     {
         CapEffect();
+
+        if (currentPowerupType != null && currentPowerupType != ModContent.GetInstance<FrogSuitData>().Type) frogSwimming = false;
 
         if (!CanDoCapEffects || Player.mount.Active)
         {
@@ -526,6 +522,12 @@ internal class CapEffectsPlayer : ModPlayer
         return false;
     }
 
+    public override void UpdateDead()
+    {
+        Player.fullRotation = 0;
+        currentPowerupType = null;
+    }
+
     internal void SetForceDirection(int duration, ForceArmMovementType type, int direction)
     {
         if (duration <= 0 || Math.Abs(direction) != 1) return;
@@ -552,6 +554,7 @@ internal class CapEffectsPlayer : ModPlayer
     {
         if (currentPowerupType != null)
         {
+            Player.fullRotation = 0;
             currentPowerupType = null;
             SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/PowerDown") { Volume = 0.4f }, Player.MountedCenter);
         }
@@ -828,7 +831,7 @@ internal class CapEffectsPlayer : ModPlayer
         SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/BlockHit") { Volume = 8 }, Player.MountedCenter);
 
         ObjectSpawnerBlockEntity? entity = TerrariaXMario.GetTileEntityOrNull((Point)point);
-        if (entity == null || entity.justStruck || entity.wasPreviouslyStruck) return;
+        if (entity == null || entity.justStruck || entity.WasPreviouslyStruck) return;
 
         if (entity.spawnContents.Length == 0 && entity.tileInternalName == nameof(BrickBlockTile))
         {
@@ -836,38 +839,62 @@ internal class CapEffectsPlayer : ModPlayer
             return;
         }
 
-        ISpawnableObject objectToSpawn = entity.spawnContents.Length == 0 && entity.tileInternalName == nameof(QuestionBlockTile) ? new DefaultSpawnableObject() : entity!.spawnContents[0];
+        ISpawnableObject objectToSpawn = entity.spawnContents.Length == 0 && entity.tileInternalName == nameof(QuestionBlockTile) ? GetObjectToSpawn(Player) : entity!.spawnContents[0];
         Vector2 center = TerrariaXMario.CenterOfMultitileInWorld((Point)point);
         TileObjectData data = TileObjectData.GetTileData(Framing.GetTileSafely((Point)point));
+
+        void SpawnItem(Item item)
+        {
+            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/ItemSpawn") { Volume = 0.4f }, center);
+            int spawnedItem = Item.NewItem(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), center - item.Size * 0.5f + new Vector2(0, data.Height * 16 * (spawnFromBottom ? -1 : 1)), new Item(item.type), noGrabDelay: true);
+            Main.item[spawnedItem].noGrabDelay = 15;
+            SpawnedItem? globalItem = Main.item[spawnedItem].GetGlobalItemOrNull<SpawnedItem>();
+            globalItem?.objectSpawnerBlockEntity = entity.Position;
+            globalItem?.spawnedFromBottom = spawnFromBottom;
+        }
 
         if (objectToSpawn is PowerupProjectile projectile)
         {
             SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/PowerupSpawn"), center);
             Projectile.NewProjectile(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), center + new Vector2(0, spawnFromBottom ? 4 : -4), new Vector2(0, spawnFromBottom ? projectile.SpawnDownSpeed : projectile.SpawnUpSpeed), projectile.Type, 0, 0);
         }
-        else if (objectToSpawn is ModItem item)
-        {
-            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/ItemSpawn") { Volume = 0.4f }, center);
-            int spawnedItem = Item.NewItem(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), center - item.Item.Size * 0.5f + new Vector2(0, data.Height * 16 * (spawnFromBottom ? -1 : 1)), new Item(item.Type), noGrabDelay: true);
-            Main.item[spawnedItem].noGrabDelay = 15;
-            SpawnedItem? globalItem = Main.item[spawnedItem].GetGlobalItemOrNull<SpawnedItem>();
-            globalItem?.objectSpawnerBlockEntity = entity.Position;
-            globalItem?.spawnedFromBottom = spawnFromBottom;
-        }
+        else if (objectToSpawn is ModItem item) SpawnItem(item.Item);
         else if (objectToSpawn is DefaultSpawnableObject)
         {
-            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/Coin") { Volume = 4f }, center);
-            int spawnedItem = Item.NewItem(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), center - new Vector2(6, 8) + new Vector2(0, data.Height * 16 * (spawnFromBottom ? -1 : 1)), new Item(ItemID.GoldCoin), noGrabDelay: true);
-            Main.item[spawnedItem].noGrabDelay = 15;
-            SpawnedItem? globalItem = Main.item[spawnedItem].GetGlobalItemOrNull<SpawnedItem>();
-            globalItem?.objectSpawnerBlockEntity = entity.Position;
-            globalItem?.spawnedFromBottom = spawnFromBottom;
+            if (Main.rand.NextBool()) SpawnItem(new(ItemID.Mushroom));
+            else
+            {
+                SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Misc/Coin") { Volume = 4f }, center);
+                int spawnedItem = Item.NewItem(Player.GetSource_TileInteraction(point.Value.X, point.Value.Y), center - new Vector2(6, 8) + new Vector2(0, data.Height * 16 * (spawnFromBottom ? -1 : 1)), new Item(ItemID.GoldCoin), noGrabDelay: true);
+                Main.item[spawnedItem].noGrabDelay = 15;
+                SpawnedItem? globalItem = Main.item[spawnedItem].GetGlobalItemOrNull<SpawnedItem>();
+                globalItem?.objectSpawnerBlockEntity = entity.Position;
+                globalItem?.spawnedFromBottom = spawnFromBottom;
+            }
         }
 
         entity?.spawnContents = [.. entity.spawnContents.Skip(1).ToArray()];
         entity?.justStruck = true;
-        if (entity?.spawnContents.Length == 0) entity.wasPreviouslyStruck = true;
+        if (entity?.spawnContents.Length == 0) entity.WasPreviouslyStruck = true;
         if (bufferPlayer) Player.velocity.Y = 1;
+    }
+
+    private static ISpawnableObject GetObjectToSpawn(Player player)
+    {
+        if (Main.rand.NextBool(4))
+        {
+            var pool = ModContent.GetContent<PowerupProjectile>().Where(i => i.CanSpawn(player)).ToList();
+            if (pool.Count > 0) return Main.rand.NextFromCollection(pool);
+        }
+
+        IEnumerable<ISpawnableObject> list = ModContent.GetContent<ISpawnableObject>().Where(e => e is not PowerupProjectile);
+        float num = Main.rand.NextFloat();
+
+        if (num < 0.01f) return Main.rand.NextFromCollection([.. list.Where(e => e.SpawnRarity == SpawnRarity.Legendary)]);
+        if (num < 0.05f) return Main.rand.NextFromCollection([.. list.Where(e => e.SpawnRarity == SpawnRarity.Epic)]);
+        if (num < 0.1f) return Main.rand.NextFromCollection([.. list.Where(e => e.SpawnRarity == SpawnRarity.Rare)]);
+        if (num < 0.5f) return Main.rand.NextFromCollection([.. list.Where(e => e.SpawnRarity == SpawnRarity.Uncommon)]);
+        return Main.rand.NextFromCollection([.. list.Where(e => e.SpawnRarity == SpawnRarity.Common), new DefaultSpawnableObject()]);
     }
 
     private void SpawnStatueSparkle()

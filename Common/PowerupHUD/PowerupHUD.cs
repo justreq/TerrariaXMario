@@ -1,11 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using System;
+using System.Linq;
 using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.UI;
 using TerrariaXMario.Common.CapEffects;
+using TerrariaXMario.Content.Powerups;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Common.PowerupHUD;
@@ -13,6 +16,7 @@ namespace TerrariaXMario.Common.PowerupHUD;
 internal class PowerupHUD : UIState
 {
     private UIElement? OverchargeBarContainer { get; set; }
+    private UIElement? AbilityContainer { get; set; }
 
     private string? path;
     private Asset<Texture2D>? OverchargeBarTexture => path == null ? null : ModContent.Request<Texture2D>($"{path}/OverchargeBar");
@@ -28,6 +32,13 @@ internal class PowerupHUD : UIState
             e.Height = StyleDimension.FromPixels(52);
             e.HAlign = 0.5f;
             e.Top = StyleDimension.FromPixels(8);
+        }));
+
+        AbilityContainer = this.AddElement(new UIElement().With(e =>
+        {
+            e.Height = StyleDimension.FromPixels(44);
+            e.HAlign = 0.5f;
+            e.Top = StyleDimension.FromPixels(68);
         }));
     }
 
@@ -53,7 +64,7 @@ internal class PowerupHUD : UIState
 
             if (ModContent.TryFind(nameof(TerrariaXMario), modPlayer.CurrentPowerup.Name.Replace("Data", ""), out ModProjectile projectile))
             {
-                if (OverchargeBarContainer.IsMouseHovering) Main.hoverItemName = $"{projectile.PrettyPrintName()}\n{Language.GetTextValue($"Mods.{nameof(TerrariaXMario)}.Projectiles.{projectile.Name}.Tooltip")}\nOvercharge: {modPlayer.PowerupOvercharge}/{modPlayer.powerupOverchargeMax}";
+                if (OverchargeBarContainer.IsMouseHovering) Main.hoverItemName = $"{projectile.PrettyPrintName()}\nCharge: {modPlayer.PowerupOvercharge}/{modPlayer.powerupOverchargeMax}";
 
                 spriteBatch.Draw(ModContent.Request<Texture2D>(projectile.Texture).Value, new Rectangle((int)position.X + 18, (int)position.Y + 14, 24, 24), new Rectangle(0, 0, projectile.Projectile.width, projectile.Projectile.height), Color.White);
 
@@ -65,6 +76,20 @@ internal class PowerupHUD : UIState
                 }
             }
 
+            if (AbilityContainer == null) return;
+
+            Vector2 position2 = AbilityContainer.GetDimensions().Position();
+
+            for (int i = 0; i < modPlayer.CurrentPowerup.Abilities.Keys.Count; i++)
+            {
+                PowerupAbility ability = modPlayer.CurrentPowerup.Abilities.Keys.ToArray()[i];
+
+                Vector2 abilityPosition = position2 + new Vector2((44 * i) + (i == 0 ? 0 : i * 8), 0);
+                spriteBatch.Draw(ModContent.Request<Texture2D>($"{path}/Ability").Value, abilityPosition, Color.White);
+                spriteBatch.Draw(ModContent.Request<Texture2D>($"{path}/Ability{ability}").Value, abilityPosition, Color.White);
+
+                if (new Rectangle((int)abilityPosition.X, (int)abilityPosition.Y, 44, 44).Contains(Main.MouseScreen.ToPoint())) Main.hoverItemName = modPlayer.CurrentPowerup.Abilities.Values.ToArray()[i];
+            }
         }
     }
 
@@ -83,8 +108,11 @@ internal class PowerupHUD : UIState
 
         if (modPlayer.PowerupOvercharge == 0) modPlayer.RemovePowerup();
 
-        if (OverchargeBarContainer == null) return;
+        if (OverchargeBarContainer == null || AbilityContainer == null) return;
 
         OverchargeBarContainer.Width = StyleDimension.FromPixels(70 + modPlayer.powerupOverchargeMax);
+        int num = modPlayer.CurrentPowerup!.Abilities.Count;
+        AbilityContainer.Width = StyleDimension.FromPixels(num * 44 + (num - 1) * 8);
+        AbilityContainer.Recalculate();
     }
 }

@@ -3,12 +3,16 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.CapEffects;
-using TerrariaXMario.Core;
+using TerrariaXMario.Common.SpawnableObject;
+using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Consumables;
 
 internal class SyrupJar1 : ModItem, ISpawnableObject
 {
+    internal virtual SpawnRarity SpawnRarity { get; set; }
+    SpawnRarity ISpawnableObject.SpawnRarity { get => SpawnRarity; set => SpawnRarity = value; }
+
     internal virtual int SPReplenishAmount => 25;
     public override void SetStaticDefaults()
     {
@@ -43,15 +47,33 @@ internal class SyrupJar1 : ModItem, ISpawnableObject
 internal class SyrupJar2 : SyrupJar1
 {
     internal override int SPReplenishAmount => 50;
+
+    public override void SetDefaults()
+    {
+        base.SetDefaults();
+        SpawnRarity = SpawnRarity.Uncommon;
+    }
 }
 
 internal class SyrupJar3 : SyrupJar1
 {
     internal override int SPReplenishAmount => 75;
+
+    public override void SetDefaults()
+    {
+        base.SetDefaults();
+        SpawnRarity = SpawnRarity.Rare;
+    }
 }
 
 internal class SyrupJar4 : SyrupJar1
 {
 
     internal override int SPReplenishAmount => 100;
+
+    public override void SetDefaults()
+    {
+        base.SetDefaults();
+        SpawnRarity = SpawnRarity.Epic;
+    }
 }

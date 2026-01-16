@@ -1,40 +1,38 @@
-float4x4 worldViewProjection;
 
 sampler2D uImage0 : register(s0);
 
-float4 color;
-float radius;
-float scale;
+// 0 -----------------------------------------> 1
+// none ---> outerThreshold ---> innerThreshold 
+// 
+// if the 
+float uOuterThreshold;
+float uInnerThreshold;
+float4 uInnerColor;
+float4 uOuterColor;
 
-float2 ScaleAroundCenter(float2 uv, float scale)
+void MainPS(inout float4 color : COLOR0, in float2 texCoords : TEXCOORD0)
 {
-    float2 center = float2(0.5f, 0.5f);
-    uv -= center;
-    uv *= scale;
-    uv += center;
-    return uv;
-}
-
-float4 PSMain(float2 textureCoordinates : TEXCOORD0, float4 interpolatedColor : COLOR0, float2 position : VPOS) : COLOR0
-{
-    float2 scaledUV = ScaleAroundCenter(textureCoordinates, scale);
-
-    float4 newColor = interpolatedColor * color;
-    newColor.a = 255;
-
-    return tex2D(uImage0, scaledUV) * newColor;
-}
-
-float4 VSMain(inout float2 textureCoordinates : TEXCOORD0, inout float4 interpolatedColor : COLOR0, float3 position : SV_Position) : SV_Position
-{
-    return mul(float4(position, 1), worldViewProjection);
-}
-
-technique
-{
-    pass
+    float4 sampledColor = tex2D(uImage0, texCoords);
+    color *= sampledColor;
+    float colorAvg = sampledColor.a; //(color.r + color.g + color.b + color.a) / 4 ;
+    if (colorAvg > uInnerThreshold)
     {
-        PixelShader = compile ps_3_0 PSMain();
-        VertexShader = compile vs_3_0 VSMain();
+        color = uInnerColor;
+    }
+    else if (colorAvg > uOuterThreshold)
+    {
+        color = uOuterColor;
+    }
+    else
+    {
+        color = float4(0, 0, 0, 0);
+    }
+}
+
+technique t0
+{
+    pass p0
+    {
+        PixelShader = compile ps_2_0 MainPS();
     }
 }

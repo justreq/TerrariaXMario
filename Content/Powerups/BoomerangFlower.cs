@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.ModLoader;
@@ -15,6 +16,7 @@ internal class BoomerangFlowerData : FireFlowerData
 
     internal override ForceArmMovementType RightClickArmMovementType => ForceArmMovementType.Extend;
     internal override Color Color => new(24, 153, 230);
+    internal override Dictionary<PowerupAbility, string> Abilities => new() { { PowerupAbility.Ranged, "Hold right click to throw out a boomerang" } };
     internal override void OnRightClick(Player player)
     {
         if (Main.projectile.Any(e => e.type == ModContent.ProjectileType<Boomerang>() && e.active && e.owner == player.whoAmI)) return;
@@ -28,4 +30,5 @@ internal class BoomerangFlower : PowerupProjectile
 {
     internal override int? PowerupType => ModContent.GetInstance<BoomerangFlowerData>().Type;
     internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
+    internal override bool CanSpawn(Player player) => player.ZoneJungle;
 }

@@ -15,6 +15,7 @@ internal sealed class Patch_DrawPageIcons : BasePatch
     private int On_Main_DrawPageIcons(On_Main.orig_DrawPageIcons orig, int yPos)
     {
         TerrariaXMario.BroInfoPageButtonPosition = new Vector2(Main.screenWidth - 44, yPos - 6);
+
         return orig(yPos);
     }
 }

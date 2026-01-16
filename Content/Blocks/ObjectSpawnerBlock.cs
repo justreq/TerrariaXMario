@@ -2,27 +2,47 @@
 using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
 using Terraria;
+using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.Enums;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
-using TerrariaXMario.Common.CapEffects;
-using TerrariaXMario.Content.Tools;
-using TerrariaXMario.Core;
-using TerrariaXMario.Utilities.Extensions;
+using TerrariaXMario.Common.SpawnableObject;
+using TerrariaXMario.Common.StatueForm;
 
 namespace TerrariaXMario.Content.Blocks;
+
 internal class ObjectSpawnerBlockEntity : ModTileEntity
 {
     internal int strikeAnimationTimeleft;
     internal bool justStruck;
-    internal bool wasPreviouslyStruck;
+    internal bool WasPreviouslyStruck
+    {
+        get => field;
+        set
+        {
+            field = value;
+            if (value && spawnContents.Length == 0)
+            {
+                SpawnToadDust();
+            }
+        }
+    }
+    internal int ticksSinceEmptied;
     internal ISpawnableObject[] spawnContents = [];
 
     internal string? tileInternalName;
-    internal bool ShouldShowEmpty => wasPreviouslyStruck && spawnContents.Length == 0;
+    internal bool ShouldShowEmpty => WasPreviouslyStruck && spawnContents.Length == 0;
+
+    internal void SpawnToadDust()
+    {
+        for (int i = 0; i < 20; i++)
+        {
+            Dust.NewDust(Position.ToWorldCoordinates() - new Vector2(0, 56), 32, 32, ModContent.DustType<StatueDust>());
+        }
+    }
 
     public override bool IsTileValidForEntity(int x, int y)
     {
@@ -39,12 +59,26 @@ internal class ObjectSpawnerBlockEntity : ModTileEntity
         }
 
         if (strikeAnimationTimeleft > 0) strikeAnimationTimeleft--;
+
+        if (ShouldShowEmpty)
+        {
+            if (ticksSinceEmptied >= Main.nightLength * 0.5f)
+            {
+                WasPreviouslyStruck = false;
+                ticksSinceEmptied = 0;
+                SpawnToadDust();
+                SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Toad/ToadSuccess") { Volume = 0.4f }, Position.ToWorldCoordinates());
+                return;
+            }
+
+            ticksSinceEmptied += (int)Main.dayRate;
+
+            if ((int)(Main.GameUpdateCount * 0.25f) % 15 == 8) SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Toad/ToadAmbient") { Volume = 0.1f }, Position.ToWorldCoordinates());
+        }
     }
 
     public override void OnKill()
     {
-        CapEffectsPlayer? modPlayer = Main.LocalPlayer.GetModPlayerOrNull<CapEffectsPlayer>();
-
         for (int a = 0; a < 4; a++)
         {
             if (Mod.TryFind($"{(ShouldShowEmpty ? "EmptyBlockTile" : $"{tileInternalName}")}Gore_{a + 1}", out ModGore goreInstance))
@@ -55,21 +89,27 @@ internal class ObjectSpawnerBlockEntity : ModTileEntity
             }
         }
 
-        if (modPlayer?.currentObjectSpawnerBlockToEdit == Position.ToVector2()) modPlayer?.currentObjectSpawnerBlockToEdit = Vector2.Zero;
+        if (ShouldShowEmpty)
+        {
+            SpawnToadDust();
+            SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/Toad/ToadKill{Main.rand.Next(1, 4)}") { Volume = 0.4f }, Position.ToWorldCoordinates());
+        }
     }
 
     public override void SaveData(TagCompound tag)
     {
-        tag[nameof(wasPreviouslyStruck)] = wasPreviouslyStruck;
+        tag[nameof(WasPreviouslyStruck)] = WasPreviouslyStruck;
         if (spawnContents.Length > 0) tag[nameof(spawnContents)] = spawnContents.ToList();
         tag[nameof(tileInternalName)] = tileInternalName;
+        tag[nameof(ticksSinceEmptied)] = ticksSinceEmptied;
     }
 
     public override void LoadData(TagCompound tag)
     {
-        if (tag.ContainsKey(nameof(wasPreviouslyStruck))) wasPreviouslyStruck = tag.GetBool(nameof(wasPreviouslyStruck));
+        if (tag.ContainsKey(nameof(WasPreviouslyStruck))) WasPreviouslyStruck = tag.GetBool(nameof(WasPreviouslyStruck));
         if (tag.ContainsKey(nameof(spawnContents))) spawnContents = [.. tag.GetList<ISpawnableObject>(nameof(spawnContents))];
         if (tag.ContainsKey(nameof(tileInternalName))) tileInternalName = tag.GetString(nameof(tileInternalName));
+        if (tag.ContainsKey(nameof(ticksSinceEmptied))) ticksSinceEmptied = tag.GetInt(nameof(ticksSinceEmptied));
     }
 }
 
@@ -103,33 +143,15 @@ internal class ObjectSpawnerBlockTile : ModTile
         ModContent.GetInstance<ObjectSpawnerBlockEntity>().Kill(i, j);
     }
 
-    public override void MouseOver(int i, int j)
-    {
-        Player player = Main.LocalPlayer;
-        CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
-
-        if (modPlayer == null || modPlayer.currentObjectSpawnerBlockToEdit != Vector2.Zero || (!modPlayer?.CanDoCapEffects ?? true)) return;
-
-        if ((player.HeldItem.type == ModContent.ItemType<Hammer>() || Main.mouseItem.type == ModContent.ItemType<Hammer>()) && modPlayer != null && TerrariaXMario.GetTileEntityOrNull(modPlayer.currentObjectSpawnerBlockToEdit.ToPoint())?.Position != TerrariaXMario.GetTileEntityOrNull(i, j)?.Position)
-        {
-            Main.cursorOverride = TerrariaXMario.Instance.CursorEditIndex;
-        }
-    }
-
     public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
     {
         ObjectSpawnerBlockEntity? entity = TerrariaXMario.GetTileEntityOrNull(i, j);
 
-        if (entity == null || entity != TerrariaXMario.GetTileEntityOrNull(Main.LocalPlayer.GetModPlayerOrNull<CapEffectsPlayer>()?.currentObjectSpawnerBlockToEdit ?? Vector2.Zero)) return;
+        if (entity == null || !entity.ShouldShowEmpty || i != entity.Position.X || j != entity.Position.Y) return;
 
-        Tile tile = Framing.GetTileSafely(i, j);
-        if (tile.TileFrameX != 0 || tile.TileFrameY != 0) return;
+        Vector2 worldPosition = (entity.Position.ToVector2() + new Vector2(11, 8)).ToWorldCoordinates() + new Vector2(-6, 6);
 
-        for (int a = 0; a < (Main.FrameSkipMode == FrameSkipMode.Off ? 1 : 4); a++)
-        {
-            Dust dust = Dust.NewDustPerfect(new Vector2(i, j).ToWorldCoordinates() + new Vector2(8f) + Main.rand.NextVector2Circular(24, 24), DustID.SeaSnail, Vector2.Zero, newColor: Color.White);
-            dust.noGravity = true;
-        }
+        spriteBatch.Draw(ModContent.Request<Texture2D>($"{TerrariaXMario.Textures}/Toad").Value, worldPosition - Main.screenPosition, new Rectangle(160, 56 * ((int)(Main.GameUpdateCount * 0.25f) % 15), 80, 56), Color.White);
     }
 
     public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY)
