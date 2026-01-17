@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.ModLoader;
@@ -16,13 +15,12 @@ internal class BoomerangFlowerData : FireFlowerData
 
     internal override ForceArmMovementType RightClickArmMovementType => ForceArmMovementType.Extend;
     internal override Color Color => new(24, 153, 230);
-    internal override Dictionary<PowerupAbility, string> Abilities => new() { { PowerupAbility.Ranged, "Hold right click to throw out a boomerang" } };
     internal override void OnRightClick(Player player)
     {
         if (Main.projectile.Any(e => e.type == ModContent.ProjectileType<Boomerang>() && e.active && e.owner == player.whoAmI)) return;
         Vector2 velocity = Main.MouseWorld - player.MountedCenter;
         velocity.Normalize();
-        Projectile.NewProjectile(player.GetSource_FromThis(), player.MountedCenter, velocity * 8, ModContent.ProjectileType<Boomerang>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.statPower ?? 1, 0f, player.whoAmI);
+        Projectile.NewProjectile(player.GetSource_FromThis(), player.MountedCenter, velocity * 8, ModContent.ProjectileType<Boomerang>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.StatPower ?? 1, 0f, player.whoAmI);
     }
 }
 

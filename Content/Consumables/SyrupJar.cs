@@ -4,16 +4,17 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Common.SpawnableObject;
+using TerrariaXMario.Common.SPBar;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Consumables;
 
 internal class SyrupJar1 : ModItem, ISpawnableObject
 {
+    internal HealSPItem? HealSPItem => Item.GetGlobalItemOrNull<HealSPItem>();
     internal virtual SpawnRarity SpawnRarity { get; set; }
     SpawnRarity ISpawnableObject.SpawnRarity { get => SpawnRarity; set => SpawnRarity = value; }
 
-    internal virtual int SPReplenishAmount => 25;
     public override void SetStaticDefaults()
     {
         Item.ResearchUnlockCount = 30;
@@ -35,45 +36,42 @@ internal class SyrupJar1 : ModItem, ISpawnableObject
         Item.useTime = 17;
         Item.useAnimation = 17;
         Item.consumable = true;
+        HealSPItem?.healSP = 25;
     }
 
     public override bool? UseItem(Player player)
     {
-        CapEffectsPlayer.RestoreSP(player, SPReplenishAmount);
+        CapEffectsPlayer.RestoreSP(player, HealSPItem?.healSP ?? 0);
         return true;
     }
 }
 
 internal class SyrupJar2 : SyrupJar1
 {
-    internal override int SPReplenishAmount => 50;
-
     public override void SetDefaults()
     {
         base.SetDefaults();
         SpawnRarity = SpawnRarity.Uncommon;
+        HealSPItem?.healSP = 50;
     }
 }
 
 internal class SyrupJar3 : SyrupJar1
 {
-    internal override int SPReplenishAmount => 75;
-
     public override void SetDefaults()
     {
         base.SetDefaults();
         SpawnRarity = SpawnRarity.Rare;
+        HealSPItem?.healSP = 75;
     }
 }
 
 internal class SyrupJar4 : SyrupJar1
 {
-
-    internal override int SPReplenishAmount => 100;
-
     public override void SetDefaults()
     {
         base.SetDefaults();
         SpawnRarity = SpawnRarity.Epic;
+        HealSPItem?.healSP = 100;
     }
 }

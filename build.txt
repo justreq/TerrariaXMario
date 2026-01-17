@@ -1,4 +1,4 @@
-displayName = [c/d91616:Mario] & [c/1b9504:Luigi]: Crossover
+displayName = [c/d91616:Mario] & [c/1b9504:Luigi]: Crossover (READ DESCRIPTION)
 author = Lacroix, Ray, Momlob, Lugnut
-version = 0.1.0
+version = 2026.0.0
 dllReferences = KBOFXCTask, StructureHelper

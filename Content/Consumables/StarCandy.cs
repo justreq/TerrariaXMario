@@ -5,15 +5,16 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Common.SpawnableObject;
+using TerrariaXMario.Common.SPBar;
+using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Consumables;
 
 internal class StarCandy1 : ModItem, ISpawnableObject
 {
+    internal HealSPItem? HealSPItem => Item.GetGlobalItemOrNull<HealSPItem>();
     internal virtual SpawnRarity SpawnRarity { get; set; } = SpawnRarity.Uncommon;
     SpawnRarity ISpawnableObject.SpawnRarity { get => SpawnRarity; set => SpawnRarity = value; }
-
-    internal virtual int SPReplenishAmount => 25;
 
     public override void SetStaticDefaults()
     {
@@ -37,31 +38,29 @@ internal class StarCandy1 : ModItem, ISpawnableObject
         Item.consumable = true;
         Item.healLife = 50;
         Item.potion = true;
+        HealSPItem?.healSP = 25;
     }
 
     public override void OnConsumeItem(Player player)
     {
         SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/Heal") { Volume = 0.4f }, player.MountedCenter);
-        CapEffectsPlayer.RestoreSP(player, SPReplenishAmount);
+        CapEffectsPlayer.RestoreSP(player, HealSPItem?.healSP ?? 0);
     }
 }
 
 internal class StarCandy2 : StarCandy1
 {
-    internal override int SPReplenishAmount => 50;
-
     public override void SetDefaults()
     {
         base.SetDefaults();
         Item.healLife = 100;
+        HealSPItem?.healSP = 50;
         SpawnRarity = SpawnRarity.Rare;
     }
 }
 
 internal class StarCandy3 : StarCandy1
 {
-    internal override int SPReplenishAmount => 75;
-
     public override void SetStaticDefaults()
     {
         base.SetStaticDefaults();
@@ -72,14 +71,13 @@ internal class StarCandy3 : StarCandy1
     {
         base.SetDefaults();
         Item.healLife = 200;
+        HealSPItem?.healSP = 75;
         SpawnRarity = SpawnRarity.Epic;
     }
 }
 
 internal class StarCandy4 : StarCandy1
 {
-    internal override int SPReplenishAmount => 100;
-
     public override void SetStaticDefaults()
     {
         base.SetStaticDefaults();
@@ -90,6 +88,7 @@ internal class StarCandy4 : StarCandy1
     {
         base.SetDefaults();
         Item.healLife = 300;
+        HealSPItem?.healSP = 100;
         SpawnRarity = SpawnRarity.Legendary;
     }
 }

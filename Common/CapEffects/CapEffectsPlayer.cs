@@ -18,6 +18,7 @@ using TerrariaXMario.Common.MiscEffects;
 using TerrariaXMario.Common.SpawnableObject;
 using TerrariaXMario.Common.StatueForm;
 using TerrariaXMario.Content.Blocks;
+using TerrariaXMario.Content.Consumables;
 using TerrariaXMario.Content.PowerupProjectiles;
 using TerrariaXMario.Content.Powerups;
 using TerrariaXMario.Utilities.Extensions;
@@ -129,9 +130,33 @@ internal class CapEffectsPlayer : ModPlayer
 
     internal int maxSP = 20;
 
-    internal int statPower = 1;
-    internal int statDefense = 0;
-    internal int statHP = 0;
+    internal int StatPower
+    {
+        get;
+        set
+        {
+            field = Math.Clamp(value, 1, StatPower);
+        }
+    } = 1;
+
+    internal int StatDefense
+    {
+        get;
+        set
+        {
+            field = Math.Clamp(value, 0, StatDefense);
+        }
+    } = 0;
+
+    internal int StatHP
+    {
+        get;
+        set
+        {
+            field = Math.Clamp(value, 0, StatHP);
+        }
+    } = 0;
+
     internal int StatSP
     {
         get;
@@ -146,13 +171,13 @@ internal class CapEffectsPlayer : ModPlayer
 
     internal float forceFullRotation;
 
-    internal int powerupOverchargeMax = 100;
-    internal int PowerupOvercharge
+    internal int powerupChargeMax = 100;
+    internal int PowerupCharge
     {
         get;
         set
         {
-            field = Math.Clamp(value, 0, powerupOverchargeMax);
+            field = Math.Clamp(value, 0, powerupChargeMax);
         }
     }
 
@@ -173,9 +198,9 @@ internal class CapEffectsPlayer : ModPlayer
     {
         if (currentPowerupType != null) tag[nameof(currentPowerupType)] = currentPowerupType;
         tag[nameof(maxSP)] = maxSP;
-        tag[nameof(statPower)] = statPower;
-        tag[nameof(statDefense)] = statDefense;
-        tag[nameof(statHP)] = statHP;
+        tag[nameof(StatPower)] = StatPower;
+        tag[nameof(StatDefense)] = StatDefense;
+        tag[nameof(StatHP)] = StatHP;
         tag[nameof(StatSP)] = StatSP;
     }
 
@@ -183,9 +208,9 @@ internal class CapEffectsPlayer : ModPlayer
     {
         if (tag.ContainsKey(nameof(currentPowerupType))) currentPowerupType = tag.GetInt(nameof(currentPowerupType));
         if (tag.ContainsKey(nameof(maxSP))) maxSP = tag.GetInt(nameof(maxSP));
-        if (tag.ContainsKey(nameof(statPower))) statPower = tag.GetInt(nameof(statPower));
-        if (tag.ContainsKey(nameof(statDefense))) statDefense = tag.GetInt(nameof(statDefense));
-        if (tag.ContainsKey(nameof(statHP))) statHP = tag.GetInt(nameof(statHP));
+        if (tag.ContainsKey(nameof(StatPower))) StatPower = tag.GetInt(nameof(StatPower));
+        if (tag.ContainsKey(nameof(StatDefense))) StatDefense = tag.GetInt(nameof(StatDefense));
+        if (tag.ContainsKey(nameof(StatHP))) StatHP = tag.GetInt(nameof(StatHP));
         if (tag.ContainsKey(nameof(StatSP))) StatSP = tag.GetInt(nameof(StatSP));
     }
 
@@ -265,7 +290,7 @@ internal class CapEffectsPlayer : ModPlayer
 
         GrabEffect();
 
-        if (flightState == FlightState.Gliding && CurrentPowerup is not CapeFeatherData)
+        if (flightState == FlightState.Gliding /*&& CurrentPowerup is not CapeFeatherData*/)
         {
             glideLegAnimationTimer++;
 
@@ -671,7 +696,7 @@ internal class CapEffectsPlayer : ModPlayer
     {
         if (!Player.IsOnGroundPrecise() && !frogSwimming)
         {
-            stompHitbox ??= Projectile.NewProjectile(Player.GetSource_FromThis(), Player.BottomLeft, Vector2.Zero, ModContent.ProjectileType<StompHitbox>(), statPower, 4f, Player.whoAmI);
+            stompHitbox ??= Projectile.NewProjectile(Player.GetSource_FromThis(), Player.BottomLeft, Vector2.Zero, ModContent.ProjectileType<StompHitbox>(), StatPower, 4f, Player.whoAmI);
         }
         else KillStompHitbox();
     }
@@ -888,6 +913,7 @@ internal class CapEffectsPlayer : ModPlayer
         }
 
         IEnumerable<ISpawnableObject> list = ModContent.GetContent<ISpawnableObject>().Where(e => e is not PowerupProjectile);
+        if (Main.netMode == NetmodeID.SinglePlayer) list = [.. list.Where(e => e is not Nut1)];
         float num = Main.rand.NextFloat();
 
         if (num < 0.01f) return Main.rand.NextFromCollection([.. list.Where(e => e.SpawnRarity == SpawnRarity.Legendary)]);

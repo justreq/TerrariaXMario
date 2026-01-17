@@ -10,7 +10,6 @@ internal class TanookiSuitData : SuperLeafData
 {
     public override string Name => "TanookiSuit";
     internal override Color Color => new(255, 90, 9);
-    internal override Dictionary<PowerupAbility, string> Abilities => new() { { PowerupAbility.Melee, "Right click to swipe your tail at enemies" }, { PowerupAbility.Glide, "Hold jump midair to glide down slowly" }, { PowerupAbility.Flight, "Hold jump with full P-Speed to start flying upwards" }, { PowerupAbility.GroundPound, "Ground pound to turn into a statue that confuses nearby enemies" } };
     internal override void UpdateWorld(Projectile projectile, int updateCount)
     {
         projectile.velocity.Y += 0.4f;

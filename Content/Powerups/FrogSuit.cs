@@ -16,7 +16,6 @@ internal class FrogSuitData : Powerup
     internal override bool LookTowardRightClick => false;
     internal override Color Color => new(22, 176, 67);
 
-    internal override Dictionary<PowerupAbility, string> Abilities => new() { { PowerupAbility.Dash, "Double tap left or right to dash into a run" }, { PowerupAbility.Swim, "Swim with ease in all 4 directions" } };
     internal override void UpdateWorld(Projectile projectile, int updateCount)
     {
         projectile.velocity.Y += 0.4f;

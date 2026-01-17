@@ -1,1 +1,31 @@
-This description will show up on the steam page, check out https://steamcommunity.com/comment/Guide/formattinghelp.
+[h1]Mario & Luigi: Crossover[/h1]
+[h4]Explore Terraria worlds as your favorite Goomba-stomping plumber duo[/h4]
+
+
+[h1]PLEASE READ THIS BEFORE USING THE MOD[/h1]
+This mod is not fully released. A lot of content in the full release is yet to be made, but this should show a small taste of what's to come. [b]It is not recommended that you use this mod in a normal playthrough, in multiplayer, or with other large content mods enabled.[/b] How successfully you'll be able to use the mod will vary, but it is not meant to be played normally.
+
+Treat this version as a "development" build. Use cheat mods such as DragonLens to play around with the content. (I know at least one of you will be happy to hear this :) ). This mod will probably have some bugs or unintended interactions with vanilla content. This is to be expected and should be reported, most preferably in our [url=https://discord.gg/st553Phdkr]Discord Server[/url]. You can also suggest content from your favorite Mario games to be added! I'm very transparent with my development process and listen carefully to feedback.
+
+[h1]Current features[/h1]
+- A new loadout for using exclusive mod equipment (some slots are currently unused)
+- Caps to transform the player into the bros. They have several unique movement mechanics from the games.
+- Powerups that give the player a range of new abilities
+- An assortment of familiar food items
+- An SP bar (currently unused)
+- A ? block that gives a bunch of different items and has a chance to give a Powerup (depending on the biome you're currently in)
+- Some other miscellanious content
+
+[h1]Future plans[/h1]
+This build mainly serves to establish important systems, such as the loadout, powerups, and transformations. In the future, expect lots of Mario representation, including enemies, Powerups, items, and even entire subworlds to explore!
+
+[h1]Want to help?[/h1]
+We would love to have you on the team to make this mod the best it can be! If you are interested in helping out and have experience in art and/or sound design, shoot me a message on Discord. I answer pretty quickly :)
+
+[h1]Credits[/h1]
+Raythemaymay - Transformation sheet sprites and some miscellanious sprites
+Momlob - The bulk of content and UI sprites
+Lugnut - Voice acting
+Lolxd87 - Anything Metaball and shader-related, as well as just being incredibly supportful
+Exslueterra - A handful of sprites
+Hencko - The owner of this mod's 1.3 version

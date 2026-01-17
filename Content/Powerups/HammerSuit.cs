@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.CapEffects;
@@ -15,11 +14,10 @@ internal class HammerSuitData : FireFlowerData
 
     internal override int RightClickActionCooldown => 8;
     internal override Color Color => new(76, 76, 109);
-    internal override Dictionary<PowerupAbility, string> Abilities => new() { { PowerupAbility.Ranged, "Right click to throw an arching hammer" } };
     internal override void OnRightClick(Player player)
     {
-        Vector2 magnitude = Main.MouseWorld - player.MountedCenter;
-        Projectile.NewProjectile(player.GetSource_FromThis(), player.MountedCenter, magnitude.SafeNormalize(Vector2.Zero) * new Vector2(15, 20), ModContent.ProjectileType<HammerSuitHammer>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.statPower ?? 1, 0f, player.whoAmI);
+        Projectile.NewProjectile(player.GetSource_FromThis(), player.MountedCenter, GetInitialProjectileVelocity(player, 0.3f), ModContent.ProjectileType<HammerSuitHammer>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.StatPower ?? 1, 0f, player.whoAmI);
+        player.GetModPlayerOrNull<CapEffectsPlayer>()?.PowerupCharge -= 20;
     }
 }
 

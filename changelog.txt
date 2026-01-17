@@ -1,32 +1,32 @@
-2026.0.0
-- Added Bro's Gear Loadout
-- Added Caps
-- Added Mario's Cap
-- Added Luigi's Cap
-- Added P-Speed Meter
-- Added Powerups
-- Added Powerup HUD
-- Added Fire Flower
-- Added Ice Flower
-- Added Boomerang Flower
-- Added Super Leaf
-- Added Tanooki Suit
-- Added Frog Suit
-- Added Hammer Suit
-- Added Cape Feather
-- Added SP Bar
-- Added Mushroom, Super Mushroom, Ultra Mushroom, and Max Mushroom
-- Added Nut, Super Nut, Ultra Nut, and Max Nut
-- Added Syrup Jar, Super Syrup Jar, Ultra Syrup Jar, and Max Syrup Jar
-- Added Star Candy, Super Star Candy, Ultra Star Candy, and Max Star Candy
-- Added Refreshing Herb
-- Added Boo Biscuit
-- Added Defense Bean
-- Added HP Bean
-- Added Pow Bean
-- Added SP Bean
-- Added Mario and Luigi Statues
-- Added 5 paintings
-- Added ? Blocks
-- Added Brick Blocks
-- Added Goomba
+﻿2026.0.0
+- ✔️ Added Bro's Gear Loadout
+- ✔️ Added Caps
+- ✔️ Added Mario's Cap
+- ✔️ Added Luigi's Cap
+- ✔️ Added P-Speed Meter
+- ✔️ Added Powerups
+- ✔️ Added Powerup HUD
+- ✔️ Added Fire Flower
+- ✔️ Added Ice Flower
+- ✔️ Added Boomerang Flower
+- ✔️ Added Super Leaf
+- ✔️ Added Tanooki Suit
+- ✔️ Added Frog Suit
+- ✔️ Added Hammer Suit
+- ✔️ Added SP Bar
+- ✔️ Added Mushroom, Super Mushroom, Ultra Mushroom, and Max Mushroom
+- ✔️ Added Nut, Super Nut, Ultra Nut, and Max Nut
+- ✔️ Added Syrup Jar, Super Syrup Jar, Ultra Syrup Jar, and Max Syrup Jar
+- ✔️ Added Star Candy, Super Star Candy, Ultra Star Candy, and Max Star Candy
+- ✔️ Added Refreshing Herb
+- ✔️ Added Boo Biscuit
+- ✔️ Added Defense Bean and Antibean
+- ✔️ Added HP Bean and Antibean
+- ✔️ Added Pow Bean and Antibean
+- ✔️ Added SP Bean and Antibean
+- ✔️ Added Mario and Luigi Statues
+- ✔️ Added 5 paintings
+- ✔️ Added ? Blocks
+- ✔️ Added Pipes
+- ✔️ Added Brick Blocks
+- ✔️ Added Goomba

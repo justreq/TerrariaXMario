@@ -22,6 +22,8 @@ internal class PowerupHUD : UIState
     private Asset<Texture2D>? OverchargeBarTexture => path == null ? null : ModContent.Request<Texture2D>($"{path}/OverchargeBar");
     private Asset<Texture2D>? OverchargeFillTexture => path == null ? null : ModContent.Request<Texture2D>($"{path}/OverchargeBarFill");
 
+    private int abilityCount;
+
     public override void OnInitialize()
     {
         path = $"{GetType().Namespace!.Replace(".", "/")}";
@@ -55,24 +57,24 @@ internal class PowerupHUD : UIState
             Color color = modPlayer.CurrentPowerup!.Color;
 
             spriteBatch.Draw(OverchargeBarTexture.Value, new Rectangle((int)position.X, (int)position.Y, 64, 52), new Rectangle(0, 0, 64, 52), Color.White);
-            spriteBatch.Draw(OverchargeBarTexture.Value, new Rectangle((int)position.X + 54, (int)position.Y, modPlayer.powerupOverchargeMax, 52), new Rectangle(66, 0, 2, 52), Color.White);
-            spriteBatch.Draw(OverchargeBarTexture.Value, new Rectangle((int)position.X + 54 + modPlayer.powerupOverchargeMax, (int)position.Y, 16, 52), new Rectangle(70, 0, 16, 52), Color.White);
+            spriteBatch.Draw(OverchargeBarTexture.Value, new Rectangle((int)position.X + 54, (int)position.Y, modPlayer.powerupChargeMax, 52), new Rectangle(66, 0, 2, 52), Color.White);
+            spriteBatch.Draw(OverchargeBarTexture.Value, new Rectangle((int)position.X + 54 + modPlayer.powerupChargeMax, (int)position.Y, 16, 52), new Rectangle(70, 0, 16, 52), Color.White);
 
             spriteBatch.Draw(OverchargeBarTexture.Value, new Rectangle((int)position.X, (int)position.Y, 64, 52), new Rectangle(0, 54, 64, 52), color);
-            spriteBatch.Draw(OverchargeBarTexture.Value, new Rectangle((int)position.X + 54, (int)position.Y, modPlayer.powerupOverchargeMax, 52), new Rectangle(66, 54, 2, 52), color);
-            spriteBatch.Draw(OverchargeBarTexture.Value, new Rectangle((int)position.X + 54 + modPlayer.powerupOverchargeMax, (int)position.Y, 16, 52), new Rectangle(70, 54, 16, 52), color);
+            spriteBatch.Draw(OverchargeBarTexture.Value, new Rectangle((int)position.X + 54, (int)position.Y, modPlayer.powerupChargeMax, 52), new Rectangle(66, 54, 2, 52), color);
+            spriteBatch.Draw(OverchargeBarTexture.Value, new Rectangle((int)position.X + 54 + modPlayer.powerupChargeMax, (int)position.Y, 16, 52), new Rectangle(70, 54, 16, 52), color);
 
             if (ModContent.TryFind(nameof(TerrariaXMario), modPlayer.CurrentPowerup.Name.Replace("Data", ""), out ModProjectile projectile))
             {
-                if (OverchargeBarContainer.IsMouseHovering) Main.hoverItemName = $"{projectile.PrettyPrintName()}\nCharge: {modPlayer.PowerupOvercharge}/{modPlayer.powerupOverchargeMax}";
+                if (OverchargeBarContainer.IsMouseHovering) Main.hoverItemName = $"{projectile.PrettyPrintName()}\nCharge: {modPlayer.PowerupCharge}/{modPlayer.powerupChargeMax}";
 
                 spriteBatch.Draw(ModContent.Request<Texture2D>(projectile.Texture).Value, new Rectangle((int)position.X + 18, (int)position.Y + 14, 24, 24), new Rectangle(0, 0, projectile.Projectile.width, projectile.Projectile.height), Color.White);
 
-                if (modPlayer.PowerupOvercharge > 0)
+                if (modPlayer.PowerupCharge > 0)
                 {
                     spriteBatch.Draw(OverchargeFillTexture.Value, new Rectangle((int)position.X + 52, (int)position.Y + 20, 2, 12), new Rectangle(0, 0, 2, 12), color);
-                    spriteBatch.Draw(OverchargeFillTexture.Value, new Rectangle((int)position.X + 54, (int)position.Y + 20, modPlayer.PowerupOvercharge, 12), new Rectangle(2, 0, 2, 12), color);
-                    spriteBatch.Draw(OverchargeFillTexture.Value, new Rectangle((int)position.X + 54 + modPlayer.PowerupOvercharge, (int)position.Y + 20, 2, 12), new Rectangle(4, 0, 2, 12), color);
+                    spriteBatch.Draw(OverchargeFillTexture.Value, new Rectangle((int)position.X + 54, (int)position.Y + 20, modPlayer.PowerupCharge, 12), new Rectangle(2, 0, 2, 12), color);
+                    spriteBatch.Draw(OverchargeFillTexture.Value, new Rectangle((int)position.X + 54 + modPlayer.PowerupCharge, (int)position.Y + 20, 2, 12), new Rectangle(4, 0, 2, 12), color);
                 }
             }
 
@@ -80,15 +82,25 @@ internal class PowerupHUD : UIState
 
             Vector2 position2 = AbilityContainer.GetDimensions().Position();
 
-            for (int i = 0; i < modPlayer.CurrentPowerup.Abilities.Keys.Count; i++)
+            for (int i = 0; i < int.MaxValue; i++)
             {
-                PowerupAbility ability = modPlayer.CurrentPowerup.Abilities.Keys.ToArray()[i];
+                string key = $"Mods.{nameof(TerrariaXMario)}.Projectiles.{projectile.Name}.Abilities.{i}";
+                LocalizedText ability = Language.GetText(key);
+                string name = Language.GetTextValue(key + ".Name");
+
+                if (name == key + ".Name")
+                {
+                    abilityCount = i;
+                    break;
+                }
+
+                string text = Language.GetTextValue(key + ".Text");
 
                 Vector2 abilityPosition = position2 + new Vector2((44 * i) + (i == 0 ? 0 : i * 8), 0);
                 spriteBatch.Draw(ModContent.Request<Texture2D>($"{path}/Ability").Value, abilityPosition, Color.White);
-                spriteBatch.Draw(ModContent.Request<Texture2D>($"{path}/Ability{ability}").Value, abilityPosition, Color.White);
+                spriteBatch.Draw(ModContent.Request<Texture2D>($"{path}/Ability{name}").Value, abilityPosition, Color.White);
 
-                if (new Rectangle((int)abilityPosition.X, (int)abilityPosition.Y, 44, 44).Contains(Main.MouseScreen.ToPoint())) Main.hoverItemName = modPlayer.CurrentPowerup.Abilities.Values.ToArray()[i];
+                if (new Rectangle((int)abilityPosition.X, (int)abilityPosition.Y, 44, 44).Contains(Main.MouseScreen.ToPoint())) Main.hoverItemName = text;
             }
         }
     }
@@ -100,19 +112,17 @@ internal class PowerupHUD : UIState
 
         if (modPlayer == null || !modPlayer.CanDoCapEffects || modPlayer.currentPowerupType == null)
         {
-            modPlayer?.PowerupOvercharge = modPlayer?.powerupOverchargeMax ?? 0;
+            modPlayer?.PowerupCharge = modPlayer?.powerupChargeMax ?? 0;
             return;
         }
 
-        modPlayer.PowerupOvercharge++;
-
-        if (modPlayer.PowerupOvercharge == 0) modPlayer.RemovePowerup();
+        if (modPlayer.PowerupCharge == 0) modPlayer.RemovePowerup();
+        modPlayer.PowerupCharge++;
 
         if (OverchargeBarContainer == null || AbilityContainer == null) return;
 
-        OverchargeBarContainer.Width = StyleDimension.FromPixels(70 + modPlayer.powerupOverchargeMax);
-        int num = modPlayer.CurrentPowerup!.Abilities.Count;
-        AbilityContainer.Width = StyleDimension.FromPixels(num * 44 + (num - 1) * 8);
+        OverchargeBarContainer.Width = StyleDimension.FromPixels(70 + modPlayer.powerupChargeMax);
+        AbilityContainer.Width = StyleDimension.FromPixels(abilityCount * 44 + (abilityCount - 1) * 8);
         AbilityContainer.Recalculate();
     }
 }

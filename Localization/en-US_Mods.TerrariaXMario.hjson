@@ -190,6 +190,51 @@ Items: {
 		DisplayName: Max Nut
 		Tooltip: Restores HP of you and nearby teammates
 	}
+
+	BeanDefense: {
+		DisplayName: Tough Bean
+		Tooltip: Permanently increases defense by 1
+	}
+
+	BeanDefenseDown: {
+		DisplayName: Brittle Bean
+		Tooltip: Permanently decreases defense by 1
+	}
+
+	BeanHP: {
+		DisplayName: Healthy Bean
+		Tooltip: Permanently increases life by 1
+	}
+
+	BeanHPDown: {
+		DisplayName: Sickly Bean
+		Tooltip: Permanently decreases life by 1
+	}
+
+	BeanPow: {
+		DisplayName: Strong Bean
+		Tooltip: Permanently increases Pow by 1
+	}
+
+	BeanPowDown: {
+		DisplayName: Weak Bean
+		Tooltip: Permanently decreases Pow by 1
+	}
+
+	BeanSP: {
+		DisplayName: Special Bean
+		Tooltip: Permanently increases SP by 1
+	}
+
+	BeanSPDown: {
+		DisplayName: Ordinary Bean
+		Tooltip: Permanently decreases SP by 1
+	}
+
+	BooBiscuit: {
+		DisplayName: Boo Biscuit
+		Tooltip: Turns you invisible for a short time
+	}
 }
 
 NPCs.Goomba.DisplayName: Goomba
@@ -200,17 +245,145 @@ Projectiles: {
 	Boomerang.DisplayName: Boomerang
 	CapeSpin.DisplayName: Cape Spin
 	FireFlowerFireball.DisplayName: Fire Flower Fireball
-	FireFlower.DisplayName: Fire Flower
+
+	FireFlower: {
+		DisplayName: Fire Flower
+
+		Abilities: {
+			0: {
+				Name: Ranged
+				Text: Right click to throw out bouncing fireballs
+			}
+		}
+	}
+
 	HammerSuitHammer.DisplayName: Hammer Suit Hammer
-	HammerSuit.DisplayName: Hammer Suit
+
+	HammerSuit: {
+		DisplayName: Hammer Suit
+
+		Abilities: {
+			0: {
+				Name: Ranged
+				Text: Right click to throw an arching hammer
+			}
+		}
+	}
+
 	IceFlowerIceball.DisplayName: Ice Flower Iceball
-	IceFlower.DisplayName: Ice Flower
+
+	IceFlower: {
+		DisplayName: Ice Flower
+
+		Abilities: {
+			0: {
+				Name: Ranged
+				Text: Right click to throw bouncing iceballs that encase enemies in a grabbable ice block
+			}
+		}
+	}
+
 	TailSwipe.DisplayName: Tail Swipe
-	BoomerangFlower.DisplayName: Boomerang Flower
-	CapeFeather.DisplayName: Cape Feather
-	SuperLeaf.DisplayName: Super Leaf
-	TanookiSuit.DisplayName: Tanooki Suit
-	FrogSuit.DisplayName: Frog Suit
+
+	BoomerangFlower: {
+		DisplayName: Boomerang Flower
+
+		Abilities: {
+			0: {
+				Name: Ranged
+				Text: Hold right click to throw out a boomerang
+			}
+		}
+	}
+
+	CapeFeather: {
+		DisplayName: Cape Feather
+
+		Abilities: {
+			0: {
+				Name: Melee
+				Text: Right click to swipe your cape at enemies
+			}
+
+			1: {
+				Name: Glide
+				Text: Hold jump midair to glide down slowly
+			}
+
+			2: {
+				Name: Flight
+				Text: Hold jump with full P-Speed to get a huge boost of flight
+			}
+
+			3: {
+				Name: FlightBoost
+				Text: Hold forward while flying to dive downwards, hold backwards to boost upwards
+			}
+		}
+	}
+
+	SuperLeaf: {
+		DisplayName: Super Leaf
+
+		Abilities: {
+			0: {
+				Name: Melee
+				Text: Right click to swipe your tail at enemies
+			}
+
+			1: {
+				Name: Glide
+				Text: Hold jump midair to glide down slowly
+			}
+
+			2: {
+				Name: Flight
+				Text: Hold jump with full P-Speed to start flying upwards
+			}
+		}
+	}
+
+	TanookiSuit: {
+		DisplayName: Tanooki Suit
+
+		Abilities: {
+			0: {
+				Name: Melee
+				Text: Right click to swipe your tail at enemies
+			}
+
+			1: {
+				Name: Glide
+				Text: Hold jump midair to glide down slowly
+			}
+
+			2: {
+				Name: Flight
+				Text: Hold jump with full P-Speed to start flying upwards
+			}
+
+			3: {
+				Name: GroundPound
+				Text: Ground pound to turn into a statue that confuses nearby enemies
+			}
+		}
+	}
+
+	FrogSuit: {
+		DisplayName: Frog Suit
+
+		Abilities: {
+			0: {
+				Name: Dash
+				Text: Double tap left or right to dash into a run
+			}
+
+			1: {
+				Name: Swim
+				Text: Swim with ease in all 4 directions
+			}
+		}
+	}
 }
 
 UI: {
@@ -230,4 +403,12 @@ UI: {
 	}
 
 	BroInfoUI.PageButton: Bro Gear
+	HealSPTooltip: Restores {0} SP
+}
+
+Buffs: {
+	BooBiscuitBuff: {
+		DisplayName: Boo Biscuit
+		Description: You are a Boo! (in spirit)
+	}
 }

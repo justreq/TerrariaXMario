@@ -1,6 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
-using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
@@ -15,12 +13,17 @@ internal class IceFlowerData : FireFlowerData
 {
     public override string Name => "IceFlower";
     internal override Color Color => new(55, 118, 242);
-    internal override Dictionary<PowerupAbility, string> Abilities => new() { { PowerupAbility.Ranged, "Right click to throw bouncing iceballs that freeze enemies (frozen enemies can be picked up and thrown for extra damage)" } };
     internal override void OnRightClick(Player player)
     {
-        if (Main.projectile.Any(e => e.type == ModContent.ProjectileType<IceFlowerIceball>() && e.active && e.owner == player.whoAmI)) return;
+        CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
+
+        if (modPlayer?.fireFlowerFireballsCast > 1) return;
+
+        modPlayer?.fireFlowerFireballsCast += 1;
+        if (modPlayer?.fireFlowerCooldown == 0) modPlayer?.fireFlowerCooldown = 50;
         SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/IceFlowerShoot") { Volume = 0.4f }, player.MountedCenter);
-        Projectile.NewProjectile(player.GetSource_FromThis(), player.MountedCenter, new Vector2(player.direction * 2.5f, 0f), ModContent.ProjectileType<IceFlowerIceball>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.statPower ?? 1, 0f, player.whoAmI);
+        Projectile.NewProjectile(player.GetSource_FromThis(), player.MountedCenter, GetInitialProjectileVelocity(player, 0.2f), ModContent.ProjectileType<IceFlowerIceball>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.StatPower ?? 1, 0f, player.whoAmI);
+        modPlayer?.PowerupCharge -= 40;
     }
 }
 

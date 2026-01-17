@@ -15,9 +15,9 @@ internal class PowerupID
             .Description("Powerups that should have a tail")
             .RegisterBoolSet(false, ModContent.GetInstance<SuperLeafData>().Type, ModContent.GetInstance<TanookiSuitData>().Type);
 
-        internal static bool[] ShowCape = Factory.CreateNamedSet("ShowCape")
+        /*internal static bool[] ShowCape = Factory.CreateNamedSet("ShowCape")
             .Description("Powerups that should have a cape")
-            .RegisterBoolSet(false, ModContent.GetInstance<CapeFeatherData>().Type);
+            .RegisterBoolSet(false, ModContent.GetInstance<CapeFeatherData>().Type);*/
 
         internal static bool[] DisableGroundPound = Factory.CreateNamedSet("DisableGroundPound")
             .Description("Powerups that prevent usage of the ground pound ability")

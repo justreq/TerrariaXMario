@@ -19,7 +19,6 @@ internal class SuperLeafData : Powerup
 
     internal override bool LookTowardRightClick => false;
     internal override Color Color => new(176, 86, 40);
-    internal override Dictionary<PowerupAbility, string> Abilities => new() { { PowerupAbility.Melee, "Right click to swipe your tail at enemies" }, { PowerupAbility.Glide, "Hold jump midair to glide down slowly" }, { PowerupAbility.Flight, "Hold jump with full P-Speed to start flying upwards" } };
     internal override void UpdateWorld(Projectile projectile, int updateCount)
     {
         projectile.velocity.X = (float)(Math.Sin(MathHelper.Pi / 60 * updateCount % 60) * (updateCount <= 60 ? 2f : 3f));
@@ -44,7 +43,7 @@ internal class SuperLeafData : Powerup
         modPlayer?.forceSwitchDirectionCount = 2;
         SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailSwipe") { Volume = 0.4f }, player.MountedCenter);
         modPlayer?.SetForceDirection(10, ForceArmMovementType.None, -player.direction);
-        Projectile.NewProjectile(player.GetSource_Misc("TailSwipe"), player.MountedCenter, Vector2.Zero, ModContent.ProjectileType<TailSwipe>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.statPower ?? 1, 7.5f, player.whoAmI);
+        Projectile.NewProjectile(player.GetSource_Misc("TailSwipe"), player.MountedCenter, Vector2.Zero, ModContent.ProjectileType<TailSwipe>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.StatPower ?? 1, 7.5f, player.whoAmI);
     }
 
     internal override void OnJumpHeldDown(Player player)
