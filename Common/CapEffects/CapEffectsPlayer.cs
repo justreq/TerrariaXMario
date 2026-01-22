@@ -261,13 +261,13 @@ internal class CapEffectsPlayer : ModPlayer
     public override void LoadData(TagCompound tag)
     {
         if (tag.ContainsKey(nameof(currentPowerupType))) currentPowerupType = tag.GetInt(nameof(currentPowerupType));
-        //if (tag.ContainsKey(nameof(maxSP))) maxSP = tag.GetInt(nameof(maxSP));
-        //if (tag.ContainsKey(nameof(StatPower))) StatPower = tag.GetInt(nameof(StatPower));
-        //if (tag.ContainsKey(nameof(StatDefense))) StatDefense = tag.GetInt(nameof(StatDefense));
-        //if (tag.ContainsKey(nameof(StatHP))) StatHP = tag.GetInt(nameof(StatHP));
-        //if (tag.ContainsKey(nameof(StatSP))) StatSP = tag.GetInt(nameof(StatSP));
-        //if (tag.ContainsKey(nameof(XP))) XP = tag.GetFloat(nameof(XP));
-        //if (tag.ContainsKey(nameof(Level))) Level = tag.GetInt(nameof(Level));
+        if (tag.ContainsKey(nameof(maxSP))) maxSP = tag.GetInt(nameof(maxSP));
+        if (tag.ContainsKey(nameof(StatPower))) StatPower = tag.GetInt(nameof(StatPower));
+        if (tag.ContainsKey(nameof(StatDefense))) StatDefense = tag.GetInt(nameof(StatDefense));
+        if (tag.ContainsKey(nameof(StatHP))) StatHP = tag.GetInt(nameof(StatHP));
+        if (tag.ContainsKey(nameof(StatSP))) StatSP = tag.GetInt(nameof(StatSP));
+        if (tag.ContainsKey(nameof(XP))) XP = tag.GetFloat(nameof(XP));
+        if (tag.ContainsKey(nameof(Level))) Level = tag.GetInt(nameof(Level));
     }
 
     public override bool CanUseItem(Item item)

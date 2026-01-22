@@ -1,15 +1,2 @@
-﻿2026.0.1
-- ✔️ Added Mario's Cap and Luigi's Cap to the Question Block item pool if the player doesn't currently have either one
-- ✔️ Added XP, Levels, and Level rewards
-- ✔️ Added Powerup items
-- ✔️ Added the ability to reserve Powerups
-- ✔️ Added Stem Bean
-- ✔️ Added Ground Pound jumps
-- ✔️ Added small screen shake to Ground Pounds
-- ✔️ Added a "Powerup grace" mechanic that waits until the player is touching the ground to remove their Powerup
-- ✔️ Removed all negative beans from the Question Block item pool
-- ✔️ Updated Bean textures and respective stat change effects
-- ✔️ Fixed glide abilities not negating fall damage
-- ✔️ Fixed post-stomp invincibility frames being incredibly short and unforgiving
-- ✔️ Fixed player heads not appearing on maps when swimming with the Frog Suit
-- ✔️ Fixed Question Blocks not generating in Drunk Worlds
+﻿2026.0.1.1
+- ✔️ Fixed player stats not persisting
