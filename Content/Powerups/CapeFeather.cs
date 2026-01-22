@@ -1,5 +1,4 @@
 ﻿//using Microsoft.Xna.Framework;
-//using System.Collections.Generic;
 //using Terraria;
 //using Terraria.Audio;
 //using Terraria.ModLoader;
@@ -10,9 +9,10 @@
 
 //namespace TerrariaXMario.Content.Powerups;
 
-//internal class CapeFeatherData : SuperLeafData
+//internal class CapeFeather : SuperLeaf
 //{
-//    public override string Name => "CapeFeather";
+//    internal override int? ProjectileType => ModContent.ProjectileType<CapeFeatherProjectile>();
+//    internal override int? ItemType => ModContent.ItemType<CapeFeatherItem>();
 
 //    internal override string EquipSound => $"{TerrariaXMario.Sounds}/PowerupEffects/CapePowerUp";
 //    internal override bool LookTowardRightClick => false;
@@ -78,9 +78,9 @@
 //    }
 //}
 
-//internal class CapeFeather : PowerupProjectile
+//internal class CapeFeatherProjectile : PowerupProjectile
 //{
-//    internal override int? PowerupType => ModContent.GetInstance<CapeFeatherData>().Type;
+//    internal override int? PowerupType => ModContent.GetInstance<CapeFeather>().Type;
 //    internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
 //    internal override bool CanSpawn(Player player) => player.ZoneSkyHeight;
 //    internal override float SpawnUpSpeed => -5f;
@@ -95,4 +95,9 @@
 //        base.SetDefaults();
 //        Projectile.tileCollide = false;
 //    }
+//}
+
+//internal class CapeFeatherItem : PowerupItem
+//{
+//    internal override int? PowerupType => ModContent.GetInstance<CapeFeather>().Type;
 //}

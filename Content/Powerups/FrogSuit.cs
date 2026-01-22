@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.ID;
@@ -10,9 +9,10 @@ using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Powerups;
 
-internal class FrogSuitData : Powerup
+internal class FrogSuit : Powerup
 {
-    public override string Name => "FrogSuit";
+    internal override int? ProjectileType => ModContent.ProjectileType<FrogSuitProjectile>();
+    internal override int? ItemType => ModContent.ItemType<FrogSuitItem>();
     internal override bool LookTowardRightClick => false;
     internal override Color Color => new(22, 176, 67);
 
@@ -62,11 +62,16 @@ internal class FrogSuitData : Powerup
     }
 }
 
-internal class FrogSuit : PowerupProjectile
+internal class FrogSuitProjectile : PowerupProjectile
 {
-    internal override int? PowerupType => ModContent.GetInstance<FrogSuitData>().Type;
+    internal override int? PowerupType => ModContent.GetInstance<FrogSuit>().Type;
     internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
     internal override string[] Variations => ["Running"];
     internal override bool CanSpawn(Player player) => player.ZoneBeach;
     internal override bool GroundPound => false;
+}
+
+internal class FrogSuitItem : PowerupItem
+{
+    internal override int? PowerupType => ModContent.GetInstance<FrogSuit>().Type;
 }

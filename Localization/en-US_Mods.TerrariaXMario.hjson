@@ -166,11 +166,6 @@ Items: {
 			'''
 	}
 
-	Hammer: {
-		DisplayName: Hammer
-		Tooltip: Useful on certain special blocks
-	}
-
 	Nut1: {
 		DisplayName: Nut
 		Tooltip: Restores HP of you and nearby teammates
@@ -235,6 +230,46 @@ Items: {
 		DisplayName: Boo Biscuit
 		Tooltip: Turns you invisible for a short time
 	}
+
+	StemBean: {
+		DisplayName: Stem Bean
+		Tooltip: ""
+	}
+
+	BoomerangFlowerItem: {
+		DisplayName: Reserved Boomerang Flower
+		Tooltip: Summons a Boomerang Flower
+	}
+
+	FireFlowerItem: {
+		DisplayName: Reserved Fire Flower
+		Tooltip: Summons a Fire Flower
+	}
+
+	FrogSuitItem: {
+		DisplayName: Reserved Frog Suit
+		Tooltip: Summons a Frog Suit
+	}
+
+	HammerSuitItem: {
+		DisplayName: Reserved Hammer Suit
+		Tooltip: Summons a Hammer Suit
+	}
+
+	IceFlowerItem: {
+		DisplayName: Reserved Ice Flower
+		Tooltip: Summons an Ice Flower
+	}
+
+	SuperLeafItem: {
+		DisplayName: Reserved Super Leaf
+		Tooltip: Summons a Super Leaf
+	}
+
+	TanookiSuitItem: {
+		DisplayName: Reserved Tanooki Suit
+		Tooltip: Summons a Tanooki Suit
+	}
 }
 
 NPCs.Goomba.DisplayName: Goomba
@@ -246,7 +281,7 @@ Projectiles: {
 	CapeSpin.DisplayName: Cape Spin
 	FireFlowerFireball.DisplayName: Fire Flower Fireball
 
-	FireFlower: {
+	FireFlowerProjectile: {
 		DisplayName: Fire Flower
 
 		Abilities: {
@@ -259,7 +294,7 @@ Projectiles: {
 
 	HammerSuitHammer.DisplayName: Hammer Suit Hammer
 
-	HammerSuit: {
+	HammerSuitProjectile: {
 		DisplayName: Hammer Suit
 
 		Abilities: {
@@ -272,7 +307,7 @@ Projectiles: {
 
 	IceFlowerIceball.DisplayName: Ice Flower Iceball
 
-	IceFlower: {
+	IceFlowerProjectile: {
 		DisplayName: Ice Flower
 
 		Abilities: {
@@ -285,7 +320,7 @@ Projectiles: {
 
 	TailSwipe.DisplayName: Tail Swipe
 
-	BoomerangFlower: {
+	BoomerangFlowerProjectile: {
 		DisplayName: Boomerang Flower
 
 		Abilities: {
@@ -296,7 +331,7 @@ Projectiles: {
 		}
 	}
 
-	CapeFeather: {
+	CapeFeatherProjectile: {
 		DisplayName: Cape Feather
 
 		Abilities: {
@@ -322,7 +357,7 @@ Projectiles: {
 		}
 	}
 
-	SuperLeaf: {
+	SuperLeafProjectile: {
 		DisplayName: Super Leaf
 
 		Abilities: {
@@ -343,7 +378,7 @@ Projectiles: {
 		}
 	}
 
-	TanookiSuit: {
+	TanookiSuitProjectile: {
 		DisplayName: Tanooki Suit
 
 		Abilities: {
@@ -369,7 +404,7 @@ Projectiles: {
 		}
 	}
 
-	FrogSuit: {
+	FrogSuitProjectile: {
 		DisplayName: Frog Suit
 
 		Abilities: {
@@ -404,6 +439,11 @@ UI: {
 
 	BroInfoUI.PageButton: Bro Gear
 	HealSPTooltip: Restores {0} SP
+	UseSPTooltip: Uses {0} SP
+	Level: Level
+	LevelUp: Level Up!
+	Rank: Rank
+	RankUp: Rank Up!
 }
 
 Buffs: {

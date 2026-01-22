@@ -7,7 +7,6 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.Localization;
-using Terraria.Map;
 using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
@@ -20,6 +19,7 @@ namespace TerrariaXMario.Common.BroInfoUI;
 internal class BroInfoUI : UIState
 {
     private string BroInfoPageButtonPath => $"{GetType().Namespace!.Replace(".", "/")}/BroInfoPageButton";
+
     private UIImageButton? BroInfoPageButton { get; set; }
     private bool showBroInfo;
     private bool showBroInfoTemporarily;
@@ -40,6 +40,7 @@ internal class BroInfoUI : UIState
 
     private void BroInfoPageButtonClick(UIMouseEvent evt, UIElement listeningElement)
     {
+        showBroInfoTemporarily = false;
         ToggleBroInfoPage(switchToPage: true);
     }
 
@@ -74,6 +75,7 @@ internal class BroInfoUI : UIState
         {
             base.Draw(spriteBatch);
             if (BroInfoPageButton?.IsMouseHovering ?? false) Main.hoverItemName = Language.GetTextValue($"Mods.{nameof(TerrariaXMario)}.UI.BroInfoUI.PageButton");
+
             if (Main.EquipPage == 0 && showBroInfo) // copied from Main.DrawDefenseCounter()
             {
                 Texture2D texture = TextureAssets.Extra[ExtrasID.DefenseShield].Value;

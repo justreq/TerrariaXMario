@@ -1,7 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
@@ -12,9 +10,10 @@ using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Powerups;
 
-internal class FireFlowerData : Powerup
+internal class FireFlower : Powerup
 {
-    public override string Name => "FireFlower";
+    internal override int? ProjectileType => ModContent.ProjectileType<FireFlowerProjectile>();
+    internal override int? ItemType => ModContent.ItemType<FireFlowerItem>();
 
     internal override ForceArmMovementType RightClickArmMovementType => ForceArmMovementType.Swing;
     internal override Color Color => new(234, 51, 34);
@@ -57,9 +56,14 @@ internal class FireFlowerData : Powerup
     }
 }
 
-internal class FireFlower : PowerupProjectile
+internal class FireFlowerProjectile : PowerupProjectile
 {
-    internal override int? PowerupType => ModContent.GetInstance<FireFlowerData>().Type;
+    internal override int? PowerupType => ModContent.GetInstance<FireFlower>().Type;
     internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
     internal override bool CanSpawn(Player player) => player.ZoneDesert || player.ZoneUndergroundDesert || player.ZoneUnderworldHeight;
+}
+
+internal class FireFlowerItem : PowerupItem
+{
+    internal override int? PowerupType => ModContent.GetInstance<FireFlower>().Type;
 }

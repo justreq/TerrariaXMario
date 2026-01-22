@@ -1,32 +1,15 @@
-﻿2026.0.0
-- ✔️ Added Bro's Gear Loadout
-- ✔️ Added Caps
-- ✔️ Added Mario's Cap
-- ✔️ Added Luigi's Cap
-- ✔️ Added P-Speed Meter
-- ✔️ Added Powerups
-- ✔️ Added Powerup HUD
-- ✔️ Added Fire Flower
-- ✔️ Added Ice Flower
-- ✔️ Added Boomerang Flower
-- ✔️ Added Super Leaf
-- ✔️ Added Tanooki Suit
-- ✔️ Added Frog Suit
-- ✔️ Added Hammer Suit
-- ✔️ Added SP Bar
-- ✔️ Added Mushroom, Super Mushroom, Ultra Mushroom, and Max Mushroom
-- ✔️ Added Nut, Super Nut, Ultra Nut, and Max Nut
-- ✔️ Added Syrup Jar, Super Syrup Jar, Ultra Syrup Jar, and Max Syrup Jar
-- ✔️ Added Star Candy, Super Star Candy, Ultra Star Candy, and Max Star Candy
-- ✔️ Added Refreshing Herb
-- ✔️ Added Boo Biscuit
-- ✔️ Added Defense Bean and Antibean
-- ✔️ Added HP Bean and Antibean
-- ✔️ Added Pow Bean and Antibean
-- ✔️ Added SP Bean and Antibean
-- ✔️ Added Mario and Luigi Statues
-- ✔️ Added 5 paintings
-- ✔️ Added ? Blocks
-- ✔️ Added Pipes
-- ✔️ Added Brick Blocks
-- ✔️ Added Goomba
+﻿2026.0.1
+- ✔️ Added Mario's Cap and Luigi's Cap to the Question Block item pool if the player doesn't currently have either one
+- ✔️ Added XP, Levels, and Level rewards
+- ✔️ Added Powerup items
+- ✔️ Added the ability to reserve Powerups
+- ✔️ Added Stem Bean
+- ✔️ Added Ground Pound jumps
+- ✔️ Added small screen shake to Ground Pounds
+- ✔️ Added a "Powerup grace" mechanic that waits until the player is touching the ground to remove their Powerup
+- ✔️ Removed all negative beans from the Question Block item pool
+- ✔️ Updated Bean textures and respective stat change effects
+- ✔️ Fixed glide abilities not negating fall damage
+- ✔️ Fixed post-stomp invincibility frames being incredibly short and unforgiving
+- ✔️ Fixed player heads not appearing on maps when swimming with the Frog Suit
+- ✔️ Fixed Question Blocks not generating in Drunk Worlds

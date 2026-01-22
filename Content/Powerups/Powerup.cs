@@ -8,6 +8,8 @@ namespace TerrariaXMario.Content.Powerups;
 internal abstract class Powerup : ModType
 {
     internal int Type { get; set; }
+    internal virtual int? ProjectileType => null;
+    internal virtual int? ItemType => null;
 
     protected override void Register()
     {
@@ -27,29 +29,29 @@ internal abstract class Powerup : ModType
     internal virtual Color Color => Color.White;
 
     /// <summary>
-    /// The behavior of this PowerupData when it exists in the world, e.g. movement behavior. Similar in concept to ModItem.Update.
+    /// The behavior of this Powerup when it exists in the world, e.g. movement behavior. Similar in concept to ModItem.Update.
     /// </summary>
     /// <param name="projectile">The projectile that exists in the world and gets consumed by the playerIndex upon contact.</param>
     internal virtual void UpdateWorld(Projectile projectile, int updateCount)
     { }
     /// <summary>
-    /// Any special effects this PowerupData gives when consumed, e.g. dust or unrelated state changes.
+    /// Any special effects this Powerup gives when consumed, e.g. dust or unrelated state changes.
     /// </summary>
-    /// <param name="player">The player that consumed this PowerupData</param>
+    /// <param name="player">The player that consumed this Powerup</param>
     internal virtual void OnConsume(Player player) { }
     /// <summary>
-    /// The effects this PowerupData gives to the player that consumed it. This is run during ModItem.UpdateAccessory.
+    /// The effects this Powerup gives to the player that consumed it. This is run during ModItem.UpdateAccessory.
     /// </summary>
-    /// <param name="player">The player that consumed this PowerupData</param>
+    /// <param name="player">The player that consumed this Powerup</param>
     internal virtual void UpdateConsumed(Player player) { }
     /// <summary>
     /// Use this method to spawn projectiles when right clicking, e.g. Fire Flower Fireball or Hammer Suit Hammer.
     /// </summary>
-    /// <param name="player">The player that consumed this PowerupData</param>
+    /// <param name="player">The player that consumed this Powerup</param>
     internal virtual void OnRightClick(Player player) { }
     /// <summary>
     /// Use this method to do something while the Jump button is pressed down, e.g. Tail Gliding.
     /// </summary>
-    /// <param name="player">The player that consumed this PowerupData</param>
+    /// <param name="player">The player that consumed this Powerup</param>
     internal virtual void OnJumpHeldDown(Player player) { }
 }

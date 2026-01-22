@@ -81,7 +81,7 @@ internal class StompHitbox : ModProjectile
                 player.fullRotationOrigin = new Vector2(player.Size.X * 0.5f, player.Size.Y * 0.75f);
                 player.velocity = new(0, 0.1f);
 
-                if (modPlayer.CurrentPowerup is not TanookiSuitData)
+                if (modPlayer.CurrentPowerup is not TanookiSuit)
                 {
                     if (groundPoundCooldown <= 5) player.fullRotation = player.direction * (groundPoundCooldown * MathHelper.Pi * 0.2f);
                     else if (groundPoundCooldown <= 15) player.fullRotation = player.direction * (MathHelper.Pi + (groundPoundCooldown - 5) * MathHelper.Pi * 0.1f);
@@ -143,9 +143,13 @@ internal class StompHitbox : ModProjectile
     public override void OnKill(int timeLeft)
     {
         Player player = Main.player[Projectile.owner];
-        player.GetModPlayerOrNull<CapEffectsPlayer>()?.GroundPounding = false;
+        CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
+        modPlayer?.GroundPounding = false;
 
         if (!groundPound) return;
+
+        modPlayer?.groundPoundJumpTimer = 15;
+        CameraModifier.Activate(player.MountedCenter, (Main.rand.NextFloat() * ((float)Math.PI * 2f)).ToRotationVector2(), modPlayer?.statueForm ?? false ? 4f : 2f, 6f, 10, 1000f);
 
         SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/CapEffects/GroundPound") { Volume = 0.4f }, player.MountedCenter);
         for (int i = -2; i < 3; i++)

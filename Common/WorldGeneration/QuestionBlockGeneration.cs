@@ -14,12 +14,7 @@ internal class QuestionBlockGeneration : ModSystem
 {
     public override void ModifyWorldGenTasks(List<GenPass> tasks, ref double totalWeight)
     {
-        int index = tasks.FindIndex(genpass => genpass.Name.Equals("Final Cleanup"));
-
-        if (index != -1)
-        {
-            tasks.Insert(index, new QuestionBlockPass("Sprinkling Question Blocks", 100f));
-        }
+        tasks.Add(new QuestionBlockPass("Sprinkling Question Blocks", 100f));
     }
 }
 internal class QuestionBlockPass(string name, float loadWeight) : GenPass(name, loadWeight)

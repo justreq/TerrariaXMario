@@ -160,6 +160,8 @@ internal class MetaballSystem2 : ModSystem
 
     public override void PostDrawTiles()
     {
+        if (mainPixellationTarget == null) return;
+
         var sb = Main.spriteBatch;
         sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 

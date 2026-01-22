@@ -8,9 +8,10 @@ using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Powerups;
 
-internal class HammerSuitData : FireFlowerData
+internal class HammerSuit : FireFlower
 {
-    public override string Name => "HammerSuit";
+    internal override int? ProjectileType => ModContent.ProjectileType<HammerSuitProjectile>();
+    internal override int? ItemType => ModContent.ItemType<HammerSuitItem>();
 
     internal override int RightClickActionCooldown => 8;
     internal override Color Color => new(76, 76, 109);
@@ -21,9 +22,14 @@ internal class HammerSuitData : FireFlowerData
     }
 }
 
-internal class HammerSuit : PowerupProjectile
+internal class HammerSuitProjectile : PowerupProjectile
 {
-    internal override int? PowerupType => ModContent.GetInstance<HammerSuitData>().Type;
+    internal override int? PowerupType => ModContent.GetInstance<HammerSuit>().Type;
     internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
     internal override bool CanSpawn(Player player) => player.ZoneDungeon || player.ZoneUndergroundDesert || player.ZoneUndergroundDesert;
+}
+
+internal class HammerSuitItem : PowerupItem
+{
+    internal override int? PowerupType => ModContent.GetInstance<HammerSuit>().Type;
 }

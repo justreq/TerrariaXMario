@@ -12,7 +12,7 @@ namespace TerrariaXMario.Content.Consumables;
 
 internal class StarCandy1 : ModItem, ISpawnableObject
 {
-    internal HealSPItem? HealSPItem => Item.GetGlobalItemOrNull<HealSPItem>();
+    internal SPItem? HealSPItem => Item.GetGlobalItemOrNull<SPItem>();
     internal virtual SpawnRarity SpawnRarity { get; set; } = SpawnRarity.Uncommon;
     SpawnRarity ISpawnableObject.SpawnRarity { get => SpawnRarity; set => SpawnRarity = value; }
 

@@ -9,9 +9,10 @@ using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Powerups;
 
-internal class IceFlowerData : FireFlowerData
+internal class IceFlower : FireFlower
 {
-    public override string Name => "IceFlower";
+    internal override int? ProjectileType => ModContent.ProjectileType<IceFlowerProjectile>();
+    internal override int? ItemType => ModContent.ItemType<IceFlowerItem>();
     internal override Color Color => new(55, 118, 242);
     internal override void OnRightClick(Player player)
     {
@@ -27,9 +28,14 @@ internal class IceFlowerData : FireFlowerData
     }
 }
 
-internal class IceFlower : PowerupProjectile
+internal class IceFlowerProjectile : PowerupProjectile
 {
-    internal override int? PowerupType => ModContent.GetInstance<IceFlowerData>().Type;
+    internal override int? PowerupType => ModContent.GetInstance<IceFlower>().Type;
     internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
     internal override bool CanSpawn(Player player) => player.ZoneSnow;
+}
+
+internal class IceFlowerItem : PowerupItem
+{
+    internal override int? PowerupType => ModContent.GetInstance<IceFlower>().Type;
 }

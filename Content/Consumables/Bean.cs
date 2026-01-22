@@ -4,15 +4,12 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TerrariaXMario.Common.CapEffects;
 using TerrariaXMario.Common.SpawnableObject;
-using TerrariaXMario.Utilities.Extensions;
+using TerrariaXMario.Content.Materials;
 
 namespace TerrariaXMario.Content.Consumables;
 
-internal class BeanDefense : ModItem, ISpawnableObject
+internal class BeanDefenseDown : ModItem
 {
-    internal static CapEffectsPlayer? CapEffectsPlayer(Player player) => player.GetModPlayerOrNull<CapEffectsPlayer>();
-
-    SpawnRarity ISpawnableObject.SpawnRarity { get; set; } = SpawnRarity.Rare;
     public override void SetStaticDefaults()
     {
         Item.ResearchUnlockCount = 30;
@@ -37,27 +34,30 @@ internal class BeanDefense : ModItem, ISpawnableObject
 
     public override bool? UseItem(Player player)
     {
-        CapEffectsPlayer(player)?.StatDefense += 1;
+        CapEffectsPlayer.IncreaseMaxStat(player, 2, -1);
         return true;
+    }
+
+    public override void AddRecipes()
+    {
+        Recipe.Create(Item.type)
+            .AddIngredient(ModContent.ItemType<StemBean>())
+            .Register();
     }
 }
 
-internal class BeanDefenseDown : BeanDefense
+internal class BeanDefense : BeanDefenseDown, ISpawnableObject
 {
-    public override void SetStaticDefaults()
-    {
-        base.SetStaticDefaults();
-        ItemID.Sets.FoodParticleColors[Item.type] = [new(50, 33, 9), new(149, 124, 107), new(181, 157, 132)];
-    }
+    SpawnRarity ISpawnableObject.SpawnRarity { get; set; } = SpawnRarity.Rare;
 
     public override bool? UseItem(Player player)
     {
-        CapEffectsPlayer(player)?.StatDefense -= 1;
+        CapEffectsPlayer.IncreaseMaxStat(player, 2, 1);
         return true;
     }
 }
 
-internal class BeanHP : BeanDefense
+internal class BeanHPDown : BeanDefenseDown
 {
     public override void SetStaticDefaults()
     {
@@ -67,27 +67,22 @@ internal class BeanHP : BeanDefense
 
     public override bool? UseItem(Player player)
     {
-        CapEffectsPlayer(player)?.StatHP += 1;
+        CapEffectsPlayer.IncreaseMaxStat(player, 1, -1);
         return true;
     }
 }
 
-internal class BeanHPDown : BeanDefense
+internal class BeanHP : BeanHPDown, ISpawnableObject
 {
-    public override void SetStaticDefaults()
-    {
-        base.SetStaticDefaults();
-        ItemID.Sets.FoodParticleColors[Item.type] = [new(0, 116, 0), new(66, 223, 66), new(99, 255, 99)];
-    }
-
+    SpawnRarity ISpawnableObject.SpawnRarity { get; set; } = SpawnRarity.Rare;
     public override bool? UseItem(Player player)
     {
-        CapEffectsPlayer(player)?.StatHP -= 1;
+        CapEffectsPlayer.IncreaseMaxStat(player, 1, 1);
         return true;
     }
 }
 
-internal class BeanSP : BeanDefense
+internal class BeanSPDown : BeanDefenseDown
 {
     public override void SetStaticDefaults()
     {
@@ -97,27 +92,22 @@ internal class BeanSP : BeanDefense
 
     public override bool? UseItem(Player player)
     {
-        CapEffectsPlayer(player)?.maxSP += 1;
+        CapEffectsPlayer.IncreaseMaxStat(player, 0, -1);
         return true;
     }
 }
 
-internal class BeanSPDown : BeanDefense
+internal class BeanSP : BeanSPDown, ISpawnableObject
 {
-    public override void SetStaticDefaults()
-    {
-        base.SetStaticDefaults();
-        ItemID.Sets.FoodParticleColors[Item.type] = [new(107, 0, 206), new(214, 83, 247), new(255, 165, 247)];
-    }
-
+    SpawnRarity ISpawnableObject.SpawnRarity { get; set; } = SpawnRarity.Rare;
     public override bool? UseItem(Player player)
     {
-        CapEffectsPlayer(player)?.maxSP -= 1;
+        CapEffectsPlayer.IncreaseMaxStat(player, 0, 1);
         return true;
     }
 }
 
-internal class BeanPow : BeanDefense
+internal class BeanPowDown : BeanDefenseDown
 {
     public override void SetStaticDefaults()
     {
@@ -127,22 +117,17 @@ internal class BeanPow : BeanDefense
 
     public override bool? UseItem(Player player)
     {
-        CapEffectsPlayer(player)?.StatPower += 1;
+        CapEffectsPlayer.IncreaseMaxStat(player, 3, -1);
         return true;
     }
 }
 
-internal class BeanPowDown : BeanDefense
+internal class BeanPow : BeanPowDown, ISpawnableObject
 {
-    public override void SetStaticDefaults()
-    {
-        base.SetStaticDefaults();
-        ItemID.Sets.FoodParticleColors[Item.type] = [new(0, 75, 214), new(42, 206, 255), new(91, 239, 255)];
-    }
-
+    SpawnRarity ISpawnableObject.SpawnRarity { get; set; } = SpawnRarity.Rare;
     public override bool? UseItem(Player player)
     {
-        CapEffectsPlayer(player)?.StatPower -= 1;
+        CapEffectsPlayer.IncreaseMaxStat(player, 3, 1);
         return true;
     }
 }

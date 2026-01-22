@@ -18,10 +18,14 @@ internal class FrogSwimDrawLayer : PlayerDrawLayer
     {
         Player player = drawInfo.drawPlayer;
         CapEffectsPlayer? modPlayer = player.GetModPlayerOrNull<CapEffectsPlayer>();
+        int frame = modPlayer?.frogSwimFrame ?? 0;
+        int xOffset;
 
-        Vector2 position = player.MountedCenter - Main.screenPosition;
+        xOffset = frame == 2 ? 8 : 6;
+
+        Vector2 position = player.MountedCenter - Main.screenPosition - new Vector2(xOffset * player.direction, 3);
         position = new((int)position.X, (int)position.Y);
 
-        drawInfo.DrawDataCache.Add(new(ModContent.Request<Texture2D>($"{GetType().Namespace!.Replace(".", "/")}/FrogSwim{modPlayer?.currentCap ?? "Mario"}").Value, position, new Rectangle(0, 40 * (modPlayer?.frogSwimFrame ?? 0), 56, 40), Color.White, player.fullRotation, new Vector2(28, 20), 1, player.direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None));
+        drawInfo.DrawDataCache.Add(new(ModContent.Request<Texture2D>($"{GetType().Namespace!.Replace(".", "/")}/FrogSwim{modPlayer?.currentCap ?? "Mario"}").Value, position, new Rectangle(0, 40 * (frame), 56, 40), Color.White, player.fullRotation, new Vector2(28, 20), 1, player.direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None));
     }
 }

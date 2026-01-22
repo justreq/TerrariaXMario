@@ -70,7 +70,8 @@ internal class Boomerang : InteractiveWithObjectSpawnerTileProjectile
                 break;
             case State.Waiting:
                 stateTimer--;
-                if (stateTimer <= 0 || PlayerInput.Triggers.JustReleased.MouseRight) state = State.Returning;
+                Main.player[Projectile.owner].GetModPlayerOrNull<CapEffectsPlayer>()?.PowerupCharge -= 2;
+                if (stateTimer <= 0 || !PlayerInput.Triggers.Current.MouseRight) state = State.Returning;
                 break;
             case State.Returning:
                 Player player = Main.player[Projectile.owner];

@@ -64,9 +64,9 @@ internal class PowerupHUD : UIState
             spriteBatch.Draw(OverchargeBarTexture.Value, new Rectangle((int)position.X + 54, (int)position.Y, modPlayer.powerupChargeMax, 52), new Rectangle(66, 54, 2, 52), color);
             spriteBatch.Draw(OverchargeBarTexture.Value, new Rectangle((int)position.X + 54 + modPlayer.powerupChargeMax, (int)position.Y, 16, 52), new Rectangle(70, 54, 16, 52), color);
 
-            if (ModContent.TryFind(nameof(TerrariaXMario), modPlayer.CurrentPowerup.Name.Replace("Data", ""), out ModProjectile projectile))
+            if (ModContent.TryFind(nameof(TerrariaXMario), modPlayer.CurrentPowerup.Name + "Projectile", out ModProjectile projectile))
             {
-                if (OverchargeBarContainer.IsMouseHovering) Main.hoverItemName = $"{projectile.PrettyPrintName()}\nCharge: {modPlayer.PowerupCharge}/{modPlayer.powerupChargeMax}";
+                if (OverchargeBarContainer.IsMouseHovering) Main.hoverItemName = $"{projectile.DisplayName}\nCharge: {modPlayer.PowerupCharge}/{modPlayer.powerupChargeMax}";
 
                 spriteBatch.Draw(ModContent.Request<Texture2D>(projectile.Texture).Value, new Rectangle((int)position.X + 18, (int)position.Y + 14, 24, 24), new Rectangle(0, 0, projectile.Projectile.width, projectile.Projectile.height), Color.White);
 
@@ -116,8 +116,8 @@ internal class PowerupHUD : UIState
             return;
         }
 
-        if (modPlayer.PowerupCharge == 0) modPlayer.RemovePowerup();
-        modPlayer.PowerupCharge++;
+        if (modPlayer.PowerupCharge == 0) modPlayer?.shouldRemovePowerup = true;
+        else modPlayer?.PowerupCharge += 1;
 
         if (OverchargeBarContainer == null || AbilityContainer == null) return;
 

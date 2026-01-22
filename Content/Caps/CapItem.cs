@@ -4,14 +4,16 @@ using Terraria.ModLoader;
 using Terraria.Utilities;
 using TerrariaXMario.Common.BroInfoUI;
 using TerrariaXMario.Common.CapEffects;
+using TerrariaXMario.Common.SpawnableObject;
 using TerrariaXMario.Content.Powerups;
-using TerrariaXMario.Core;
 using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Caps;
 
-internal abstract class CapItem : ModItem
+internal abstract class CapItem : ModItem, ISpawnableObject
 {
+    SpawnRarity ISpawnableObject.SpawnRarity { get; set; } = SpawnRarity.Legendary;
+
     private void LoadEquipTextures(string variation = "", bool head = true, bool body = true, bool legs = true)
     {
         if (head) EquipLoader.AddEquipTexture(Mod, $"{Texture}{variation}_{EquipType.Head}", EquipType.Head, this, $"{Name}{variation}");
@@ -62,6 +64,7 @@ internal abstract class CapItem : ModItem
         SetupEquipTextures();
         SetupEquipTextures("GroundPound", false, false);
         SetupEquipTextures("Flying", false);
+        SetupEquipTextures("Statue", body: false, legs: false);
     }
 
     public override void SetDefaults()
@@ -87,6 +90,10 @@ internal abstract class CapItem : ModItem
         player.statDefense += capEffectsPlayer?.StatDefense ?? 0;
         player.statLifeMax2 += capEffectsPlayer?.StatHP ?? 0;
 
+        if (capEffectsPlayer?.shouldRemovePowerup ?? false) player.immune = true;
+
+        if (capEffectsPlayer?.flightState != FlightState.None) player.noFallDmg = true;
+
         if (Name == "Luigi") player.jumpSpeedBoost = 0.5f;
 
 
@@ -94,7 +101,7 @@ internal abstract class CapItem : ModItem
 
         if (capEffectsPlayer == null) return;
 
-        if (!capEffectsPlayer.GroundPounding && capEffectsPlayer.currentPowerupType != ModContent.GetInstance<FrogSuitData>().Type) player.spikedBoots = 1;
+        if (!capEffectsPlayer.GroundPounding && capEffectsPlayer.currentPowerupType != ModContent.GetInstance<FrogSuit>().Type) player.spikedBoots = 1;
 
         capEffectsPlayer.CurrentPowerup?.UpdateConsumed(player);
     }

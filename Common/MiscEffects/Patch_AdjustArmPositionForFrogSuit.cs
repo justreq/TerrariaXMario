@@ -30,7 +30,7 @@ internal class Patch_AdjustArmPositionForFrogSuit : BasePatch
         c.EmitLdloca(4);
         c.EmitDelegate((Player player, ref Vector2 position) =>
         {
-            position.Y += player.GetModPlayerOrNull<CapEffectsPlayer>()?.currentPowerupType == ModContent.GetInstance<FrogSuitData>().Type ? 10 : 0;
+            position.Y += player.GetModPlayerOrNull<CapEffectsPlayer>()?.currentPowerupType == ModContent.GetInstance<FrogSuit>().Type ? 10 : 0;
         });
     }
 
@@ -45,7 +45,7 @@ internal class Patch_AdjustArmPositionForFrogSuit : BasePatch
         c.EmitLdloca(2);
         c.EmitDelegate((Player player, ref Vector2 position) =>
         {
-            position.Y += player.GetModPlayerOrNull<CapEffectsPlayer>()?.currentPowerupType == ModContent.GetInstance<FrogSuitData>().Type ? 10 : 0;
+            position.Y += player.GetModPlayerOrNull<CapEffectsPlayer>()?.currentPowerupType == ModContent.GetInstance<FrogSuit>().Type ? 10 : 0;
         });
     }
 }

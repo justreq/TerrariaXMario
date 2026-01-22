@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ModLoader;
@@ -11,9 +10,10 @@ using TerrariaXMario.Utilities.Extensions;
 
 namespace TerrariaXMario.Content.Powerups;
 
-internal class SuperLeafData : Powerup
+internal class SuperLeaf : Powerup
 {
-    public override string Name => "SuperLeaf";
+    internal override int? ProjectileType => ModContent.ProjectileType<SuperLeafProjectile>();
+    internal override int? ItemType => ModContent.ItemType<SuperLeafItem>();
 
     internal override string EquipSound => $"{TerrariaXMario.Sounds}/PowerupEffects/TailPowerUp";
 
@@ -44,6 +44,7 @@ internal class SuperLeafData : Powerup
         SoundEngine.PlaySound(new($"{TerrariaXMario.Sounds}/PowerupEffects/TailSwipe") { Volume = 0.4f }, player.MountedCenter);
         modPlayer?.SetForceDirection(10, ForceArmMovementType.None, -player.direction);
         Projectile.NewProjectile(player.GetSource_Misc("TailSwipe"), player.MountedCenter, Vector2.Zero, ModContent.ProjectileType<TailSwipe>(), player.GetModPlayerOrNull<CapEffectsPlayer>()?.StatPower ?? 1, 7.5f, player.whoAmI);
+        modPlayer?.PowerupCharge -= 30;
     }
 
     internal override void OnJumpHeldDown(Player player)
@@ -92,9 +93,9 @@ internal class SuperLeafData : Powerup
     }
 }
 
-internal class SuperLeaf : PowerupProjectile
+internal class SuperLeafProjectile : PowerupProjectile
 {
-    internal override int? PowerupType => ModContent.GetInstance<SuperLeafData>().Type;
+    internal override int? PowerupType => ModContent.GetInstance<SuperLeaf>().Type;
     internal override string[] Caps => [nameof(Mario), nameof(Luigi)];
     internal override bool CanSpawn(Player player) => (player.ZoneForest || player.ZoneJungle) && Main.dayTime;
     internal override float SpawnUpSpeed => -5f;
@@ -115,4 +116,10 @@ internal class SuperLeaf : PowerupProjectile
         base.SetDefaults();
         Projectile.tileCollide = false;
     }
+}
+
+internal class SuperLeafItem : PowerupItem
+{
+    internal override int FrameCount => 2;
+    internal override int? PowerupType => ModContent.GetInstance<SuperLeaf>().Type;
 }

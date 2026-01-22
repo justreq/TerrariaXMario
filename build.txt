@@ -1,4 +1,5 @@
-displayName = [c/d91616:Mario] & [c/1b9504:Luigi]: Crossover (READ DESCRIPTION)
-author = Lacroix, Ray, Momlob, Lugnut
-version = 2026.0.0
+displayName = [c/d91616:Mario] & [c/1b9504:Luigi]: Crossover
+author = Lacroix
+version = 2026.0.1
 dllReferences = KBOFXCTask, StructureHelper
+homepage = https://github.com/justreq/TerrariaXMario/blob/master/README.md
